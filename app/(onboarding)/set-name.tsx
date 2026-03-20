@@ -1,0 +1,51 @@
+import { useState } from "react";
+import { View, Text, TextInput, TouchableOpacity } from "react-native";
+import { useRouter } from "expo-router";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useAuthStore } from "@/stores/useAuthStore";
+
+export default function SetNameScreen() {
+  const router = useRouter();
+  const { tutorType, setTutorName, completeOnboarding } = useAuthStore();
+  const [name, setName] = useState("");
+
+  const icon = tutorType === "cat" ? "cat" : "rabbit";
+  const color = tutorType === "cat" ? "#DAA520" : "#6B8E23";
+
+  const handleComplete = () => {
+    if (!name.trim()) return;
+    setTutorName(name.trim());
+    completeOnboarding();
+    router.replace("/");
+  };
+
+  return (
+    <View className="flex-1 bg-[#FFE2DE] px-6 justify-center items-center">
+      <MaterialCommunityIcons name={icon} size={80} color={color} />
+      <Text className="text-2xl font-bold text-[#5D4037] mt-4 mb-2">
+        튜터 이름을 지어주세요!
+      </Text>
+      <Text className="text-base text-[#8D6E63] mb-8">
+        나만의 특별한 이름을 붙여주세요
+      </Text>
+
+      <TextInput
+        className="w-full bg-[#FFF8F0] rounded-xl px-4 py-3 mb-8 text-lg text-center border border-[#F0D5C8]"
+        placeholder="이름을 입력하세요"
+        value={name}
+        onChangeText={setName}
+        maxLength={10}
+      />
+
+      <TouchableOpacity
+        className={`w-full py-4 rounded-xl items-center ${
+          name.trim() ? "bg-[#A0522D]" : "bg-[#CDAB8F]"
+        }`}
+        onPress={handleComplete}
+        disabled={!name.trim()}
+      >
+        <Text className="text-white text-lg font-bold">완료! 마을로 가기</Text>
+      </TouchableOpacity>
+    </View>
+  );
+}
