@@ -7,6 +7,7 @@ import {
   Alert,
   ActivityIndicator,
 } from "react-native";
+import { useRouter } from "expo-router";
 import { useAuthStore } from "@/stores/useAuthStore";
 
 const GRADES = [1, 2, 3];
@@ -15,6 +16,7 @@ export default function RegisterScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [selectedGrade, setSelectedGrade] = useState<number>(1);
+  const router = useRouter();
   const { register, isLoading, error, clearError } = useAuthStore();
 
   const handleRegister = async () => {
@@ -94,7 +96,7 @@ export default function RegisterScreen() {
       </View>
 
       <TouchableOpacity
-        className={`rounded-xl py-4 items-center ${isLoading ? "bg-[#CDAB8F]" : "bg-[#A0522D]"}`}
+        className={`rounded-xl py-4 items-center mb-4 ${isLoading ? "bg-[#CDAB8F]" : "bg-[#A0522D]"}`}
         onPress={handleRegister}
         disabled={isLoading}
       >
@@ -103,6 +105,16 @@ export default function RegisterScreen() {
         ) : (
           <Text className="text-white text-lg font-bold">가입하기</Text>
         )}
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        className="items-center py-2"
+        onPress={() => router.push("/(auth)/login")}
+        disabled={isLoading}
+      >
+        <Text className="text-[#A0522D] text-base">
+          이미 계정이 있으신가요? <Text className="font-bold">로그인</Text>
+        </Text>
       </TouchableOpacity>
     </View>
   );
