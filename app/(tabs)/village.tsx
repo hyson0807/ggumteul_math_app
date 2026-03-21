@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, ImageBackground } from "react-native";
+import { View, Text, ImageBackground } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useAuthStore } from "@/stores/useAuthStore";
 
@@ -22,28 +22,29 @@ export default function VillageScreen() {
       >
       <View className="flex-1 bg-transparent px-4 pt-4">
       {/* 유저 정보 바 */}
-      <View className="flex-row justify-between items-center mb-4">
-        <Text className="text-lg font-bold text-[#5D4037]">
-          {user?.name ?? "마을"}의 마을
-        </Text>
-        <View className="flex-row gap-3">
-          <View className="flex-row items-center bg-[#FFF8F0] rounded-full px-3 py-1">
-            <MaterialCommunityIcons name="star" size={18} color="#FFD700" />
-            <Text className="text-sm font-semibold text-[#5D4037] ml-1">
-              {user?.stars ?? 0}
-            </Text>
-          </View>
-          <View className="flex-row items-center bg-[#FFF8F0] rounded-full px-3 py-1">
-            <MaterialCommunityIcons name="circle" size={14} color="#DAA520" />
-            <Text className="text-sm font-semibold text-[#5D4037] ml-1">
-              {user?.coins ?? 0}
-            </Text>
-          </View>
+      <View className="flex-row items-center bg-white/90 rounded-2xl px-4 py-2 mb-4 border border-[#E8D5C4]">
+        {/* 아바타 */}
+        <View className="w-8 h-8 rounded-full bg-[#FFE0B2] items-center justify-center">
+          <MaterialCommunityIcons name="account" size={20} color="#8D6E63" />
         </View>
+        {/* 이름 */}
+        <Text className="text-sm font-bold text-[#5D4037] ml-2">
+          {user?.name ?? "마을"}
+        </Text>
+        {/* 구분선 */}
+        <View className="w-[1px] h-4 bg-[#D4C4B0] mx-3" />
+        {/* 별 */}
+        <Text className="text-xs text-[#8D6E63]">별 획득: </Text>
+        <Text className="text-xs font-bold text-[#5D4037]">{user?.stars ?? 0}</Text>
+        <MaterialCommunityIcons name="star" size={16} color="#FFD700" style={{ marginLeft: 2 }} />
+        {/* 코인 */}
+        <Text className="text-xs text-[#8D6E63] ml-3">코인: </Text>
+        <Text className="text-xs font-bold text-[#5D4037]">{user?.coins ?? 0}</Text>
+        <MaterialCommunityIcons name="circle" size={14} color="#DAA520" style={{ marginLeft: 2 }} />
       </View>
 
       {/* 마을 맵 - 2x2 건물 그리드 */}
-      <View className="flex-1 mb-4">
+      <View className="flex-1 mb-4 mt-20">
         <View className="flex-row flex-wrap gap-3 justify-between">
           {BUILDINGS.map((building) => (
             <View
@@ -68,18 +69,6 @@ export default function VillageScreen() {
         </View>
       </View>
 
-      {/* 하단: 학습 진행도 + CTA */}
-      <View className="bg-[#FFF8F0] rounded-2xl p-4 mb-3 border border-[#F0D5C8]">
-        <Text className="text-sm text-[#8D6E63] mb-2">오늘의 학습</Text>
-        <View className="bg-[#F0D5C8] rounded-full h-3 mb-2">
-          <View className="bg-[#6B8E23] rounded-full h-3 w-0" />
-        </View>
-        <Text className="text-xs text-[#CDAB8F]">0 / 5 문제 완료</Text>
-      </View>
-
-      <TouchableOpacity className="bg-[#C0392B] rounded-2xl py-4 items-center mb-6">
-        <Text className="text-white text-lg font-bold">문제 풀러 가기!</Text>
-      </TouchableOpacity>
       </View>
       </ImageBackground>
     </View>
