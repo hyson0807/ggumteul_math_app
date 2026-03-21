@@ -1,8 +1,8 @@
 import axios from "axios";
 import { tokenService } from "./token";
 
-// TODO: 배포 시 실제 서버 URL로 변경
-const API_BASE_URL = "http://localhost:3001";
+// TODO: 배포 시 환경변수로 변경 (HTTPS 필수)
+export const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:3000";
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -20,10 +20,10 @@ api.interceptors.request.use((config) => {
 
 // Response: 401 시 refresh 자동 시도
 let isRefreshing = false;
-let failedQueue: Array<{
+let failedQueue: {
   resolve: (token: string) => void;
   reject: (error: unknown) => void;
-}> = [];
+}[] = [];
 
 const processQueue = (error: unknown, token: string | null) => {
   failedQueue.forEach((prom) => {
@@ -83,5 +83,12 @@ api.interceptors.response.use(
     }
   },
 );
+
+export function getApiErrorMessage(error: unknown, fallback: string): string {
+  if (axios.isAxiosError(error)) {
+    return error.response?.data?.message ?? fallback;
+  }
+  return fallback;
+}
 
 export default api;

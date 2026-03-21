@@ -1,9 +1,11 @@
 import { create } from "zustand";
 import { authApi, User } from "@/services/auth";
 import { tokenService } from "@/services/token";
+import { getApiErrorMessage } from "@/services/api";
 
 interface AuthState {
   isAuthenticated: boolean;
+  isInitialized: boolean;
   isLoading: boolean;
   error: string | null;
   user: User | null;
@@ -19,7 +21,8 @@ interface AuthState {
 
 export const useAuthStore = create<AuthState>((set) => ({
   isAuthenticated: false,
-  isLoading: true,
+  isInitialized: false,
+  isLoading: false,
   error: null,
   user: null,
 
@@ -27,15 +30,15 @@ export const useAuthStore = create<AuthState>((set) => ({
     try {
       const refreshToken = await tokenService.getRefreshToken();
       if (!refreshToken) {
-        set({ isLoading: false });
+        set({ isInitialized: true });
         return;
       }
 
       const { user } = await authApi.refresh(refreshToken);
-      set({ isAuthenticated: true, user, isLoading: false });
+      set({ isAuthenticated: true, user, isInitialized: true });
     } catch {
       await tokenService.clearAll();
-      set({ isAuthenticated: false, user: null, isLoading: false });
+      set({ isAuthenticated: false, user: null, isInitialized: true });
     }
   },
 
@@ -44,10 +47,8 @@ export const useAuthStore = create<AuthState>((set) => ({
     try {
       const { user } = await authApi.login(email, password);
       set({ isAuthenticated: true, user, isLoading: false });
-    } catch (e: any) {
-      const message =
-        e.response?.data?.message || "로그인에 실패했습니다.";
-      set({ isLoading: false, error: message });
+    } catch (e: unknown) {
+      set({ isLoading: false, error: getApiErrorMessage(e, "로그인에 실패했습니다.") });
       throw e;
     }
   },
@@ -57,10 +58,8 @@ export const useAuthStore = create<AuthState>((set) => ({
     try {
       const { user } = await authApi.register(email, password, grade);
       set({ isAuthenticated: true, user, isLoading: false });
-    } catch (e: any) {
-      const message =
-        e.response?.data?.message || "회원가입에 실패했습니다.";
-      set({ isLoading: false, error: message });
+    } catch (e: unknown) {
+      set({ isLoading: false, error: getApiErrorMessage(e, "회원가입에 실패했습니다.") });
       throw e;
     }
   },
@@ -74,8 +73,13 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   deleteAccount: async () => {
-    await authApi.deleteAccount();
-    set({ isAuthenticated: false, user: null, error: null });
+    try {
+      await authApi.deleteAccount();
+      set({ isAuthenticated: false, user: null, error: null });
+    } catch (e: unknown) {
+      set({ error: getApiErrorMessage(e, "계정 삭제에 실패했습니다.") });
+      throw e;
+    }
   },
 
   updateProfile: async (data) => {

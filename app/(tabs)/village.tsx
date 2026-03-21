@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, ImageBackground } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useAuthStore } from "@/stores/useAuthStore";
 
@@ -13,7 +13,14 @@ export default function VillageScreen() {
   const user = useAuthStore((s) => s.user);
 
   return (
-    <View className="flex-1 bg-transparent px-6 pt-4">
+    <View className="flex-1 p-2">
+      <ImageBackground
+        source={require("@/assets/images/village.png")}
+        className="flex-1"
+        imageStyle={{ borderRadius: 16 }}
+        resizeMode="cover"
+      >
+      <View className="flex-1 bg-transparent px-4 pt-4">
       {/* 유저 정보 바 */}
       <View className="flex-row justify-between items-center mb-4">
         <Text className="text-lg font-bold text-[#5D4037]">
@@ -73,6 +80,8 @@ export default function VillageScreen() {
       <TouchableOpacity className="bg-[#C0392B] rounded-2xl py-4 items-center mb-6">
         <Text className="text-white text-lg font-bold">문제 풀러 가기!</Text>
       </TouchableOpacity>
+      </View>
+      </ImageBackground>
     </View>
   );
 }

@@ -1,15 +1,12 @@
 import { View, Text, TouchableOpacity, Alert } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
 import { useAuthStore } from "@/stores/useAuthStore";
 
 export default function ProfileScreen() {
-  const router = useRouter();
   const { user, logout, deleteAccount } = useAuthStore();
 
   const handleLogout = async () => {
     await logout();
-    router.replace("/");
   };
 
   const handleDeleteAccount = () => {
@@ -23,7 +20,6 @@ export default function ProfileScreen() {
           style: "destructive",
           onPress: async () => {
             await deleteAccount();
-            router.replace("/");
           },
         },
       ],

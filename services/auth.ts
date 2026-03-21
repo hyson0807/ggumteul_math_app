@@ -1,4 +1,5 @@
-import api from "./api";
+import axios from "axios";
+import api, { API_BASE_URL } from "./api";
 import { tokenService } from "./token";
 
 export interface User {
@@ -45,9 +46,12 @@ export const authApi = {
   },
 
   refresh: async (refreshToken: string) => {
-    const { data } = await api.post<AuthResponse>("/auth/refresh", {
-      refreshToken,
-    });
+    // 인터셉터를 우회하여 이중 refresh 방지
+    const { data } = await axios.post<AuthResponse>(
+      `${API_BASE_URL}/auth/refresh`,
+      { refreshToken },
+      { timeout: 10_000 },
+    );
     await saveTokens(data);
     return data;
   },

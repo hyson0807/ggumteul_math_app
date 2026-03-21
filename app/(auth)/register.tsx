@@ -7,7 +7,6 @@ import {
   Alert,
   ActivityIndicator,
 } from "react-native";
-import { useRouter } from "expo-router";
 import { useAuthStore } from "@/stores/useAuthStore";
 
 const GRADES = [1, 2, 3];
@@ -16,7 +15,6 @@ export default function RegisterScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [selectedGrade, setSelectedGrade] = useState<number>(1);
-  const router = useRouter();
   const { register, isLoading, error, clearError } = useAuthStore();
 
   const handleRegister = async () => {
@@ -31,7 +29,6 @@ export default function RegisterScreen() {
     clearError();
     try {
       await register(email, password, selectedGrade);
-      router.replace("/");
     } catch {}
   };
 

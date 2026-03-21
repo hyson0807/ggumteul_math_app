@@ -25,7 +25,6 @@ export default function LoginScreen() {
     clearError();
     try {
       await login(email, password);
-      router.replace("/");
     } catch {}
   };
 
