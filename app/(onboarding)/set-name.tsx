@@ -1,32 +1,48 @@
 import { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  ActivityIndicator,
+  Alert,
+} from "react-native";
 import { useRouter } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useAuthStore } from "@/stores/useAuthStore";
 
 export default function SetNameScreen() {
   const router = useRouter();
-  const { tutorType, setTutorName, completeOnboarding } = useAuthStore();
+  const user = useAuthStore((s) => s.user);
+  const updateProfile = useAuthStore((s) => s.updateProfile);
   const [name, setName] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
+  const tutorType = user?.tutorType;
   const icon = tutorType === "cat" ? "cat" : "rabbit";
   const color = tutorType === "cat" ? "#DAA520" : "#6B8E23";
 
-  const handleComplete = () => {
+  const handleComplete = async () => {
     if (!name.trim()) return;
-    setTutorName(name.trim());
-    completeOnboarding();
-    router.replace("/");
+    setIsLoading(true);
+    try {
+      await updateProfile({ name: name.trim() });
+      router.replace("/");
+    } catch {
+      Alert.alert("오류", "저장에 실패했습니다. 다시 시도해주세요.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <View className="flex-1 bg-[#FFE2DE] px-6 justify-center items-center">
       <MaterialCommunityIcons name={icon} size={80} color={color} />
       <Text className="text-2xl font-bold text-[#5D4037] mt-4 mb-2">
-        튜터 이름을 지어주세요!
+        이름을 알려주세요!
       </Text>
       <Text className="text-base text-[#8D6E63] mb-8">
-        나만의 특별한 이름을 붙여주세요
+        마을에서 사용할 이름을 입력해주세요
       </Text>
 
       <TextInput
@@ -35,16 +51,23 @@ export default function SetNameScreen() {
         value={name}
         onChangeText={setName}
         maxLength={10}
+        editable={!isLoading}
       />
 
       <TouchableOpacity
         className={`w-full py-4 rounded-xl items-center ${
-          name.trim() ? "bg-[#A0522D]" : "bg-[#CDAB8F]"
+          name.trim() && !isLoading ? "bg-[#A0522D]" : "bg-[#CDAB8F]"
         }`}
         onPress={handleComplete}
-        disabled={!name.trim()}
+        disabled={!name.trim() || isLoading}
       >
-        <Text className="text-white text-lg font-bold">완료! 마을로 가기</Text>
+        {isLoading ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Text className="text-white text-lg font-bold">
+            완료! 마을로 가기
+          </Text>
+        )}
       </TouchableOpacity>
     </View>
   );

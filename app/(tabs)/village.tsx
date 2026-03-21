@@ -10,23 +10,27 @@ const BUILDINGS = [
 ];
 
 export default function VillageScreen() {
-  const { tutorName } = useAuthStore();
+  const user = useAuthStore((s) => s.user);
 
   return (
     <View className="flex-1 bg-transparent px-6 pt-4">
       {/* 유저 정보 바 */}
       <View className="flex-row justify-between items-center mb-4">
         <Text className="text-lg font-bold text-[#5D4037]">
-          {tutorName}의 마을
+          {user?.name ?? "마을"}의 마을
         </Text>
         <View className="flex-row gap-3">
           <View className="flex-row items-center bg-[#FFF8F0] rounded-full px-3 py-1">
             <MaterialCommunityIcons name="star" size={18} color="#FFD700" />
-            <Text className="text-sm font-semibold text-[#5D4037] ml-1">0</Text>
+            <Text className="text-sm font-semibold text-[#5D4037] ml-1">
+              {user?.stars ?? 0}
+            </Text>
           </View>
           <View className="flex-row items-center bg-[#FFF8F0] rounded-full px-3 py-1">
             <MaterialCommunityIcons name="circle" size={14} color="#DAA520" />
-            <Text className="text-sm font-semibold text-[#5D4037] ml-1">0</Text>
+            <Text className="text-sm font-semibold text-[#5D4037] ml-1">
+              {user?.coins ?? 0}
+            </Text>
           </View>
         </View>
       </View>

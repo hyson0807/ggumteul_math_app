@@ -1,15 +1,33 @@
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, Alert } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useAuthStore } from "@/stores/useAuthStore";
 
 export default function ProfileScreen() {
   const router = useRouter();
-  const { userEmail, userGrade, tutorName, logout } = useAuthStore();
+  const { user, logout, deleteAccount } = useAuthStore();
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     router.replace("/");
+  };
+
+  const handleDeleteAccount = () => {
+    Alert.alert(
+      "회원 탈퇴",
+      "정말 탈퇴하시겠습니까? 모든 데이터가 삭제되며 복구할 수 없습니다.",
+      [
+        { text: "취소", style: "cancel" },
+        {
+          text: "탈퇴하기",
+          style: "destructive",
+          onPress: async () => {
+            await deleteAccount();
+            router.replace("/");
+          },
+        },
+      ],
+    );
   };
 
   return (
@@ -19,11 +37,17 @@ export default function ProfileScreen() {
       {/* 사용자 정보 카드 */}
       <View className="bg-[#FFF8F0] rounded-2xl p-5 mb-4 items-center border border-[#F0D5C8]">
         <View className="w-20 h-20 rounded-full bg-transparent items-center justify-center mb-3">
-          <MaterialCommunityIcons name="account-circle" size={40} color="#A0522D" />
+          <MaterialCommunityIcons
+            name="account-circle"
+            size={40}
+            color="#A0522D"
+          />
         </View>
-        <Text className="text-lg font-bold text-[#5D4037]">{userEmail}</Text>
+        <Text className="text-lg font-bold text-[#5D4037]">
+          {user?.name ?? user?.email}
+        </Text>
         <Text className="text-sm text-[#8D6E63] mt-1">
-          {userGrade}학년 · 튜터: {tutorName}
+          {user?.grade}학년 · Lv.{user?.level}
         </Text>
       </View>
 
@@ -50,11 +74,19 @@ export default function ProfileScreen() {
 
       {/* 로그아웃 */}
       <TouchableOpacity
-        className="bg-[#FFF8F0] rounded-2xl p-4 flex-row items-center justify-center border border-[#CD5C5C]"
+        className="bg-[#FFF8F0] rounded-2xl p-4 flex-row items-center justify-center border border-[#F0D5C8] mb-3"
         onPress={handleLogout}
       >
-        <MaterialCommunityIcons name="logout" size={20} color="#CD5C5C" />
-        <Text className="text-[#CD5C5C] font-semibold ml-2">로그아웃</Text>
+        <MaterialCommunityIcons name="logout" size={20} color="#8D6E63" />
+        <Text className="text-[#8D6E63] font-semibold ml-2">로그아웃</Text>
+      </TouchableOpacity>
+
+      {/* 회원 탈퇴 */}
+      <TouchableOpacity
+        className="rounded-2xl p-4 flex-row items-center justify-center"
+        onPress={handleDeleteAccount}
+      >
+        <Text className="text-[#CDAB8F] text-sm">회원 탈퇴</Text>
       </TouchableOpacity>
     </View>
   );

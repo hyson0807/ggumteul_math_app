@@ -1,5 +1,12 @@
 import { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Alert,
+  ActivityIndicator,
+} from "react-native";
 import { useRouter } from "expo-router";
 import { useAuthStore } from "@/stores/useAuthStore";
 
@@ -10,15 +17,22 @@ export default function RegisterScreen() {
   const [password, setPassword] = useState("");
   const [selectedGrade, setSelectedGrade] = useState<number>(1);
   const router = useRouter();
-  const register = useAuthStore((s) => s.register);
+  const { register, isLoading, error, clearError } = useAuthStore();
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
     if (!email || !password) {
       Alert.alert("알림", "이메일과 비밀번호를 입력해주세요.");
       return;
     }
-    register(email, password, selectedGrade);
-    router.replace("/");
+    if (password.length < 6) {
+      Alert.alert("알림", "비밀번호는 6자 이상이어야 합니다.");
+      return;
+    }
+    clearError();
+    try {
+      await register(email, password, selectedGrade);
+      router.replace("/");
+    } catch {}
   };
 
   return (
@@ -26,6 +40,12 @@ export default function RegisterScreen() {
       <Text className="text-2xl font-bold text-center text-[#8B6914] mb-8">
         회원가입
       </Text>
+
+      {error && (
+        <View className="bg-[#FDECEA] rounded-xl px-4 py-3 mb-4">
+          <Text className="text-[#CD5C5C] text-sm text-center">{error}</Text>
+        </View>
+      )}
 
       <Text className="text-sm font-semibold text-[#5D4037] mb-1">이메일</Text>
       <TextInput
@@ -35,6 +55,7 @@ export default function RegisterScreen() {
         onChangeText={setEmail}
         keyboardType="email-address"
         autoCapitalize="none"
+        editable={!isLoading}
       />
 
       <Text className="text-sm font-semibold text-[#5D4037] mb-1">
@@ -42,10 +63,11 @@ export default function RegisterScreen() {
       </Text>
       <TextInput
         className="bg-[#FFF8F0] rounded-xl px-4 py-3 mb-4 text-base border border-[#F0D5C8]"
-        placeholder="비밀번호를 입력하세요"
+        placeholder="비밀번호를 입력하세요 (6자 이상)"
         value={password}
         onChangeText={setPassword}
         secureTextEntry
+        editable={!isLoading}
       />
 
       <Text className="text-sm font-semibold text-[#5D4037] mb-2">
@@ -61,6 +83,7 @@ export default function RegisterScreen() {
                 : "bg-[#FFF8F0] border-[#F0D5C8]"
             }`}
             onPress={() => setSelectedGrade(grade)}
+            disabled={isLoading}
           >
             <Text
               className={`text-lg font-bold ${
@@ -74,10 +97,15 @@ export default function RegisterScreen() {
       </View>
 
       <TouchableOpacity
-        className="bg-[#A0522D] rounded-xl py-4 items-center"
+        className={`rounded-xl py-4 items-center ${isLoading ? "bg-[#CDAB8F]" : "bg-[#A0522D]"}`}
         onPress={handleRegister}
+        disabled={isLoading}
       >
-        <Text className="text-white text-lg font-bold">가입하기</Text>
+        {isLoading ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Text className="text-white text-lg font-bold">가입하기</Text>
+        )}
       </TouchableOpacity>
     </View>
   );

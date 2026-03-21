@@ -2,13 +2,13 @@ import { Redirect } from "expo-router";
 import { useAuthStore } from "@/stores/useAuthStore";
 
 export default function Index() {
-  const { isAuthenticated, isOnboarded } = useAuthStore();
+  const { isAuthenticated, user } = useAuthStore();
 
   if (!isAuthenticated) {
     return <Redirect href="/(auth)/login" />;
   }
 
-  if (!isOnboarded) {
+  if (!user?.tutorType) {
     return <Redirect href="/(onboarding)/select-tutor" />;
   }
 

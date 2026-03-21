@@ -1,56 +1,87 @@
 import { create } from "zustand";
+import { authApi, User } from "@/services/auth";
+import { tokenService } from "@/services/token";
 
 interface AuthState {
   isAuthenticated: boolean;
-  isOnboarded: boolean;
-  tutorType: "cat" | "rabbit" | null;
-  tutorName: string;
-  userEmail: string;
-  userGrade: number;
+  isLoading: boolean;
+  error: string | null;
+  user: User | null;
 
-  login: (email: string, password: string) => void;
-  register: (email: string, password: string, grade: number) => void;
-  logout: () => void;
-  selectTutor: (type: "cat" | "rabbit") => void;
-  setTutorName: (name: string) => void;
-  completeOnboarding: () => void;
+  initialize: () => Promise<void>;
+  login: (email: string, password: string) => Promise<void>;
+  register: (email: string, password: string, grade: number) => Promise<void>;
+  logout: () => Promise<void>;
+  deleteAccount: () => Promise<void>;
+  updateProfile: (data: { name?: string; tutorType?: string }) => Promise<void>;
+  clearError: () => void;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
   isAuthenticated: false,
-  isOnboarded: false,
-  tutorType: null,
-  tutorName: "",
-  userEmail: "",
-  userGrade: 1,
+  isLoading: true,
+  error: null,
+  user: null,
 
-  login: (_email: string, _password: string) => {
-    set({ isAuthenticated: true, userEmail: _email });
+  initialize: async () => {
+    try {
+      const refreshToken = await tokenService.getRefreshToken();
+      if (!refreshToken) {
+        set({ isLoading: false });
+        return;
+      }
+
+      const { user } = await authApi.refresh(refreshToken);
+      set({ isAuthenticated: true, user, isLoading: false });
+    } catch {
+      await tokenService.clearAll();
+      set({ isAuthenticated: false, user: null, isLoading: false });
+    }
   },
 
-  register: (email: string, _password: string, grade: number) => {
-    set({ isAuthenticated: true, userEmail: email, userGrade: grade });
+  login: async (email, password) => {
+    set({ isLoading: true, error: null });
+    try {
+      const { user } = await authApi.login(email, password);
+      set({ isAuthenticated: true, user, isLoading: false });
+    } catch (e: any) {
+      const message =
+        e.response?.data?.message || "로그인에 실패했습니다.";
+      set({ isLoading: false, error: message });
+      throw e;
+    }
   },
 
-  logout: () => {
-    set({
-      isAuthenticated: false,
-      isOnboarded: false,
-      tutorType: null,
-      tutorName: "",
-      userEmail: "",
-    });
+  register: async (email, password, grade) => {
+    set({ isLoading: true, error: null });
+    try {
+      const { user } = await authApi.register(email, password, grade);
+      set({ isAuthenticated: true, user, isLoading: false });
+    } catch (e: any) {
+      const message =
+        e.response?.data?.message || "회원가입에 실패했습니다.";
+      set({ isLoading: false, error: message });
+      throw e;
+    }
   },
 
-  selectTutor: (type) => {
-    set({ tutorType: type });
+  logout: async () => {
+    try {
+      await authApi.logout();
+    } finally {
+      set({ isAuthenticated: false, user: null, error: null });
+    }
   },
 
-  setTutorName: (name) => {
-    set({ tutorName: name });
+  deleteAccount: async () => {
+    await authApi.deleteAccount();
+    set({ isAuthenticated: false, user: null, error: null });
   },
 
-  completeOnboarding: () => {
-    set({ isOnboarded: true });
+  updateProfile: async (data) => {
+    const user = await authApi.updateProfile(data);
+    set({ user });
   },
+
+  clearError: () => set({ error: null }),
 }));
