@@ -7,9 +7,10 @@ import {
   Alert,
   ActivityIndicator,
   Platform,
+  Image,
 } from "react-native";
 import { useRouter } from "expo-router";
-import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import Svg, { Path } from "react-native-svg";
 import * as AppleAuthentication from "expo-apple-authentication";
 import {
@@ -134,18 +135,14 @@ export default function LoginScreen() {
     <View className="flex-1 bg-[#FFE2DE] px-6 justify-center">
       {/* 로고 */}
       <View className="items-center mb-2">
-        <MaterialCommunityIcons name="home-group" size={56} color="#8B6914" />
+        <Image
+          source={require("@/assets/images/math-tree.png")}
+          style={{ width: 180, height: 180 }}
+          resizeMode="contain"
+        />
       </View>
-      <Text className="text-3xl font-bold text-center text-[#8B6914]">
-        수학마을
-      </Text>
-      <Text className="text-base text-center text-[#8D6E63] mb-8">
+      <Text className="text-base text-center text-[#8D6E63] mb-6">
         수학으로 마을을 꾸며보세요!
-      </Text>
-
-      {/* 헤더 */}
-      <Text className="text-2xl font-bold text-center text-[#5D4037] mb-6">
-        로그인
       </Text>
 
       {error && (
