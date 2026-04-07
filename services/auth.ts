@@ -26,11 +26,10 @@ const saveTokens = async (data: AuthResponse) => {
 };
 
 export const authApi = {
-  register: async (email: string, password: string, grade: number) => {
+  register: async (email: string, password: string) => {
     const { data } = await api.post<AuthResponse>("/auth/register", {
       email,
       password,
-      grade,
     });
     await saveTokens(data);
     return data;

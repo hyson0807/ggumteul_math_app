@@ -12,7 +12,7 @@ interface AuthState {
 
   initialize: () => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string, grade: number) => Promise<void>;
+  register: (email: string, password: string) => Promise<void>;
   googleSignIn: (idToken: string) => Promise<void>;
   appleSignIn: (params: {
     identityToken: string;
@@ -91,10 +91,10 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
   },
 
-  register: async (email, password, grade) => {
+  register: async (email, password) => {
     set({ isLoading: true, error: null });
     try {
-      const { user } = await authApi.register(email, password, grade);
+      const { user } = await authApi.register(email, password);
       set({ isAuthenticated: true, user, isLoading: false });
     } catch (e: unknown) {
       set({ isLoading: false, error: getApiErrorMessage(e, "회원가입에 실패했습니다.") });
