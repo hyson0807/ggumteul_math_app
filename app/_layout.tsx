@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { Stack, useSegments, useRouter } from "expo-router";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { useAuthStore } from "@/stores/useAuthStore";
+import { Toast } from "@/components/common/Toast";
 import { View, ActivityIndicator } from "react-native";
 
 export default function RootLayout() {
@@ -58,6 +59,7 @@ export default function RootLayout() {
         <Stack.Screen name="(onboarding)" />
         <Stack.Screen name="(tabs)" />
       </Stack>
+      <Toast />
     </SafeAreaProvider>
   );
 }
