@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -8,6 +8,8 @@ import {
   ActivityIndicator,
   Platform,
   Image,
+  Animated,
+  Easing,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
@@ -23,6 +25,98 @@ GoogleSignin.configure({
   iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
   webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
 });
+
+type FloatingItem = {
+  char: string;
+  left: string;
+  top: string;
+  size: number;
+  color: string;
+  duration: number;
+  delay: number;
+  range: number;
+};
+
+const FLOATING_ITEMS: FloatingItem[] = [
+  { char: "+", left: "8%", top: "6%", size: 38, color: "#DAA520", duration: 4200, delay: 0, range: 18 },
+  { char: "3", left: "82%", top: "10%", size: 44, color: "#CD5C5C", duration: 5200, delay: 600, range: 22 },
+  { char: "×", left: "70%", top: "30%", size: 32, color: "#6B8E23", duration: 4600, delay: 1200, range: 16 },
+  { char: "7", left: "5%", top: "32%", size: 36, color: "#A0522D", duration: 5000, delay: 300, range: 20 },
+  { char: "−", left: "88%", top: "48%", size: 40, color: "#DAA520", duration: 4400, delay: 900, range: 18 },
+  { char: "5", left: "12%", top: "56%", size: 34, color: "#CD5C5C", duration: 5400, delay: 200, range: 22 },
+  { char: "÷", left: "78%", top: "70%", size: 36, color: "#6B8E23", duration: 4800, delay: 1500, range: 18 },
+  { char: "9", left: "3%", top: "78%", size: 42, color: "#A0522D", duration: 5200, delay: 700, range: 20 },
+  { char: "=", left: "85%", top: "88%", size: 32, color: "#DAA520", duration: 4500, delay: 1100, range: 16 },
+  { char: "2", left: "20%", top: "92%", size: 38, color: "#CD5C5C", duration: 5100, delay: 400, range: 20 },
+];
+
+function FloatingMathItem({ item }: { item: FloatingItem }) {
+  const translateY = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    let mounted = true;
+    const start = () => {
+      if (!mounted) return;
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(translateY, {
+            toValue: -item.range,
+            duration: item.duration,
+            easing: Easing.inOut(Easing.sin),
+            useNativeDriver: true,
+          }),
+          Animated.timing(translateY, {
+            toValue: item.range,
+            duration: item.duration,
+            easing: Easing.inOut(Easing.sin),
+            useNativeDriver: true,
+          }),
+        ]),
+      ).start();
+    };
+    const t = setTimeout(start, item.delay);
+    return () => {
+      mounted = false;
+      clearTimeout(t);
+    };
+  }, [translateY, item.duration, item.delay, item.range]);
+
+  return (
+    <Animated.Text
+      style={{
+        position: "absolute",
+        left: item.left as `${number}%`,
+        top: item.top as `${number}%`,
+        fontSize: item.size,
+        color: item.color,
+        opacity: 0.18,
+        fontWeight: "900",
+        transform: [{ translateY }],
+      }}
+    >
+      {item.char}
+    </Animated.Text>
+  );
+}
+
+function FloatingMathBackground() {
+  return (
+    <View
+      pointerEvents="none"
+      style={{
+        position: "absolute",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+      }}
+    >
+      {FLOATING_ITEMS.map((item, idx) => (
+        <FloatingMathItem key={idx} item={item} />
+      ))}
+    </View>
+  );
+}
 
 const GoogleGLogo = ({ size = 26 }: { size?: number }) => (
   <Svg width={size} height={size} viewBox="0 0 24 24">
@@ -133,6 +227,7 @@ export default function LoginScreen() {
 
   return (
     <View className="flex-1 bg-[#FFE2DE] px-6 justify-center">
+      <FloatingMathBackground />
       {/* 로고 */}
       <View className="items-center mb-2">
         <Image
