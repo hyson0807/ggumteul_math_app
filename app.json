@@ -10,7 +10,9 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.hyson.math-village-app"
+      "bundleIdentifier": "com.hyson.math-village-app",
+      "usesAppleSignIn": true,
+      "appleTeamId": "REPLACE_WITH_APPLE_TEAM_ID"
     },
     "android": {
       "adaptiveIcon": {
@@ -20,7 +22,9 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "googleServicesFile": "./google-services.json",
+      "package": "com.hyson.mathvillageapp"
     },
     "web": {
       "output": "static",
@@ -40,7 +44,14 @@
           }
         }
       ],
-      "expo-secure-store"
+      "expo-secure-store",
+      "expo-apple-authentication",
+      [
+        "@react-native-google-signin/google-signin",
+        {
+          "iosUrlScheme": "com.googleusercontent.apps.90199202530-d2g716susi8esg5ho07kk0vc7osgiqif"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

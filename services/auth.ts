@@ -6,7 +6,7 @@ export interface User {
   id: string;
   email: string;
   name: string | null;
-  grade: number;
+  grade: number | null;
   level: number;
   coins: number;
   stars: number;
@@ -45,6 +45,22 @@ export const authApi = {
     return data;
   },
 
+  googleSignIn: async (idToken: string) => {
+    const { data } = await api.post<AuthResponse>("/auth/google", { idToken });
+    await saveTokens(data);
+    return data;
+  },
+
+  appleSignIn: async (params: {
+    identityToken: string;
+    fullName?: string;
+    email?: string;
+  }) => {
+    const { data } = await api.post<AuthResponse>("/auth/apple", params);
+    await saveTokens(data);
+    return data;
+  },
+
   refresh: async (refreshToken: string) => {
     // 인터셉터를 우회하여 이중 refresh 방지
     const { data } = await axios.post<AuthResponse>(
@@ -69,7 +85,11 @@ export const authApi = {
     return data;
   },
 
-  updateProfile: async (body: { name?: string; tutorType?: string }) => {
+  updateProfile: async (body: {
+    name?: string;
+    tutorType?: string;
+    grade?: number;
+  }) => {
     const { data } = await api.patch<User>("/users/me", body);
     return data;
   },

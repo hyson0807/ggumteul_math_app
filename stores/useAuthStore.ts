@@ -13,9 +13,19 @@ interface AuthState {
   initialize: () => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string, grade: number) => Promise<void>;
+  googleSignIn: (idToken: string) => Promise<void>;
+  appleSignIn: (params: {
+    identityToken: string;
+    fullName?: string;
+    email?: string;
+  }) => Promise<void>;
   logout: () => Promise<void>;
   deleteAccount: () => Promise<void>;
-  updateProfile: (data: { name?: string; tutorType?: string }) => Promise<void>;
+  updateProfile: (data: {
+    name?: string;
+    tutorType?: string;
+    grade?: number;
+  }) => Promise<void>;
   clearError: () => void;
 }
 
@@ -49,6 +59,34 @@ export const useAuthStore = create<AuthState>((set) => ({
       set({ isAuthenticated: true, user, isLoading: false });
     } catch (e: unknown) {
       set({ isLoading: false, error: getApiErrorMessage(e, "로그인에 실패했습니다.") });
+      throw e;
+    }
+  },
+
+  googleSignIn: async (idToken) => {
+    set({ isLoading: true, error: null });
+    try {
+      const { user } = await authApi.googleSignIn(idToken);
+      set({ isAuthenticated: true, user, isLoading: false });
+    } catch (e: unknown) {
+      set({
+        isLoading: false,
+        error: getApiErrorMessage(e, "Google 로그인에 실패했습니다."),
+      });
+      throw e;
+    }
+  },
+
+  appleSignIn: async (params) => {
+    set({ isLoading: true, error: null });
+    try {
+      const { user } = await authApi.appleSignIn(params);
+      set({ isAuthenticated: true, user, isLoading: false });
+    } catch (e: unknown) {
+      set({
+        isLoading: false,
+        error: getApiErrorMessage(e, "Apple 로그인에 실패했습니다."),
+      });
       throw e;
     }
   },

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -6,16 +6,35 @@ import {
   TouchableOpacity,
   Alert,
   ActivityIndicator,
+  Platform,
 } from "react-native";
 import { useRouter } from "expo-router";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
+import * as AppleAuthentication from "expo-apple-authentication";
+import {
+  GoogleSignin,
+  statusCodes,
+} from "@react-native-google-signin/google-signin";
 import { useAuthStore } from "@/stores/useAuthStore";
+
+GoogleSignin.configure({
+  iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
+  webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
+});
 
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
-  const { login, isLoading, error, clearError } = useAuthStore();
+  const { login, googleSignIn, appleSignIn, isLoading, error, clearError } =
+    useAuthStore();
+  const [appleAvailable, setAppleAvailable] = useState(false);
+
+  useEffect(() => {
+    if (Platform.OS === "ios") {
+      AppleAuthentication.isAvailableAsync().then(setAppleAvailable);
+    }
+  }, []);
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -26,6 +45,63 @@ export default function LoginScreen() {
     try {
       await login(email, password);
     } catch {}
+  };
+
+  const handleGoogle = async () => {
+    clearError();
+    try {
+      await GoogleSignin.hasPlayServices();
+      const response = await GoogleSignin.signIn();
+      const idToken = response.data?.idToken;
+      if (!idToken) {
+        Alert.alert("알림", "Google 인증에 실패했습니다.");
+        return;
+      }
+      await googleSignIn(idToken);
+    } catch (e: unknown) {
+      if (
+        typeof e === "object" &&
+        e !== null &&
+        "code" in e &&
+        (e as { code: string }).code === statusCodes.SIGN_IN_CANCELLED
+      ) {
+        return;
+      }
+    }
+  };
+
+  const handleApple = async () => {
+    clearError();
+    try {
+      const credential = await AppleAuthentication.signInAsync({
+        requestedScopes: [
+          AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+          AppleAuthentication.AppleAuthenticationScope.EMAIL,
+        ],
+      });
+      if (!credential.identityToken) {
+        Alert.alert("알림", "Apple 인증에 실패했습니다.");
+        return;
+      }
+      const fullName =
+        [credential.fullName?.givenName, credential.fullName?.familyName]
+          .filter(Boolean)
+          .join(" ") || undefined;
+      await appleSignIn({
+        identityToken: credential.identityToken,
+        fullName,
+        email: credential.email ?? undefined,
+      });
+    } catch (e: unknown) {
+      if (
+        typeof e === "object" &&
+        e !== null &&
+        "code" in e &&
+        (e as { code: string }).code === "ERR_REQUEST_CANCELED"
+      ) {
+        return;
+      }
+    }
   };
 
   return (
@@ -90,6 +166,38 @@ export default function LoginScreen() {
           계정이 없으신가요? <Text className="font-bold">회원가입</Text>
         </Text>
       </TouchableOpacity>
+
+      <View className="flex-row items-center my-5">
+        <View className="flex-1 h-px bg-[#F0D5C8]" />
+        <Text className="mx-3 text-xs text-[#8D6E63]">또는</Text>
+        <View className="flex-1 h-px bg-[#F0D5C8]" />
+      </View>
+
+      <TouchableOpacity
+        className="bg-white border border-[#F0D5C8] rounded-xl py-3 flex-row items-center justify-center mb-3"
+        onPress={handleGoogle}
+        disabled={isLoading}
+        activeOpacity={0.8}
+      >
+        <Ionicons name="logo-google" size={18} color="#5D4037" />
+        <Text className="ml-2 text-[#5D4037] text-base font-semibold">
+          Google로 계속하기
+        </Text>
+      </TouchableOpacity>
+
+      {Platform.OS === "ios" && appleAvailable && (
+        <AppleAuthentication.AppleAuthenticationButton
+          buttonType={
+            AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN
+          }
+          buttonStyle={
+            AppleAuthentication.AppleAuthenticationButtonStyle.BLACK
+          }
+          cornerRadius={12}
+          style={{ height: 48 }}
+          onPress={handleApple}
+        />
+      )}
     </View>
   );
 }

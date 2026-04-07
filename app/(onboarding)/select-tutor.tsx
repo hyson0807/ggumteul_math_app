@@ -15,7 +15,7 @@ export default function SelectTutorScreen() {
     setIsLoading(true);
     try {
       await updateProfile({ tutorType: selected });
-      router.push("/(onboarding)/set-name");
+      router.push("/(onboarding)/select-grade");
     } catch {
       Alert.alert("오류", "저장에 실패했습니다. 다시 시도해주세요.");
     } finally {

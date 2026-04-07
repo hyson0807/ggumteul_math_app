@@ -7,13 +7,15 @@ import {
   ActivityIndicator,
   Alert,
 } from "react-native";
+import { useRouter } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useAuthStore } from "@/stores/useAuthStore";
 
 export default function SetNameScreen() {
+  const router = useRouter();
   const user = useAuthStore((s) => s.user);
   const updateProfile = useAuthStore((s) => s.updateProfile);
-  const [name, setName] = useState("");
+  const [name, setName] = useState(user?.name ?? "");
   const [isLoading, setIsLoading] = useState(false);
 
   const tutorType = user?.tutorType;
@@ -25,6 +27,7 @@ export default function SetNameScreen() {
     setIsLoading(true);
     try {
       await updateProfile({ name: name.trim() });
+      router.replace("/(tabs)/village");
     } catch {
       Alert.alert("오류", "저장에 실패했습니다. 다시 시도해주세요.");
     } finally {
