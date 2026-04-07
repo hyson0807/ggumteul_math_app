@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -13,14 +13,20 @@ import Animated, {
   useSharedValue,
   withDelay,
   withRepeat,
+  withSequence,
   withTiming,
 } from "react-native-reanimated";
+import * as Haptics from "expo-haptics";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuthStore } from "@/stores/useAuthStore";
+import { useBuildingStore } from "@/stores/useBuildingStore";
+import { BuildingModal } from "@/components/village/BuildingModal";
+import type { BuildingType } from "@/types/building";
 
 type Building = {
   name: string;
+  type: BuildingType;
   image: number;
   // 화면 너비/높이 대비 비율 (0~1)
   topRatio: number;
@@ -31,6 +37,7 @@ type Building = {
 const BUILDINGS: Building[] = [
   {
     name: "공원",
+    type: "park",
     image: require("@/assets/images/buildings/park.png"),
     topRatio: 0.18,
     leftRatio: 0.55,
@@ -38,6 +45,7 @@ const BUILDINGS: Building[] = [
   },
   {
     name: "학교",
+    type: "school",
     image: require("@/assets/images/buildings/school.png"),
     topRatio: 0.39,
     leftRatio: 0.62,
@@ -45,6 +53,7 @@ const BUILDINGS: Building[] = [
   },
   {
     name: "집",
+    type: "house",
     image: require("@/assets/images/buildings/house.png"),
     topRatio: 0.23,
     leftRatio: 0.04,
@@ -52,6 +61,7 @@ const BUILDINGS: Building[] = [
   },
   {
     name: "상점",
+    type: "shop",
     image: require("@/assets/images/buildings/shop.png"),
     topRatio: 0.5,
     leftRatio: 0,
@@ -63,6 +73,12 @@ export default function VillageScreen() {
   const user = useAuthStore((s) => s.user);
   const insets = useSafeAreaInsets();
   const { width: screenW, height: screenH } = useWindowDimensions();
+  const fetchBuildings = useBuildingStore((s) => s.fetch);
+  const [selectedType, setSelectedType] = useState<BuildingType | null>(null);
+
+  useEffect(() => {
+    fetchBuildings();
+  }, [fetchBuildings]);
 
   return (
     <View className="flex-1">
@@ -106,12 +122,15 @@ export default function VillageScreen() {
             index={index}
             screenW={screenW}
             screenH={screenH}
+            onPress={setSelectedType}
           />
         ))}
       </View>
 
       </View>
       </ImageBackground>
+
+      <BuildingModal type={selectedType} onClose={() => setSelectedType(null)} />
     </View>
   );
 }
@@ -121,11 +140,19 @@ type AnimatedBuildingProps = {
   index: number;
   screenW: number;
   screenH: number;
+  onPress: (type: BuildingType) => void;
 };
 
-function AnimatedBuilding({ building, index, screenW, screenH }: AnimatedBuildingProps) {
+function AnimatedBuilding({
+  building,
+  index,
+  screenW,
+  screenH,
+  onPress,
+}: AnimatedBuildingProps) {
   const size = screenW * building.sizeRatio;
   const translateY = useSharedValue(0);
+  const scale = useSharedValue(1);
 
   useEffect(() => {
     // 건물마다 다른 주기/시작 시점으로 동기화 방지
@@ -146,8 +173,20 @@ function AnimatedBuilding({ building, index, screenW, screenH }: AnimatedBuildin
   }, [index, translateY]);
 
   const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: translateY.value }],
+    transform: [
+      { translateY: translateY.value },
+      { scale: scale.value },
+    ],
   }));
+
+  const handlePress = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    scale.value = withSequence(
+      withTiming(0.9, { duration: 80, easing: Easing.out(Easing.quad) }),
+      withTiming(1, { duration: 140, easing: Easing.out(Easing.back(2)) }),
+    );
+    onPress(building.type);
+  };
 
   return (
     <Animated.View
@@ -162,7 +201,7 @@ function AnimatedBuilding({ building, index, screenW, screenH }: AnimatedBuildin
         animatedStyle,
       ]}
     >
-      <Pressable style={{ alignItems: "center" }}>
+      <Pressable onPress={handlePress} style={{ alignItems: "center" }}>
         <Image
           source={building.image}
           style={{ width: size, height: size }}

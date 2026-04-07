@@ -1,5 +1,6 @@
 import { View, Text, TouchableOpacity, ScrollView } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const CONCEPTS = [
   { id: "1", name: "덧셈", icon: "plus-circle" as const, color: "#6B8E23", progress: "0/10" },
@@ -9,8 +10,15 @@ const CONCEPTS = [
 ];
 
 export default function MathScreen() {
+  const insets = useSafeAreaInsets();
   return (
-    <ScrollView className="flex-1 bg-transparent px-6 pt-4">
+    <ScrollView
+      className="flex-1 bg-transparent px-6"
+      contentContainerStyle={{
+        paddingTop: insets.top + 16,
+        paddingBottom: insets.bottom + 96,
+      }}
+    >
       <Text className="text-xl font-bold text-[#5D4037] mb-6">
         개념별 문제
       </Text>

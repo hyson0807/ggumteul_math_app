@@ -1,9 +1,17 @@
 import { View, Text } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function BagScreen() {
+  const insets = useSafeAreaInsets();
   return (
-    <View className="flex-1 bg-transparent px-6 pt-4">
+    <View
+      className="flex-1 bg-transparent px-6"
+      style={{
+        paddingTop: insets.top + 16,
+        paddingBottom: insets.bottom + 96,
+      }}
+    >
       <Text className="text-xl font-bold text-[#5D4037] mb-6">내 가방</Text>
 
       <View className="flex-1 items-center justify-center">

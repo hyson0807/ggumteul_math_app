@@ -1,8 +1,10 @@
-import { View, Text, TouchableOpacity, Alert } from "react-native";
+import { View, Text, TouchableOpacity, Alert, ScrollView } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuthStore } from "@/stores/useAuthStore";
 
 export default function ProfileScreen() {
+  const insets = useSafeAreaInsets();
   const { user, logout, deleteAccount } = useAuthStore();
 
   const handleLogout = async () => {
@@ -27,7 +29,13 @@ export default function ProfileScreen() {
   };
 
   return (
-    <View className="flex-1 bg-transparent px-6 pt-4">
+    <ScrollView
+      className="flex-1 bg-transparent px-6"
+      contentContainerStyle={{
+        paddingTop: insets.top + 16,
+        paddingBottom: insets.bottom + 96,
+      }}
+    >
       <Text className="text-xl font-bold text-[#5D4037] mb-6">프로필</Text>
 
       {/* 사용자 정보 카드 */}
@@ -84,6 +92,6 @@ export default function ProfileScreen() {
       >
         <Text className="text-[#CDAB8F] text-sm">회원 탈퇴</Text>
       </TouchableOpacity>
-    </View>
+    </ScrollView>
   );
 }
