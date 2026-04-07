@@ -1,4 +1,20 @@
-import { View, Text, ImageBackground, Image, Pressable, useWindowDimensions } from "react-native";
+import { useEffect } from "react";
+import {
+  View,
+  Text,
+  ImageBackground,
+  Image,
+  Pressable,
+  useWindowDimensions,
+} from "react-native";
+import Animated, {
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withDelay,
+  withRepeat,
+  withTiming,
+} from "react-native-reanimated";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuthStore } from "@/stores/useAuthStore";
@@ -83,34 +99,76 @@ export default function VillageScreen() {
 
       {/* 마을 맵 - 배경 위 자유 배치 */}
       <View className="flex-1">
-        {BUILDINGS.map((building) => {
-          const size = screenW * building.sizeRatio;
-          return (
-            <Pressable
-              key={building.name}
-              style={{
-                position: "absolute",
-                top: screenH * building.topRatio,
-                left: screenW * building.leftRatio,
-                width: size,
-                alignItems: "center",
-              }}
-            >
-              <Image
-                source={building.image}
-                style={{ width: size, height: size }}
-                resizeMode="contain"
-              />
-              <Text className="text-[10px] font-bold text-[#5D4037] mt-0.5 bg-white/80 px-1.5 py-0.5 rounded-full">
-                {building.name}
-              </Text>
-            </Pressable>
-          );
-        })}
+        {BUILDINGS.map((building, index) => (
+          <AnimatedBuilding
+            key={building.name}
+            building={building}
+            index={index}
+            screenW={screenW}
+            screenH={screenH}
+          />
+        ))}
       </View>
 
       </View>
       </ImageBackground>
     </View>
+  );
+}
+
+type AnimatedBuildingProps = {
+  building: Building;
+  index: number;
+  screenW: number;
+  screenH: number;
+};
+
+function AnimatedBuilding({ building, index, screenW, screenH }: AnimatedBuildingProps) {
+  const size = screenW * building.sizeRatio;
+  const translateY = useSharedValue(0);
+
+  useEffect(() => {
+    // 건물마다 다른 주기/시작 시점으로 동기화 방지
+    const duration = 2400 + index * 300;
+    const delay = index * 400;
+
+    translateY.value = withDelay(
+      delay,
+      withRepeat(
+        withTiming(-1., {
+          duration,
+          easing: Easing.inOut(Easing.sin),
+        }),
+        -1, // 무한 반복
+        true // reverse: 위→아래→위...
+      )
+    );
+  }, [index, translateY]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: translateY.value }],
+  }));
+
+  return (
+    <Animated.View
+      style={[
+        {
+          position: "absolute",
+          top: screenH * building.topRatio,
+          left: screenW * building.leftRatio,
+          width: size,
+          alignItems: "center",
+        },
+        animatedStyle,
+      ]}
+    >
+      <Pressable style={{ alignItems: "center" }}>
+        <Image
+          source={building.image}
+          style={{ width: size, height: size }}
+          resizeMode="contain"
+        />
+      </Pressable>
+    </Animated.View>
   );
 }
