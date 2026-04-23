@@ -20,20 +20,20 @@ export default function TabsLayout() {
           }}
         >
           <Tabs.Screen
-            name="village"
+            name="home"
             options={{
-              title: "마을",
+              title: "홈",
               tabBarIcon: ({ color, size }) => (
-                <MaterialCommunityIcons name="home-variant" size={size} color={color} />
+                <MaterialCommunityIcons name="sprout" size={size} color={color} />
               ),
             }}
           />
           <Tabs.Screen
-            name="math"
+            name="shop"
             options={{
-              title: "수학문제",
+              title: "상점",
               tabBarIcon: ({ color, size }) => (
-                <MaterialCommunityIcons name="pencil-ruler" size={size} color={color} />
+                <MaterialCommunityIcons name="storefront-outline" size={size} color={color} />
               ),
             }}
           />

@@ -26,6 +26,7 @@ interface AuthState {
     tutorType?: string;
     grade?: number;
   }) => Promise<void>;
+  syncUser: (user: User) => void;
   clearError: () => void;
 }
 
@@ -124,6 +125,8 @@ export const useAuthStore = create<AuthState>((set) => ({
     const user = await authApi.updateProfile(data);
     set({ user });
   },
+
+  syncUser: (user) => set({ user }),
 
   clearError: () => set({ error: null }),
 }));

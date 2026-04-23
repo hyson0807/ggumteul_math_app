@@ -27,7 +27,7 @@ export default function SetNameScreen() {
     setIsLoading(true);
     try {
       await updateProfile({ name: name.trim() });
-      router.replace("/(tabs)/village");
+      router.replace("/(tabs)/home");
     } catch {
       Alert.alert("오류", "저장에 실패했습니다. 다시 시도해주세요.");
     } finally {
@@ -42,7 +42,7 @@ export default function SetNameScreen() {
         이름을 알려주세요!
       </Text>
       <Text className="text-base text-[#8D6E63] mb-8">
-        마을에서 사용할 이름을 입력해주세요
+        지렁이 친구에게 불러줄 이름을 입력해주세요
       </Text>
 
       <TextInput
@@ -65,7 +65,7 @@ export default function SetNameScreen() {
           <ActivityIndicator color="#fff" />
         ) : (
           <Text className="text-white text-lg font-bold">
-            완료! 마을로 가기
+            완료! 모험 시작하기
           </Text>
         )}
       </TouchableOpacity>

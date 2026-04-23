@@ -11,6 +11,11 @@ export interface User {
   coins: number;
   stars: number;
   tutorType: "cat" | "rabbit" | null;
+  wormStage: number;
+  wormProgress: number;
+  equippedHatId: string | null;
+  equippedBodyId: string | null;
+  equippedAccessoryId: string | null;
   createdAt: string;
 }
 

@@ -1,7 +1,8 @@
 import "../global.css";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Stack, useSegments, useRouter } from "expo-router";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { Toast } from "@/components/common/Toast";
 import { View, ActivityIndicator } from "react-native";
@@ -35,10 +36,11 @@ export default function RootLayout() {
         router.replace("/(onboarding)/select-tutor");
       }
     } else {
-      // (onboarding) 안에 있으면 사용자가 마지막 단계까지 자연스럽게 진행하도록 둔다.
-      // set-name 화면이 완료 시 명시적으로 (tabs)로 이동한다.
-      if (rootSegment !== "(tabs)" && rootSegment !== "(onboarding)") {
-        router.replace("/(tabs)/village");
+      // 인증 + 온보딩 완료 상태.
+      // (auth) 또는 루트 index에 있으면 홈으로 보내고,
+      // 그 외 (tabs, onboarding, map, stage, concept, ...)는 자유롭게 이동하도록 허용.
+      if (rootSegment === "(auth)" || rootSegment == null) {
+        router.replace("/(tabs)/home");
       }
     }
   }, [isInitialized, isAuthenticated, tutorType, name, grade, rootSegment]);
@@ -52,14 +54,31 @@ export default function RootLayout() {
   }
 
   return (
-    <SafeAreaProvider>
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="index" />
-        <Stack.Screen name="(auth)" />
-        <Stack.Screen name="(onboarding)" />
-        <Stack.Screen name="(tabs)" />
-      </Stack>
-      <Toast />
-    </SafeAreaProvider>
+    <QueryProvider>
+      <SafeAreaProvider>
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="index" />
+          <Stack.Screen name="(auth)" />
+          <Stack.Screen name="(onboarding)" />
+          <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="map" options={{ presentation: "modal" }} />
+          <Stack.Screen name="stage/[stage]" />
+          <Stack.Screen name="concept/[conceptId]" />
+        </Stack>
+        <Toast />
+      </SafeAreaProvider>
+    </QueryProvider>
   );
+}
+
+function QueryProvider({ children }: { children: React.ReactNode }) {
+  const [client] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: { staleTime: 30_000, retry: 1 },
+        },
+      }),
+  );
+  return <QueryClientProvider client={client}>{children}</QueryClientProvider>;
 }

@@ -2,6 +2,7 @@ import { View, Text, TouchableOpacity, Alert, ScrollView } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuthStore } from "@/stores/useAuthStore";
+import { WORM_STAGE_LABELS } from "@/constants/worm";
 
 export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
@@ -55,23 +56,31 @@ export default function ProfileScreen() {
         </Text>
       </View>
 
-      {/* 학습 통계 */}
+      {/* 지렁이 진행도 */}
       <View className="bg-[#FFF8F0] rounded-2xl p-5 mb-4 border border-[#F0D5C8]">
         <Text className="text-base font-semibold text-[#5D4037] mb-3">
-          학습 통계
+          지렁이 진행도
         </Text>
         <View className="flex-row justify-around">
           <View className="items-center">
-            <Text className="text-2xl font-bold text-[#A0522D]">0</Text>
-            <Text className="text-xs text-[#8D6E63]">풀이 수</Text>
+            <Text className="text-2xl font-bold text-[#A0522D]">
+              Lv.{user?.wormStage ?? 1}
+            </Text>
+            <Text className="text-xs text-[#8D6E63]">
+              {WORM_STAGE_LABELS[user?.wormStage ?? 1]}
+            </Text>
           </View>
           <View className="items-center">
-            <Text className="text-2xl font-bold text-[#6B8E23]">0%</Text>
-            <Text className="text-xs text-[#8D6E63]">정답률</Text>
+            <Text className="text-2xl font-bold text-[#6B8E23]">
+              {user?.wormProgress ?? 0}
+            </Text>
+            <Text className="text-xs text-[#8D6E63]">이번 단계 진행</Text>
           </View>
           <View className="items-center">
-            <Text className="text-2xl font-bold text-[#DAA520]">0일</Text>
-            <Text className="text-xs text-[#8D6E63]">연속 학습</Text>
+            <Text className="text-2xl font-bold text-[#DAA520]">
+              {user?.coins ?? 0}
+            </Text>
+            <Text className="text-xs text-[#8D6E63]">보유 코인</Text>
           </View>
         </View>
       </View>
