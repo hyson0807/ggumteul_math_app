@@ -1,16 +1,42 @@
-import { View, Text, TouchableOpacity } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 import Svg, { Path } from "react-native-svg";
+import { Colors } from "@/constants/colors";
 import { UNIT_META, type UnitId } from "@/constants/units";
 
 interface Props {
   unit: UnitId;
+  activeConceptName: string | null;
+  clearedNodes: number;
+  totalNodes: number;
+  stageCleared: boolean;
   bottomOffset: number;
   onClose: () => void;
   onStartSolve: () => void;
+  onViewStage: () => void;
 }
 
-export function FocusCard({ unit, bottomOffset, onClose, onStartSolve }: Props) {
+export function FocusCard({
+  unit,
+  activeConceptName,
+  clearedNodes,
+  totalNodes,
+  stageCleared,
+  bottomOffset,
+  onClose,
+  onStartSolve,
+  onViewStage,
+}: Props) {
   const meta = UNIT_META[unit];
+  const pct =
+    totalNodes > 0 ? Math.min(100, Math.round((clearedNodes / totalNodes) * 100)) : 0;
+
+  const hasActive = !!activeConceptName && !stageCleared;
+  const primaryLabel = stageCleared
+    ? "다음 스테이지로 이동"
+    : hasActive
+      ? "이 문제 풀기"
+      : "스테이지 노드 보기";
+  const primaryAction = stageCleared || !hasActive ? onViewStage : onStartSolve;
 
   return (
     <View
@@ -25,10 +51,10 @@ export function FocusCard({ unit, bottomOffset, onClose, onStartSolve }: Props) 
     >
       <View
         style={{
-          width: 320,
+          width: 340,
           maxWidth: "92%",
           borderRadius: 22,
-          padding: 16,
+          padding: 18,
           backgroundColor: "rgba(255,248,240,0.97)",
           borderWidth: 1,
           borderColor: "rgba(160,82,45,0.2)",
@@ -37,6 +63,7 @@ export function FocusCard({ unit, bottomOffset, onClose, onStartSolve }: Props) 
           shadowOpacity: 0.25,
           shadowRadius: 40,
           elevation: 12,
+          gap: 12,
         }}
       >
         <View
@@ -44,120 +71,173 @@ export function FocusCard({ unit, bottomOffset, onClose, onStartSolve }: Props) 
             flexDirection: "row",
             alignItems: "center",
             justifyContent: "space-between",
-            marginBottom: 8,
           }}
         >
-          <View style={{ flexDirection: "row", alignItems: "baseline" }}>
+          <View>
             <Text
               style={{
-                fontSize: 22,
-                fontWeight: "900",
-                color: "#A0522D",
-                marginRight: 8,
+                fontSize: 10,
+                color: Colors.textSecondary,
+                fontWeight: "800",
+                letterSpacing: 2,
               }}
             >
-              {unit}
-            </Text>
-            <Text style={{ fontSize: 12, color: "#8D6E63", fontWeight: "600" }}>
               {meta.grade}
             </Text>
+            <View style={{ flexDirection: "row", alignItems: "baseline", gap: 8, marginTop: 2 }}>
+              <Text style={{ fontSize: 22, fontWeight: "900", color: Colors.primary }}>
+                {unit}
+              </Text>
+              <Text style={{ fontSize: 13, color: Colors.text, fontWeight: "700" }}>
+                {meta.region}
+              </Text>
+            </View>
           </View>
           <TouchableOpacity
             onPress={onClose}
+            hitSlop={10}
             style={{
-              width: 24,
-              height: 24,
+              width: 28,
+              height: 28,
               borderRadius: 999,
-              backgroundColor: "#F0D5C8",
+              backgroundColor: Colors.surfaceBorder,
               alignItems: "center",
               justifyContent: "center",
             }}
           >
-            <Text style={{ fontSize: 11, fontWeight: "700", color: "#5D4037" }}>
-              ✕
-            </Text>
+            <Text style={{ fontSize: 12, fontWeight: "800", color: Colors.text }}>✕</Text>
           </TouchableOpacity>
         </View>
 
-        <Text style={{ fontSize: 12, color: "#5D4037", marginBottom: 12, opacity: 0.8 }}>
-          <Text style={{ fontWeight: "700" }}>{meta.region}</Text>
-          <Text> · 세 가지 개념을 이어서 풀어요</Text>
-        </Text>
-
-        <View style={{ gap: 6, marginBottom: 12 }}>
-          {meta.concepts.map((c, i) => (
+        <View style={{ gap: 6 }}>
+          <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "baseline" }}>
+            <Text style={{ fontSize: 11, color: Colors.textSecondary, fontWeight: "700" }}>
+              스테이지 진행
+            </Text>
+            <Text style={{ fontSize: 12, color: Colors.text, fontWeight: "900" }}>
+              {clearedNodes} / {totalNodes}
+            </Text>
+          </View>
+          <View
+            style={{
+              height: 6,
+              borderRadius: 999,
+              backgroundColor: Colors.surfaceBorder,
+              overflow: "hidden",
+            }}
+          >
             <View
-              key={c}
               style={{
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 10,
-                paddingHorizontal: 10,
-                paddingVertical: 8,
-                borderRadius: 10,
-                backgroundColor: i === 0 ? "#FFF0E0" : "#FCF3E7",
-                borderWidth: 1,
-                borderColor: i === 0 ? "#F0C8A0" : "rgba(160,82,45,0.1)",
+                height: "100%",
+                width: `${pct}%`,
+                backgroundColor: Colors.secondary,
+                borderRadius: 999,
               }}
-            >
-              <View
-                style={{
-                  width: 22,
-                  height: 22,
-                  borderRadius: 999,
-                  backgroundColor: i === 0 ? "#A0522D" : "#E8D0B8",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <Text style={{ fontSize: 11, fontWeight: "800", color: "#fff" }}>
-                  {i + 1}
-                </Text>
-              </View>
-              <Text
-                style={{
-                  flex: 1,
-                  fontSize: 13,
-                  fontWeight: "600",
-                  color: "#5D4037",
-                }}
-              >
-                {c}
-              </Text>
-              <View style={{ flexDirection: "row" }}>
-                {[0, 1, 2].map((s) => (
-                  <Svg key={s} width={10} height={10} viewBox="0 0 12 12">
-                    <Path
-                      d="M6 1 L7.5 4.5 L11 5 L8.5 7.5 L9 11 L6 9 L3 11 L3.5 7.5 L1 5 L4.5 4.5 Z"
-                      fill={i === 0 && s === 0 ? "#DAA520" : "rgba(160,82,45,0.15)"}
-                    />
-                  </Svg>
-                ))}
-              </View>
-            </View>
-          ))}
+            />
+          </View>
         </View>
 
-        <TouchableOpacity
-          onPress={onStartSolve}
-          activeOpacity={0.85}
+        <View
           style={{
-            height: 44,
-            borderRadius: 12,
-            backgroundColor: "#C0392B",
-            alignItems: "center",
-            justifyContent: "center",
-            shadowColor: "#C0392B",
-            shadowOffset: { width: 0, height: 6 },
-            shadowOpacity: 0.35,
-            shadowRadius: 16,
+            padding: 14,
+            borderRadius: 14,
+            backgroundColor: stageCleared
+              ? "rgba(107,142,35,0.12)"
+              : hasActive
+                ? "rgba(192,57,43,0.08)"
+                : Colors.background,
+            borderWidth: 1,
+            borderColor: stageCleared
+              ? Colors.success
+              : hasActive
+                ? "rgba(192,57,43,0.25)"
+                : Colors.surfaceBorder,
+            gap: 4,
           }}
         >
-          <Text style={{ color: "#fff", fontSize: 14, fontWeight: "800" }}>
-            여기서부터 풀기 →
+          <Text
+            style={{
+              fontSize: 10,
+              fontWeight: "800",
+              letterSpacing: 1,
+              color: stageCleared
+                ? Colors.success
+                : hasActive
+                  ? Colors.cta
+                  : Colors.textSecondary,
+            }}
+          >
+            {stageCleared ? "스테이지 완료" : hasActive ? "다음 도전 개념" : "상태"}
           </Text>
-        </TouchableOpacity>
+          <Text
+            numberOfLines={2}
+            style={{ fontSize: 16, fontWeight: "900", color: Colors.text, lineHeight: 22 }}
+          >
+            {stageCleared
+              ? "모든 개념을 클리어했어요!"
+              : activeNodeText(activeConceptName, totalNodes)}
+          </Text>
+        </View>
+
+        <View style={{ flexDirection: "row", gap: 8 }}>
+          <TouchableOpacity
+            onPress={onViewStage}
+            activeOpacity={0.85}
+            style={{
+              flex: 1,
+              height: 46,
+              borderRadius: 14,
+              backgroundColor: Colors.surface,
+              borderWidth: 1,
+              borderColor: Colors.surfaceBorder,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Text style={{ color: Colors.text, fontSize: 13, fontWeight: "800" }}>
+              지도 보기
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={primaryAction}
+            activeOpacity={0.85}
+            style={{
+              flex: 1.4,
+              height: 46,
+              borderRadius: 14,
+              backgroundColor: Colors.cta,
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 6,
+              shadowColor: Colors.cta,
+              shadowOffset: { width: 0, height: 6 },
+              shadowOpacity: 0.35,
+              shadowRadius: 16,
+            }}
+          >
+            <Text style={{ color: "#fff", fontSize: 14, fontWeight: "900" }}>
+              {primaryLabel}
+            </Text>
+            <Svg width={14} height={14} viewBox="0 0 14 14">
+              <Path
+                d="M3 7 L10 7 M7 3 L11 7 L7 11"
+                stroke="#fff"
+                strokeWidth={2}
+                fill="none"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </Svg>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
+}
+
+function activeNodeText(name: string | null, totalNodes: number): string {
+  if (name) return name;
+  if (totalNodes === 0) return "아직 준비된 개념이 없어요";
+  return "지도에서 다음 개념을 골라주세요";
 }

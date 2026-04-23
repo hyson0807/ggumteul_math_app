@@ -1,10 +1,15 @@
 import { useEffect, useMemo, useRef } from "react";
-import { Animated, ScrollView, View, useWindowDimensions } from "react-native";
+import {
+  Animated,
+  Pressable,
+  ScrollView,
+  View,
+  useWindowDimensions,
+} from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import Svg, {
   Circle,
   Defs,
-  G,
   Path,
   RadialGradient,
   Rect,
@@ -34,6 +39,7 @@ interface Props {
   worm: WormState;
   currentUnit: UnitId;
   scrollToUnitRef?: React.MutableRefObject<((unit: UnitId) => void) | null>;
+  onWormPress?: () => void;
 }
 
 function buildHorizontalGradient() {
@@ -72,6 +78,7 @@ export function WormScene({
   worm,
   currentUnit,
   scrollToUnitRef,
+  onWormPress,
 }: Props) {
   const { width: frameW, height: frameH } = useWindowDimensions();
   const sceneW = frameW * SCENE_WIDTH_MULTIPLIER;
@@ -275,7 +282,9 @@ export function WormScene({
             ],
           }}
         >
-          <WormSprite stage={worm.stage} equipped={worm.equipped} />
+          <Pressable onPress={onWormPress} hitSlop={16}>
+            <WormSprite stage={worm.stage} equipped={worm.equipped} />
+          </Pressable>
         </Animated.View>
       </View>
     </ScrollView>
