@@ -3,12 +3,18 @@ import { useEffect, useState } from "react";
 import { Stack, useSegments, useRouter } from "expo-router";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useFonts, Jua_400Regular } from "@expo-google-fonts/jua";
+import { GowunDodum_400Regular } from "@expo-google-fonts/gowun-dodum";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { Toast } from "@/components/common/Toast";
 import { BgmController } from "@/components/common/BgmController";
 import { View, ActivityIndicator } from "react-native";
 
 export default function RootLayout() {
+  const [fontsLoaded] = useFonts({
+    Jua: Jua_400Regular,
+    GowunDodum: GowunDodum_400Regular,
+  });
   const isInitialized = useAuthStore((s) => s.isInitialized);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const tutorType = useAuthStore((s) => s.user?.tutorType);
@@ -46,7 +52,7 @@ export default function RootLayout() {
     }
   }, [isInitialized, isAuthenticated, tutorType, name, grade, rootSegment]);
 
-  if (!isInitialized) {
+  if (!isInitialized || !fontsLoaded) {
     return (
       <View className="flex-1 bg-[#FFE2DE] items-center justify-center">
         <ActivityIndicator size="large" color="#A0522D" />
