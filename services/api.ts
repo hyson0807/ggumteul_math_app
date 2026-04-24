@@ -1,8 +1,13 @@
 import axios from "axios";
 import { tokenService } from "./token";
 
-// TODO: 배포 시 환경변수로 변경 (HTTPS 필수)
-export const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:3000";
+const envUrl = process.env.EXPO_PUBLIC_API_URL;
+if (!envUrl && !__DEV__) {
+  throw new Error(
+    "EXPO_PUBLIC_API_URL is required in production builds. Configure it in eas.json.",
+  );
+}
+export const API_BASE_URL = envUrl ?? "http://localhost:3000";
 
 const api = axios.create({
   baseURL: API_BASE_URL,

@@ -15,7 +15,7 @@ export const usePurchaseItem = () => {
     mutationFn: (shopItemId: string) => shopApi.purchase(shopItemId),
     onSuccess: ({ user }) => {
       syncUser(user);
-      queryClient.invalidateQueries({ queryKey: ["shop"] });
+      queryClient.invalidateQueries({ queryKey: ["shop", "items"] });
       queryClient.invalidateQueries({ queryKey: ["inventory"] });
     },
   });

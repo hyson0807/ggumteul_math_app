@@ -17,7 +17,6 @@ export const useEquipItem = () => {
       wormApi.equip(slot, shopItemId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: WORM_QUERY_KEY });
-      queryClient.invalidateQueries({ queryKey: ["shop"] });
       queryClient.invalidateQueries({ queryKey: ["inventory"] });
     },
   });
@@ -29,7 +28,6 @@ export const useUnequipItem = () => {
     mutationFn: ({ slot }: { slot: EquipSlot }) => wormApi.unequip(slot),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: WORM_QUERY_KEY });
-      queryClient.invalidateQueries({ queryKey: ["shop"] });
       queryClient.invalidateQueries({ queryKey: ["inventory"] });
     },
   });
