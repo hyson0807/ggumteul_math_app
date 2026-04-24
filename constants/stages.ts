@@ -35,7 +35,7 @@ export const STAGE_SCENES: Record<StageId, StageSceneConfig> = {
     gradient: ["#2A1810", "#1A0F08", "#0A0604"],
     locations: [0, 0.5, 1],
     wormX: 0.5,
-    wormY: 0.62,
+    wormY: 0.38,
   },
   2: {
     stage: 2,
@@ -46,7 +46,7 @@ export const STAGE_SCENES: Record<StageId, StageSceneConfig> = {
     gradient: ["#4A2A18", "#2E1A10", "#1A0F08"],
     locations: [0, 0.5, 1],
     wormX: 0.5,
-    wormY: 0.58,
+    wormY: 0.38,
   },
   3: {
     stage: 3,
@@ -57,7 +57,7 @@ export const STAGE_SCENES: Record<StageId, StageSceneConfig> = {
     gradient: ["#7A4A2E", "#6B4226", "#4A2A18"],
     locations: [0, 0.5, 1],
     wormX: 0.5,
-    wormY: 0.58,
+    wormY: 0.38,
   },
   4: {
     stage: 4,
@@ -68,7 +68,7 @@ export const STAGE_SCENES: Record<StageId, StageSceneConfig> = {
     gradient: ["#A67450", "#8A5A3A", "#6B4226"],
     locations: [0, 0.5, 1],
     wormX: 0.5,
-    wormY: 0.58,
+    wormY: 0.38,
   },
   5: {
     stage: 5,
@@ -79,7 +79,7 @@ export const STAGE_SCENES: Record<StageId, StageSceneConfig> = {
     gradient: ["#6FB4F0", "#8FC9F9", "#BFE0FF"],
     locations: [0, 0.5, 1],
     wormX: 0.5,
-    wormY: 0.5,
+    wormY: 0.38,
   },
   6: {
     stage: 6,
@@ -90,7 +90,7 @@ export const STAGE_SCENES: Record<StageId, StageSceneConfig> = {
     gradient: ["#05051A", "#0B0E2A", "#1A1040"],
     locations: [0, 0.5, 1],
     wormX: 0.5,
-    wormY: 0.5,
+    wormY: 0.38,
   },
 };
 
