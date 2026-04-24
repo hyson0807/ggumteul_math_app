@@ -22,7 +22,11 @@
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "googleServicesFile": "./google-services.json",
-      "package": "com.hyson.ggumteulmathapp"
+      "package": "com.hyson.ggumteulmathapp",
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS"
+      ]
     },
     "web": {
       "output": "static",
@@ -50,7 +54,8 @@
           "iosUrlScheme": "com.googleusercontent.apps.90199202530-d2g716susi8esg5ho07kk0vc7osgiqif"
         }
       ],
-      "expo-audio"
+      "expo-audio",
+      "expo-updates"
     ],
     "experiments": {
       "typedRoutes": true,
@@ -60,10 +65,17 @@
       "enabled": true,
       "checkAutomatically": "ON_ERROR_RECOVERY",
       "fallbackToCacheTimeout": 0,
-      "url": "https://u.expo.dev/REPLACE_WITH_EAS_PROJECT_ID"
+      "url": "https://u.expo.dev/7afb0c27-e40b-4ba1-ae12-67101fef154b"
     },
     "runtimeVersion": {
       "policy": "appVersion"
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "7afb0c27-e40b-4ba1-ae12-67101fef154b"
+      }
+    },
+    "owner": "hyson"
   }
 }
