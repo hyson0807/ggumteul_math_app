@@ -18,4 +18,10 @@ export const Colors = {
   tabBarInactive: "#CDAB8F",
   cta: "#C0392B",
   banner: "#8B6914",
+  undergroundDeep: "#2A1810",
+  undergroundShallow: "#6B4226",
+  groundGrass: "#7FB83D",
+  skyLight: "#8FC9F9",
+  spaceDark: "#0B0E2A",
+  splashBg: "#2E2217",
 };

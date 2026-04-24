@@ -1,61 +1,123 @@
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, ScrollView } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { router } from "expo-router";
 import { useAuthStore } from "@/stores/useAuthStore";
+import { WORM_STAGE_LABELS, MAX_WORM_STAGE } from "@/constants/worm";
+import { WormSprite } from "@/components/worm/WormSprite";
+import { useWorm } from "@/hooks/useWorm";
+import { Colors } from "@/constants/colors";
+
+function formatJoinedDate(isoDate?: string) {
+  if (!isoDate) return "-";
+  const d = new Date(isoDate);
+  if (Number.isNaN(d.getTime())) return "-";
+  return `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일`;
+}
 
 export default function ProfileScreen() {
-  const router = useRouter();
-  const { userEmail, userGrade, tutorName, logout } = useAuthStore();
+  const insets = useSafeAreaInsets();
+  const user = useAuthStore((s) => s.user);
+  const { data: worm } = useWorm();
 
-  const handleLogout = () => {
-    logout();
-    router.replace("/");
-  };
+  const stage = Math.min(Math.max(user?.wormStage ?? 1, 1), MAX_WORM_STAGE);
+  const stageLabel = WORM_STAGE_LABELS[stage];
 
   return (
-    <View className="flex-1 bg-transparent px-6 pt-4">
-      <Text className="text-xl font-bold text-[#5D4037] mb-6">프로필</Text>
-
-      {/* 사용자 정보 카드 */}
-      <View className="bg-[#FFF8F0] rounded-2xl p-5 mb-4 items-center border border-[#F0D5C8]">
-        <View className="w-20 h-20 rounded-full bg-transparent items-center justify-center mb-3">
-          <MaterialCommunityIcons name="account-circle" size={40} color="#A0522D" />
-        </View>
-        <Text className="text-lg font-bold text-[#5D4037]">{userEmail}</Text>
-        <Text className="text-sm text-[#8D6E63] mt-1">
-          {userGrade}학년 · 튜터: {tutorName}
-        </Text>
-      </View>
-
-      {/* 학습 통계 */}
-      <View className="bg-[#FFF8F0] rounded-2xl p-5 mb-4 border border-[#F0D5C8]">
-        <Text className="text-base font-semibold text-[#5D4037] mb-3">
-          학습 통계
-        </Text>
-        <View className="flex-row justify-around">
-          <View className="items-center">
-            <Text className="text-2xl font-bold text-[#A0522D]">0</Text>
-            <Text className="text-xs text-[#8D6E63]">풀이 수</Text>
-          </View>
-          <View className="items-center">
-            <Text className="text-2xl font-bold text-[#6B8E23]">0%</Text>
-            <Text className="text-xs text-[#8D6E63]">정답률</Text>
-          </View>
-          <View className="items-center">
-            <Text className="text-2xl font-bold text-[#DAA520]">0일</Text>
-            <Text className="text-xs text-[#8D6E63]">연속 학습</Text>
-          </View>
-        </View>
-      </View>
-
-      {/* 로그아웃 */}
-      <TouchableOpacity
-        className="bg-[#FFF8F0] rounded-2xl p-4 flex-row items-center justify-center border border-[#CD5C5C]"
-        onPress={handleLogout}
+    <View className="flex-1 bg-transparent">
+      <View
+        className="flex-row items-center justify-end px-5 pb-2"
+        style={{ paddingTop: insets.top + 8 }}
       >
-        <MaterialCommunityIcons name="logout" size={20} color="#CD5C5C" />
-        <Text className="text-[#CD5C5C] font-semibold ml-2">로그아웃</Text>
-      </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => router.push("/settings")}
+          className="w-10 h-10 items-center justify-center rounded-full bg-white/80 border border-village-border"
+          activeOpacity={0.8}
+        >
+          <MaterialCommunityIcons
+            name="cog-outline"
+            size={22}
+            color={Colors.text}
+          />
+        </TouchableOpacity>
+      </View>
+
+      <ScrollView
+        contentContainerStyle={{
+          paddingBottom: insets.bottom + 120,
+          paddingHorizontal: 24,
+        }}
+      >
+        <View className="items-center mt-2">
+          <View
+            className="rounded-full bg-village-surface items-center justify-center"
+            style={{
+              width: 120,
+              height: 120,
+              borderWidth: 4,
+              borderColor: "#FFFFFF",
+              shadowColor: "#000",
+              shadowOpacity: 0.08,
+              shadowRadius: 8,
+              shadowOffset: { width: 0, height: 3 },
+              elevation: 3,
+            }}
+          >
+            <WormSprite equipped={worm?.equipped} size={0.7} />
+          </View>
+
+          <Text className="text-[20px] font-extrabold text-village-text mt-4">
+            {user?.name ?? "이름 없음"}
+          </Text>
+          <Text className="text-sm text-village-text-secondary mt-1">
+            {user?.grade ? `${user.grade}학년` : "학년 미설정"} · Lv.
+            {user?.level ?? 1}
+          </Text>
+        </View>
+
+        <View
+          className="bg-village-surface mt-6"
+          style={{
+            borderRadius: 24,
+            paddingHorizontal: 20,
+            paddingVertical: 4,
+            shadowColor: "#000",
+            shadowOpacity: 0.05,
+            shadowRadius: 10,
+            shadowOffset: { width: 0, height: 2 },
+            elevation: 2,
+          }}
+        >
+          <StatRow label="단계" value={stageLabel} />
+          <Divider />
+          <StatRow label="모은 별" value={`${user?.stars ?? 0}`} />
+          <Divider />
+          <StatRow label="모은 코인" value={`${user?.coins ?? 0}`} />
+          <Divider />
+          <StatRow label="가입일" value={formatJoinedDate(user?.createdAt)} />
+        </View>
+      </ScrollView>
     </View>
+  );
+}
+
+function StatRow({ label, value }: { label: string; value: string }) {
+  return (
+    <View className="flex-row items-center justify-between py-3.5">
+      <Text className="text-sm text-village-text-secondary">{label}</Text>
+      <Text className="text-base font-bold text-village-text">{value}</Text>
+    </View>
+  );
+}
+
+function Divider() {
+  return (
+    <View
+      style={{
+        height: 1,
+        backgroundColor: Colors.surfaceBorder,
+        opacity: 0.6,
+      }}
+    />
   );
 }

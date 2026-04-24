@@ -1,15 +1,26 @@
-import { View, Text, TouchableOpacity } from "react-native";
+import { useState } from "react";
+import { View, Text, TouchableOpacity, ActivityIndicator, Alert } from "react-native";
 import { useRouter } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useAuthStore } from "@/stores/useAuthStore";
 
 export default function SelectTutorScreen() {
   const router = useRouter();
-  const { tutorType, selectTutor } = useAuthStore();
+  const updateProfile = useAuthStore((s) => s.updateProfile);
+  const [selected, setSelected] = useState<"cat" | "rabbit" | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleNext = () => {
-    if (!tutorType) return;
-    router.push("/(onboarding)/set-name");
+  const handleNext = async () => {
+    if (!selected) return;
+    setIsLoading(true);
+    try {
+      await updateProfile({ tutorType: selected });
+      router.push("/(onboarding)/select-grade");
+    } catch {
+      Alert.alert("오류", "저장에 실패했습니다. 다시 시도해주세요.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -24,20 +35,21 @@ export default function SelectTutorScreen() {
       <View className="flex-row gap-6 mb-12">
         <TouchableOpacity
           className={`w-36 h-44 rounded-2xl items-center justify-center border-3 ${
-            tutorType === "cat"
+            selected === "cat"
               ? "bg-[#FFF8F0] border-[#DAA520]"
               : "bg-[#FFF8F0] border-[#F0D5C8]"
           }`}
-          onPress={() => selectTutor("cat")}
+          onPress={() => setSelected("cat")}
+          disabled={isLoading}
         >
           <MaterialCommunityIcons
             name="cat"
             size={60}
-            color={tutorType === "cat" ? "#DAA520" : "#CDAB8F"}
+            color={selected === "cat" ? "#DAA520" : "#CDAB8F"}
           />
           <Text
             className={`text-lg font-bold mt-3 ${
-              tutorType === "cat" ? "text-[#DAA520]" : "text-[#8D6E63]"
+              selected === "cat" ? "text-[#DAA520]" : "text-[#8D6E63]"
             }`}
           >
             고양이
@@ -46,20 +58,21 @@ export default function SelectTutorScreen() {
 
         <TouchableOpacity
           className={`w-36 h-44 rounded-2xl items-center justify-center border-3 ${
-            tutorType === "rabbit"
+            selected === "rabbit"
               ? "bg-[#FFF8F0] border-[#6B8E23]"
               : "bg-[#FFF8F0] border-[#F0D5C8]"
           }`}
-          onPress={() => selectTutor("rabbit")}
+          onPress={() => setSelected("rabbit")}
+          disabled={isLoading}
         >
           <MaterialCommunityIcons
             name="rabbit"
             size={60}
-            color={tutorType === "rabbit" ? "#6B8E23" : "#CDAB8F"}
+            color={selected === "rabbit" ? "#6B8E23" : "#CDAB8F"}
           />
           <Text
             className={`text-lg font-bold mt-3 ${
-              tutorType === "rabbit" ? "text-[#6B8E23]" : "text-[#8D6E63]"
+              selected === "rabbit" ? "text-[#6B8E23]" : "text-[#8D6E63]"
             }`}
           >
             토끼
@@ -69,12 +82,16 @@ export default function SelectTutorScreen() {
 
       <TouchableOpacity
         className={`w-full py-4 rounded-xl items-center ${
-          tutorType ? "bg-[#A0522D]" : "bg-[#CDAB8F]"
+          selected && !isLoading ? "bg-[#A0522D]" : "bg-[#CDAB8F]"
         }`}
         onPress={handleNext}
-        disabled={!tutorType}
+        disabled={!selected || isLoading}
       >
-        <Text className="text-white text-lg font-bold">다음</Text>
+        {isLoading ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Text className="text-white text-lg font-bold">다음</Text>
+        )}
       </TouchableOpacity>
     </View>
   );
