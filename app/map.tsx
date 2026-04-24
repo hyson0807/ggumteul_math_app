@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import {
   LayoutChangeEvent,
   StyleSheet,
@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { useRouter } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Svg, {
   Circle,
@@ -27,6 +27,7 @@ import {
   unitFromWorm,
   type UnitId,
 } from "@/constants/units";
+import { pauseBgm, playBgm } from "@/utils/bgm";
 
 const NODES: { id: UnitId; x: number; y: number }[] = [
   { id: "1-1", x: 40, y: 520 },
@@ -46,6 +47,13 @@ export default function MapScreen() {
   const { data: worm } = useWorm();
   const { data: stagesData } = useStages();
   const [bodySize, setBodySize] = useState({ w: 0, h: 0 });
+
+  useFocusEffect(
+    useCallback(() => {
+      playBgm("map");
+      return () => pauseBgm();
+    }, []),
+  );
 
   const currentUnit: UnitId = worm ? unitFromWorm(worm.stage) : "1-1";
   const meta = UNIT_META[currentUnit];

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import {
   View,
   Text,
@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { router } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
 import { usePurchaseItem, useShopItems } from "@/hooks/useShop";
 import { useWorm } from "@/hooks/useWorm";
 import { useToastStore } from "@/stores/useToastStore";
@@ -18,6 +18,7 @@ import { CategoryTabBar } from "@/components/shop/CategoryTabBar";
 import { WormSprite } from "@/components/worm/WormSprite";
 import { getApiErrorMessage } from "@/services/api";
 import { Colors } from "@/constants/colors";
+import { pauseBgm, playBgm } from "@/utils/bgm";
 import type {
   ShopCategory,
   ShopItem,
@@ -36,6 +37,13 @@ export default function ShopScreen() {
   const purchase = usePurchaseItem();
   const [category, setCategory] = useState<ShopCategory>("hat");
   const [preview, setPreview] = useState<PreviewMap>({});
+
+  useFocusEffect(
+    useCallback(() => {
+      playBgm("shop");
+      return () => pauseBgm();
+    }, []),
+  );
 
   const filtered = useMemo<ShopItemWithStatus[]>(
     () => items.filter((i) => i.category === category),

@@ -7,6 +7,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { Colors } from "@/constants/colors";
+import { feedback } from "@/utils/feedback";
 
 const ICON_SIZE = 26;
 const BAR_HEIGHT = 64;
@@ -56,6 +57,7 @@ export function LiquidGlassTabBar({
                 : Colors.tabBarInactive;
 
               const onPress = () => {
+                feedback.tabPress();
                 const event = navigation.emit({
                   type: "tabPress",
                   target: route.key,

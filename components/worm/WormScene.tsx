@@ -9,6 +9,7 @@ import Svg, {
 import { STAGE_SCENES, clampStage } from "@/constants/stages";
 import { WormSprite } from "./WormSprite";
 import { StageBackdrop } from "./StageBackdrop";
+import { feedback } from "@/utils/feedback";
 import type { WormState } from "@/types/worm";
 
 interface Props {
@@ -90,7 +91,13 @@ export function WormScene({ worm, displayStage, onWormPress }: Props) {
           ],
         }}
       >
-        <Pressable onPress={onWormPress} hitSlop={16}>
+        <Pressable
+          onPress={() => {
+            feedback.wormTap();
+            onWormPress?.();
+          }}
+          hitSlop={16}
+        >
           <WormSprite stage={worm.stage} equipped={worm.equipped} />
         </Pressable>
       </Animated.View>
