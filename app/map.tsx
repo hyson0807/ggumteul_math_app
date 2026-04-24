@@ -331,7 +331,10 @@ export default function MapScreen() {
                   onPress={
                     locked
                       ? undefined
-                      : () => router.push(`/stage/${UNIT_TO_STAGE[n.id]}`)
+                      : () => {
+                          router.dismiss();
+                          router.push(`/stage/${UNIT_TO_STAGE[n.id]}`);
+                        }
                   }
                 >
                   {isCurrent && (
