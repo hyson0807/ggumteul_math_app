@@ -2,7 +2,7 @@
   "expo": {
     "name": "꿈틀매쓰",
     "slug": "ggumteul_math_app",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "ggumteulmathapp",
@@ -11,6 +11,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.hyson.ggumteul-math-app",
+      "appleTeamId": "KX7984KBJW",
       "usesAppleSignIn": true,
       "config": {
         "usesNonExemptEncryption": false
