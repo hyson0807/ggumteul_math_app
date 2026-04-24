@@ -112,7 +112,7 @@ export default function MapScreen() {
               letterSpacing: 3,
             }}
           >
-            수학마을 지도
+            꿈틀매쓰 지도
           </Text>
           <Text style={{ fontSize: 22, fontWeight: "900", color: "#5D4037" }}>
             모험의 현재

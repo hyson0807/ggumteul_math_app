@@ -1,16 +1,16 @@
 {
   "expo": {
-    "name": "math_village_app",
-    "slug": "math_village_app",
+    "name": "꿈틀매쓰",
+    "slug": "ggumteul_math_app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "mathvillageapp",
+    "scheme": "ggumteulmathapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.hyson.math-village-app",
+      "bundleIdentifier": "com.hyson.ggumteul-math-app",
       "usesAppleSignIn": true,
       "appleTeamId": "REPLACE_WITH_APPLE_TEAM_ID"
     },
@@ -24,7 +24,7 @@
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "googleServicesFile": "./google-services.json",
-      "package": "com.hyson.mathvillageapp"
+      "package": "com.hyson.ggumteulmathapp"
     },
     "web": {
       "output": "static",
