@@ -6,6 +6,8 @@ interface Props {
   item: ShopItemWithStatus;
   currentStage: number;
   onPurchase: () => void;
+  onTryOn?: () => void;
+  previewing?: boolean;
   disabled?: boolean;
   busy?: boolean;
 }
@@ -14,6 +16,8 @@ export function ShopItemCard({
   item,
   currentStage,
   onPurchase,
+  onTryOn,
+  previewing,
   disabled,
   busy,
 }: Props) {
@@ -29,7 +33,22 @@ export function ShopItemCard({
   const ctaDisabled = disabled || isOwned || locked;
 
   return (
-    <View className="flex-1 bg-village-surface rounded-2xl p-3 border border-village-border">
+    <TouchableOpacity
+      activeOpacity={onTryOn ? 0.8 : 1}
+      onPress={onTryOn}
+      disabled={!onTryOn}
+      className={`flex-1 rounded-2xl p-3 border ${
+        previewing
+          ? "bg-white border-village-primary border-2"
+          : "bg-village-surface border-village-border"
+      }`}
+    >
+      {previewing && (
+        <View className="absolute -top-2 -right-2 z-10 bg-village-primary w-6 h-6 rounded-full items-center justify-center border-2 border-white">
+          <MaterialCommunityIcons name="check" size={14} color="#fff" />
+        </View>
+      )}
+
       <View className="h-24 items-center justify-center bg-white/60 rounded-xl mb-2">
         <MaterialCommunityIcons
           name={
@@ -81,6 +100,6 @@ export function ShopItemCard({
           </>
         )}
       </TouchableOpacity>
-    </View>
+    </TouchableOpacity>
   );
 }

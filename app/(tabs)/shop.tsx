@@ -8,82 +8,135 @@ import {
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { router } from "expo-router";
 import { usePurchaseItem, useShopItems } from "@/hooks/useShop";
+import { useWorm } from "@/hooks/useWorm";
 import { useToastStore } from "@/stores/useToastStore";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { ShopItemCard } from "@/components/shop/ShopItemCard";
+import { CategoryTabBar } from "@/components/shop/CategoryTabBar";
+import { WormSprite } from "@/components/worm/WormSprite";
 import { getApiErrorMessage } from "@/services/api";
-import { SHOP_CATEGORY_CONFIG } from "@/constants/shop";
-import type { ShopCategory, ShopItemWithStatus } from "@/types/shop";
+import { Colors } from "@/constants/colors";
+import type {
+  ShopCategory,
+  ShopItem,
+  ShopItemWithStatus,
+} from "@/types/shop";
+import type { WormState } from "@/types/worm";
+
+type PreviewMap = Partial<Record<ShopCategory, ShopItem>>;
 
 export default function ShopScreen() {
   const insets = useSafeAreaInsets();
   const user = useAuthStore((s) => s.user);
   const showToast = useToastStore((s) => s.show);
   const { data: items = [], isLoading } = useShopItems();
+  const { data: worm } = useWorm();
   const purchase = usePurchaseItem();
   const [category, setCategory] = useState<ShopCategory>("hat");
+  const [preview, setPreview] = useState<PreviewMap>({});
 
   const filtered = useMemo<ShopItemWithStatus[]>(
     () => items.filter((i) => i.category === category),
     [items, category],
   );
 
+  const mergedEquipped = useMemo<WormState["equipped"]>(
+    () => ({
+      hat: preview.hat ?? worm?.equipped.hat ?? null,
+      body: preview.body ?? worm?.equipped.body ?? null,
+      accessory: preview.accessory ?? worm?.equipped.accessory ?? null,
+    }),
+    [preview, worm?.equipped],
+  );
+
+  const hasPreview = Boolean(
+    preview.hat || preview.body || preview.accessory,
+  );
+
   const handlePurchase = (item: ShopItemWithStatus) => {
     purchase.mutate(item.id, {
-      onSuccess: () => showToast(`${item.name} 구매 완료!`, "success"),
-      onError: (e) => showToast(getApiErrorMessage(e, "구매에 실패했어요."), "error"),
+      onSuccess: () =>
+        showToast(`${item.name} 구매 완료! 가방에서 장착하세요.`, "success"),
+      onError: (e) =>
+        showToast(getApiErrorMessage(e, "구매에 실패했어요."), "error"),
     });
   };
+
+  const handleTryOn = (item: ShopItemWithStatus) => {
+    setPreview((p) => {
+      const cur = p[item.category];
+      if (cur?.id === item.id) {
+        const next = { ...p };
+        delete next[item.category];
+        return next;
+      }
+      return { ...p, [item.category]: item };
+    });
+  };
+
+  const resetPreview = () => setPreview({});
 
   return (
     <View
       className="flex-1 bg-transparent px-5"
       style={{ paddingTop: insets.top + 12, paddingBottom: insets.bottom + 96 }}
     >
-      <View className="flex-row items-center justify-between mb-4">
-        <Text className="text-xl font-bold text-village-text">상점</Text>
+      <View className="flex-row items-center justify-between mb-3">
+        <TouchableOpacity
+          onPress={() => router.push("/bag")}
+          className="flex-row items-center bg-white/80 rounded-full pl-2 pr-3 py-1.5 border border-village-border"
+          activeOpacity={0.8}
+        >
+          <MaterialCommunityIcons
+            name="bag-personal"
+            size={18}
+            color={Colors.primary}
+          />
+          <Text className="text-sm font-bold text-village-text ml-1">
+            내 가방
+          </Text>
+        </TouchableOpacity>
         <View className="flex-row items-center bg-white/80 rounded-full px-3 py-1.5 border border-village-border">
-          <MaterialCommunityIcons name="circle" size={14} color="#DAA520" />
+          <MaterialCommunityIcons name="circle" size={14} color={Colors.coin} />
           <Text className="text-sm font-bold text-village-text ml-1">
             {user?.coins ?? 0}
           </Text>
         </View>
       </View>
 
-      {/* 카테고리 탭 */}
-      <View className="flex-row mb-4 bg-village-surface rounded-2xl p-1 border border-village-border">
-        {SHOP_CATEGORY_CONFIG.map((c) => {
-          const active = c.key === category;
-          return (
-            <TouchableOpacity
-              key={c.key}
-              className={`flex-1 py-2 rounded-xl flex-row items-center justify-center ${
-                active ? "bg-village-primary" : ""
-              }`}
-              onPress={() => setCategory(c.key)}
-              activeOpacity={0.8}
-            >
-              <MaterialCommunityIcons
-                name={c.icon as never}
-                size={16}
-                color={active ? "#fff" : "#8D6E63"}
-              />
-              <Text
-                className={`ml-1 text-sm font-semibold ${
-                  active ? "text-white" : "text-village-text-secondary"
-                }`}
-              >
-                {c.label}
-              </Text>
-            </TouchableOpacity>
-          );
-        })}
+      <View className="rounded-3xl bg-white/70 border border-village-border py-5 items-center justify-center mb-4 relative">
+        <WormSprite
+          stage={worm?.stage ?? user?.wormStage ?? 1}
+          equipped={mergedEquipped}
+          size={1.2}
+        />
+        {hasPreview && (
+          <TouchableOpacity
+            onPress={resetPreview}
+            className="absolute top-2 right-2 flex-row items-center bg-village-surface rounded-full px-3 py-1 border border-village-border"
+            activeOpacity={0.8}
+          >
+            <MaterialCommunityIcons
+              name="restore"
+              size={14}
+              color={Colors.textSecondary}
+            />
+            <Text className="text-[11px] font-semibold text-village-text-secondary ml-1">
+              원래대로
+            </Text>
+          </TouchableOpacity>
+        )}
+      </View>
+
+      <View className="mb-4">
+        <CategoryTabBar value={category} onChange={setCategory} />
       </View>
 
       {isLoading ? (
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#A0522D" />
+          <ActivityIndicator size="large" color={Colors.primary} />
         </View>
       ) : filtered.length === 0 ? (
         <View className="flex-1 items-center justify-center">
@@ -103,6 +156,8 @@ export default function ShopScreen() {
                   item={item}
                   currentStage={user?.wormStage ?? 1}
                   onPurchase={() => handlePurchase(item)}
+                  onTryOn={() => handleTryOn(item)}
+                  previewing={preview[item.category]?.id === item.id}
                   busy={purchase.isPending && purchase.variables === item.id}
                 />
               </View>

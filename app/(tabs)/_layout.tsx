@@ -38,15 +38,6 @@ export default function TabsLayout() {
             }}
           />
           <Tabs.Screen
-            name="bag"
-            options={{
-              title: "내 가방",
-              tabBarIcon: ({ color, size }) => (
-                <MaterialCommunityIcons name="bag-personal" size={size} color={color} />
-              ),
-            }}
-          />
-          <Tabs.Screen
             name="profile"
             options={{
               title: "프로필",
