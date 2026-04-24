@@ -5,6 +5,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { Toast } from "@/components/common/Toast";
+import { BgmController } from "@/components/common/BgmController";
 import { View, ActivityIndicator } from "react-native";
 
 export default function RootLayout() {
@@ -66,6 +67,7 @@ export default function RootLayout() {
           <Stack.Screen name="concept/[conceptId]" />
           <Stack.Screen name="bag" />
         </Stack>
+        <BgmController />
         <Toast />
       </SafeAreaProvider>
     </QueryProvider>

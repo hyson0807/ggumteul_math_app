@@ -1,6 +1,6 @@
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { ActivityIndicator, View } from "react-native";
-import { useFocusEffect, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useWorm } from "@/hooks/useWorm";
@@ -10,7 +10,6 @@ import { HUD } from "@/components/worm/HUD";
 import { FocusCard } from "@/components/worm/FocusCard";
 import { DevStageSwitcher } from "@/components/worm/DevStageSwitcher";
 import { STAGE_SCENES, clampStage, type StageId } from "@/constants/stages";
-import { pauseBgm, playBgm } from "@/utils/bgm";
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -25,13 +24,6 @@ export default function HomeScreen() {
   const displayStage: StageId = __DEV__ && devStage != null ? devStage : realStage;
 
   const { data: stageNodesData } = useStageNodes(displayStage);
-
-  useFocusEffect(
-    useCallback(() => {
-      playBgm("home");
-      return () => pauseBgm();
-    }, []),
-  );
 
   if (isLoading || !worm) {
     return (
