@@ -25,6 +25,7 @@ module.exports = {
         "village-ground-grass": "#7FB83D",
         "village-sky": "#8FC9F9",
         "village-space": "#0B0E2A",
+        "village-splash-bg": "#2E2217",
       },
     },
   },

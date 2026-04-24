@@ -3,62 +3,41 @@ import { useEffect, useState } from "react";
 import { Stack, useSegments, useRouter } from "expo-router";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useFonts, Jua_400Regular } from "@expo-google-fonts/jua";
-import { GowunDodum_400Regular } from "@expo-google-fonts/gowun-dodum";
+import * as SplashScreen from "expo-splash-screen";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { Toast } from "@/components/common/Toast";
 import { BgmController } from "@/components/common/BgmController";
-import { View, ActivityIndicator } from "react-native";
+import { isUserOnboarded } from "@/utils/onboarding";
+
+SplashScreen.preventAutoHideAsync().catch(() => {});
 
 export default function RootLayout() {
-  const [fontsLoaded] = useFonts({
-    Jua: Jua_400Regular,
-    GowunDodum: GowunDodum_400Regular,
-  });
   const isInitialized = useAuthStore((s) => s.isInitialized);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-  const tutorType = useAuthStore((s) => s.user?.tutorType);
-  const name = useAuthStore((s) => s.user?.name);
-  const grade = useAuthStore((s) => s.user?.grade);
-  const initialize = useAuthStore((s) => s.initialize);
+  const user = useAuthStore((s) => s.user);
   const rootSegment = useSegments()[0];
   const router = useRouter();
 
-  useEffect(() => {
-    initialize();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
+  // 부팅 이후의 인증 상태 변화(로그아웃, 온보딩 진행 등)에만 반응.
+  // 초기 진입(rootSegment == null)은 app/index.tsx의 StartupScreen이 담당.
   useEffect(() => {
     if (!isInitialized) return;
-
-    const needsOnboarding = !tutorType || !name || !grade;
+    if (rootSegment == null) return;
 
     if (!isAuthenticated) {
       if (rootSegment !== "(auth)") {
         router.replace("/(auth)/login");
       }
-    } else if (needsOnboarding) {
+    } else if (!isUserOnboarded(user)) {
       if (rootSegment !== "(onboarding)") {
         router.replace("/(onboarding)/select-tutor");
       }
     } else {
-      // 인증 + 온보딩 완료 상태.
-      // (auth) 또는 루트 index에 있으면 홈으로 보내고,
-      // 그 외 (tabs, onboarding, map, stage, concept, ...)는 자유롭게 이동하도록 허용.
-      if (rootSegment === "(auth)" || rootSegment == null) {
+      if (rootSegment === "(auth)") {
         router.replace("/(tabs)/home");
       }
     }
-  }, [isInitialized, isAuthenticated, tutorType, name, grade, rootSegment]);
-
-  if (!isInitialized || !fontsLoaded) {
-    return (
-      <View className="flex-1 bg-[#FFE2DE] items-center justify-center">
-        <ActivityIndicator size="large" color="#A0522D" />
-      </View>
-    );
-  }
+  }, [isInitialized, isAuthenticated, user, rootSegment, router]);
 
   return (
     <QueryProvider>
