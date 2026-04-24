@@ -2,7 +2,9 @@ import { useRef, useState } from "react";
 import {
   ActivityIndicator,
   Image,
+  KeyboardAvoidingView,
   Modal,
+  Platform,
   ScrollView,
   Text,
   TextInput,
@@ -105,7 +107,10 @@ export default function ConceptScreen() {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: Colors.background, paddingTop: insets.top }}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={{ flex: 1, backgroundColor: Colors.background, paddingTop: insets.top }}
+    >
       {/* Header */}
       <View style={{ paddingHorizontal: 18, paddingVertical: 14, flexDirection: "row", alignItems: "center", gap: 12 }}>
         <TouchableOpacity
@@ -139,8 +144,10 @@ export default function ConceptScreen() {
       </View>
 
       <ScrollView
-        contentContainerStyle={{ paddingHorizontal: 18, paddingBottom: insets.bottom + 100 }}
+        style={{ flex: 1 }}
+        contentContainerStyle={{ paddingHorizontal: 18, paddingBottom: 20 }}
         keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="interactive"
       >
         <View
           style={{
@@ -207,6 +214,11 @@ export default function ConceptScreen() {
               returnKeyType="done"
               autoCapitalize="none"
               autoCorrect={false}
+              autoComplete="off"
+              spellCheck={false}
+              textContentType="none"
+              importantForAutofill="no"
+              keyboardAppearance="dark"
             />
           </View>
         )}
@@ -215,8 +227,9 @@ export default function ConceptScreen() {
       {/* Submit CTA */}
       <View
         style={{
-          position: "absolute",
-          left: 18, right: 18, bottom: insets.bottom + 18,
+          paddingHorizontal: 18,
+          paddingTop: 8,
+          paddingBottom: insets.bottom + 18,
         }}
       >
         <TouchableOpacity
@@ -251,7 +264,7 @@ export default function ConceptScreen() {
           />
         )}
       </Modal>
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 
