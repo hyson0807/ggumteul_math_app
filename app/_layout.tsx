@@ -51,6 +51,7 @@ export default function RootLayout() {
           <Stack.Screen name="stage/[stage]" />
           <Stack.Screen name="concept/[conceptId]" />
           <Stack.Screen name="bag" />
+          <Stack.Screen name="settings" />
         </Stack>
         <BgmController />
         <Toast />
