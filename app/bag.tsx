@@ -86,7 +86,6 @@ export default function BagScreen() {
 
       <View className="mx-5 mt-2 mb-4 rounded-3xl bg-white/70 border border-village-border py-6 items-center justify-center">
         <WormSprite
-          stage={worm?.stage ?? user?.wormStage ?? 1}
           equipped={worm?.equipped}
           size={1.4}
         />

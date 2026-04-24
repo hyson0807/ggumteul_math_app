@@ -11,7 +11,6 @@ import type { WormState } from "@/types/worm";
 type Equipped = WormState["equipped"];
 
 interface Props {
-  stage: number;
   equipped?: Equipped;
   size?: number;
 }
@@ -31,33 +30,25 @@ function hasGlasses(equipped: Equipped | undefined): boolean {
   return name.includes("안경") || name.includes("이슬");
 }
 
-export function WormSprite({ stage, equipped, size = 1 }: Props) {
+export function WormSprite({ equipped, size = 1 }: Props) {
   const hatKind = hatKindFor(equipped);
   const glasses = hasGlasses(equipped);
-  if (stage >= 5) return <Butterfly size={size} />;
-  if (stage === 4) return <Cocoon size={size} />;
-  if (stage === 3)
-    return <Caterpillar size={size} hatKind={hatKind} glasses={glasses} />;
-  return (
-    <Worm stage={stage} size={size} hatKind={hatKind} glasses={glasses} />
-  );
+  return <Worm size={size} hatKind={hatKind} glasses={glasses} />;
 }
 
 function Worm({
-  stage,
   size,
   hatKind,
   glasses,
 }: {
-  stage: number;
   size: number;
   hatKind: HatKind | null;
   glasses: boolean;
 }) {
   const w = 120 * size;
   const h = 80 * size;
-  const body = stage === 1 ? "#E89B7A" : "#F0B090";
-  const shade = stage === 1 ? "#C87A5A" : "#D48B6A";
+  const body = "#E89B7A";
+  const shade = "#C87A5A";
   return (
     <View style={{ width: w, height: h, position: "relative" }}>
       <Svg width={w} height={h} viewBox="0 0 120 80">
@@ -95,159 +86,6 @@ function Worm({
           <Glasses scale={size} />
         </View>
       )}
-    </View>
-  );
-}
-
-function Caterpillar({
-  size,
-  hatKind,
-  glasses,
-}: {
-  size: number;
-  hatKind: HatKind | null;
-  glasses: boolean;
-}) {
-  const w = 130 * size;
-  const h = 80 * size;
-  const body = "#C8E080";
-  const shade = "#9DBB5A";
-  return (
-    <View style={{ width: w, height: h, position: "relative" }}>
-      <Svg width={w} height={h} viewBox="0 0 130 80">
-        <Ellipse cx={65} cy={72} rx={44} ry={4} fill="rgba(0,0,0,0.15)" />
-        {[22, 40, 58, 76, 94].map((cx) => (
-          <G key={cx}>
-            <Circle cx={cx} cy={48} r={15} fill={body} />
-            <Circle cx={cx - 4} cy={46} r={10} fill={shade} opacity={0.3} />
-          </G>
-        ))}
-        <Circle cx={102} cy={44} r={14} fill={body} />
-        <Circle cx={96} cy={42} r={4} fill="#E8F5C0" opacity={0.8} />
-        <Path
-          d="M104 32 Q106 24 110 22"
-          stroke={shade}
-          strokeWidth={1.6}
-          fill="none"
-          strokeLinecap="round"
-        />
-        <Circle cx={110.5} cy={22} r={1.8} fill={shade} />
-        <Path
-          d="M100 32 Q100 24 96 22"
-          stroke={shade}
-          strokeWidth={1.6}
-          fill="none"
-          strokeLinecap="round"
-        />
-        <Circle cx={95.5} cy={22} r={1.8} fill={shade} />
-        <Circle cx={108} cy={52} r={3} fill="#F19C8A" opacity={0.55} />
-        <Circle cx={106} cy={44} r={2.4} fill="#2A1810" />
-        <Circle cx={106.8} cy={43.4} r={0.8} fill="#fff" />
-        <Path
-          d="M104 50 Q107 52 110 50"
-          stroke="#6B3A2A"
-          strokeWidth={1.4}
-          fill="none"
-          strokeLinecap="round"
-        />
-      </Svg>
-      {hatKind && (
-        <View
-          style={{ position: "absolute", left: 92 * size, top: 14 * size }}
-        >
-          <HatOverlay kind={hatKind} scale={size} />
-        </View>
-      )}
-      {glasses && (
-        <View
-          style={{ position: "absolute", left: 88 * size, top: 40 * size }}
-        >
-          <Glasses scale={size} />
-        </View>
-      )}
-    </View>
-  );
-}
-
-function Cocoon({ size }: { size: number }) {
-  const w = 100 * size;
-  const h = 120 * size;
-  return (
-    <View style={{ width: w, height: h }}>
-      <Svg width={w} height={h} viewBox="0 0 100 120">
-        <Path
-          d="M50 4 L50 24"
-          stroke="#B8A880"
-          strokeWidth={1.2}
-          strokeDasharray="2 2"
-        />
-        <Ellipse cx={50} cy={64} rx={26} ry={38} fill="#D9C8A8" />
-        <Ellipse cx={42} cy={50} rx={8} ry={16} fill="#EEDDBB" opacity={0.7} />
-        {[32, 46, 60, 74, 88].map((y) => (
-          <Path
-            key={y}
-            d={`M26 ${y} Q50 ${y + 3} 74 ${y}`}
-            stroke="#B8A880"
-            strokeWidth={1}
-            fill="none"
-            opacity={0.6}
-          />
-        ))}
-        <Path
-          d="M40 62 Q43 60 46 62"
-          stroke="#6B5A3A"
-          strokeWidth={1.4}
-          fill="none"
-          strokeLinecap="round"
-        />
-        <Path
-          d="M54 62 Q57 60 60 62"
-          stroke="#6B5A3A"
-          strokeWidth={1.4}
-          fill="none"
-          strokeLinecap="round"
-        />
-        <Circle cx={50} cy={70} r={2.5} fill="#C88A6A" opacity={0.5} />
-      </Svg>
-    </View>
-  );
-}
-
-function Butterfly({ size }: { size: number }) {
-  const w = 140 * size;
-  const h = 120 * size;
-  return (
-    <View style={{ width: w, height: h }}>
-      <Svg width={w} height={h} viewBox="0 0 140 120">
-        <Path d="M70 60 Q28 22 18 50 Q10 76 40 84 Q60 84 70 70 Z" fill="#F5B9D0" />
-        <Path d="M70 60 Q112 22 122 50 Q130 76 100 84 Q80 84 70 70 Z" fill="#F5B9D0" />
-        <Path d="M70 62 Q46 92 34 100 Q56 110 70 86 Z" fill="#FFD9CF" />
-        <Path d="M70 62 Q94 92 106 100 Q84 110 70 86 Z" fill="#FFD9CF" />
-        <Circle cx={36} cy={54} r={3} fill="#C0628A" />
-        <Circle cx={104} cy={54} r={3} fill="#C0628A" />
-        <Circle cx={46} cy={98} r={2} fill="#E0856A" />
-        <Circle cx={94} cy={98} r={2} fill="#E0856A" />
-        <Ellipse cx={70} cy={68} rx={5} ry={22} fill="#5D4037" />
-        <Circle cx={70} cy={48} r={6} fill="#5D4037" />
-        <Path
-          d="M68 44 Q64 36 60 34"
-          stroke="#5D4037"
-          strokeWidth={1.6}
-          fill="none"
-          strokeLinecap="round"
-        />
-        <Path
-          d="M72 44 Q76 36 80 34"
-          stroke="#5D4037"
-          strokeWidth={1.6}
-          fill="none"
-          strokeLinecap="round"
-        />
-        <Circle cx={60} cy={34} r={1.6} fill="#5D4037" />
-        <Circle cx={80} cy={34} r={1.6} fill="#5D4037" />
-        <Circle cx={68} cy={48} r={1.4} fill="#fff" />
-        <Circle cx={72} cy={48} r={1.4} fill="#fff" />
-      </Svg>
     </View>
   );
 }

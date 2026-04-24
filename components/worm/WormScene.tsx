@@ -98,7 +98,7 @@ export function WormScene({ worm, displayStage, onWormPress }: Props) {
           }}
           hitSlop={16}
         >
-          <WormSprite stage={worm.stage} equipped={worm.equipped} />
+          <WormSprite equipped={worm.equipped} />
         </Pressable>
       </Animated.View>
     </View>

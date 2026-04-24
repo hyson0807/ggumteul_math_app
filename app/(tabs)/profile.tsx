@@ -69,7 +69,6 @@ export default function ProfileScreen() {
           }}
         >
           <WormSprite
-            stage={stage}
             equipped={worm?.equipped}
             size={0.7}
           />

@@ -108,7 +108,6 @@ export default function ShopScreen() {
 
       <View className="rounded-3xl bg-white/70 border border-village-border py-5 items-center justify-center mb-4 relative">
         <WormSprite
-          stage={worm?.stage ?? user?.wormStage ?? 1}
           equipped={mergedEquipped}
           size={1.2}
         />
