@@ -2,6 +2,7 @@ import { View } from "react-native";
 import { Tabs } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { LiquidGlassTabBar } from "@/components/navigation/LiquidGlassTabBar";
+import { WormTabIcon } from "@/components/navigation/WormTabIcon";
 
 export default function TabsLayout() {
   return (
@@ -41,9 +42,7 @@ export default function TabsLayout() {
             name="profile"
             options={{
               title: "프로필",
-              tabBarIcon: ({ color, size }) => (
-                <MaterialCommunityIcons name="account-circle" size={size} color={color} />
-              ),
+              tabBarIcon: ({ focused }) => <WormTabIcon focused={focused} />,
             }}
           />
         </Tabs>

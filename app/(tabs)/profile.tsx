@@ -2,11 +2,25 @@ import { View, Text, TouchableOpacity, Alert, ScrollView } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuthStore } from "@/stores/useAuthStore";
-import { WORM_STAGE_LABELS } from "@/constants/worm";
+import { WORM_STAGE_LABELS, MAX_WORM_STAGE } from "@/constants/worm";
+import { WormSprite } from "@/components/worm/WormSprite";
+import { useWorm } from "@/hooks/useWorm";
+import { Colors } from "@/constants/colors";
+
+function formatJoinedDate(isoDate?: string) {
+  if (!isoDate) return "-";
+  const d = new Date(isoDate);
+  if (Number.isNaN(d.getTime())) return "-";
+  return `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일`;
+}
 
 export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
   const { user, logout, deleteAccount } = useAuthStore();
+  const { data: worm } = useWorm();
+
+  const stage = Math.min(Math.max(user?.wormStage ?? 1, 1), MAX_WORM_STAGE);
+  const stageLabel = WORM_STAGE_LABELS[stage];
 
   const handleLogout = async () => {
     await logout();
@@ -31,76 +45,120 @@ export default function ProfileScreen() {
 
   return (
     <ScrollView
-      className="flex-1 bg-transparent px-6"
+      className="flex-1 bg-transparent"
       contentContainerStyle={{
-        paddingTop: insets.top + 16,
-        paddingBottom: insets.bottom + 96,
+        paddingTop: insets.top + 8,
+        paddingBottom: insets.bottom + 120,
+        paddingHorizontal: 24,
       }}
     >
-      <Text className="text-xl font-bold text-[#5D4037] mb-6">프로필</Text>
-
-      {/* 사용자 정보 카드 */}
-      <View className="bg-[#FFF8F0] rounded-2xl p-5 mb-4 items-center border border-[#F0D5C8]">
-        <View className="w-20 h-20 rounded-full bg-transparent items-center justify-center mb-3">
-          <MaterialCommunityIcons
-            name="account-circle"
-            size={40}
-            color="#A0522D"
+      {/* 상단 아바타 */}
+      <View className="items-center mt-4">
+        <View
+          className="rounded-full bg-village-surface items-center justify-center"
+          style={{
+            width: 120,
+            height: 120,
+            borderWidth: 4,
+            borderColor: "#FFFFFF",
+            shadowColor: "#000",
+            shadowOpacity: 0.08,
+            shadowRadius: 8,
+            shadowOffset: { width: 0, height: 3 },
+            elevation: 3,
+          }}
+        >
+          <WormSprite
+            stage={stage}
+            equipped={worm?.equipped}
+            size={0.7}
           />
         </View>
-        <Text className="text-lg font-bold text-[#5D4037]">
-          {user?.name ?? user?.email}
+
+        <Text className="text-[20px] font-extrabold text-village-text mt-4">
+          {user?.name ?? "이름 없음"}
         </Text>
-        <Text className="text-sm text-[#8D6E63] mt-1">
-          {user?.grade}학년 · Lv.{user?.level}
+        <Text className="text-sm text-village-text-secondary mt-1">
+          {user?.grade ? `${user.grade}학년` : "학년 미설정"} · Lv.
+          {user?.level ?? 1}
         </Text>
       </View>
 
-      {/* 지렁이 진행도 */}
-      <View className="bg-[#FFF8F0] rounded-2xl p-5 mb-4 border border-[#F0D5C8]">
-        <Text className="text-base font-semibold text-[#5D4037] mb-3">
-          지렁이 진행도
-        </Text>
-        <View className="flex-row justify-around">
-          <View className="items-center">
-            <Text className="text-2xl font-bold text-[#A0522D]">
-              Lv.{user?.wormStage ?? 1}
-            </Text>
-            <Text className="text-xs text-[#8D6E63]">
-              {WORM_STAGE_LABELS[user?.wormStage ?? 1]}
-            </Text>
-          </View>
-          <View className="items-center">
-            <Text className="text-2xl font-bold text-[#6B8E23]">
-              {user?.wormProgress ?? 0}
-            </Text>
-            <Text className="text-xs text-[#8D6E63]">이번 단계 진행</Text>
-          </View>
-          <View className="items-center">
-            <Text className="text-2xl font-bold text-[#DAA520]">
-              {user?.coins ?? 0}
-            </Text>
-            <Text className="text-xs text-[#8D6E63]">보유 코인</Text>
-          </View>
-        </View>
+      {/* 스탯 카드 */}
+      <View
+        className="bg-village-surface mt-6"
+        style={{
+          borderRadius: 24,
+          paddingHorizontal: 20,
+          paddingVertical: 4,
+          shadowColor: "#000",
+          shadowOpacity: 0.05,
+          shadowRadius: 10,
+          shadowOffset: { width: 0, height: 2 },
+          elevation: 2,
+        }}
+      >
+        <StatRow label="단계" value={stageLabel} />
+        <Divider />
+        <StatRow label="모은 별" value={`${user?.stars ?? 0}`} />
+        <Divider />
+        <StatRow label="모은 코인" value={`${user?.coins ?? 0}`} />
+        <Divider />
+        <StatRow label="가입일" value={formatJoinedDate(user?.createdAt)} />
       </View>
 
       {/* 로그아웃 */}
       <TouchableOpacity
-        className="bg-[#FFF8F0] rounded-2xl p-4 flex-row items-center justify-center border border-[#F0D5C8] mb-3"
+        className="bg-village-surface mt-5 flex-row items-center justify-center"
+        style={{
+          borderRadius: 18,
+          paddingVertical: 12,
+          shadowColor: "#000",
+          shadowOpacity: 0.04,
+          shadowRadius: 6,
+          shadowOffset: { width: 0, height: 2 },
+          elevation: 1,
+        }}
         onPress={handleLogout}
       >
-        <MaterialCommunityIcons name="logout" size={20} color="#8D6E63" />
-        <Text className="text-[#8D6E63] font-semibold ml-2">로그아웃</Text>
+        <MaterialCommunityIcons
+          name="logout"
+          size={18}
+          color={Colors.textSecondary}
+        />
+        <Text className="text-village-text-secondary font-semibold ml-2 text-sm">
+          로그아웃
+        </Text>
       </TouchableOpacity>
 
       {/* 회원 탈퇴 */}
       <TouchableOpacity
-        className="rounded-2xl p-4 flex-row items-center justify-center"
+        className="items-center mt-3 py-2"
         onPress={handleDeleteAccount}
       >
-        <Text className="text-[#CDAB8F] text-sm">회원 탈퇴</Text>
+        <Text className="text-village-inactive text-xs">회원 탈퇴</Text>
       </TouchableOpacity>
     </ScrollView>
+  );
+}
+
+function StatRow({ label, value }: { label: string; value: string }) {
+  return (
+    <View className="flex-row items-center justify-between py-3.5">
+      <Text className="text-sm text-village-text-secondary">{label}</Text>
+      <Text className="text-base font-bold text-village-text">{value}</Text>
+    </View>
+  );
+}
+
+function Divider() {
+  return (
+    <View
+      style={{
+        height: 1,
+        backgroundColor: Colors.surfaceBorder,
+        opacity: 0.6,
+      }}
+    />
   );
 }
