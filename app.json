@@ -12,7 +12,9 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.hyson.ggumteul-math-app",
       "usesAppleSignIn": true,
-      "appleTeamId": "REPLACE_WITH_APPLE_TEAM_ID"
+      "config": {
+        "usesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -54,7 +56,12 @@
           "iosUrlScheme": "com.googleusercontent.apps.90199202530-d2g716susi8esg5ho07kk0vc7osgiqif"
         }
       ],
-      "expo-audio",
+      [
+        "expo-audio",
+        {
+          "microphonePermission": false
+        }
+      ],
       "expo-updates"
     ],
     "experiments": {
