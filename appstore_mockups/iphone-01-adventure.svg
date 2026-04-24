@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1242" height="2688" viewBox="0 0 1242 2688">
+    <defs>
+      <linearGradient id="bgiphone0" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#FFF4E6"/>
+        <stop offset="55%" stop-color="#FFE2DE"/>
+        <stop offset="100%" stop-color="#F7C9B8"/>
+      </linearGradient>
+      <pattern id="paperiphone0" width="38" height="38" patternUnits="userSpaceOnUse">
+        <circle cx="6" cy="9" r="1.4" fill="#C8956C" opacity=".18"/>
+        <circle cx="29" cy="24" r="1.2" fill="#C8956C" opacity=".16"/>
+      </pattern>
+      <filter id="shadowiphone0" x="-20%" y="-20%" width="140%" height="140%">
+        <feDropShadow dx="0" dy="18" stdDeviation="16" flood-color="#8D5F48" flood-opacity=".20"/>
+      </filter>
+    </defs>
+    <rect width="100%" height="100%" fill="url(#bgiphone0)"/>
+    <rect width="100%" height="100%" fill="url(#paperiphone0)"/>
+    <text x="621" y="170" font-family="Apple SD Gothic Neo, Arial, sans-serif" font-size="72" font-weight="900" fill="#5D4037" text-anchor="middle"><tspan x="621" dy="0">깊은 땅에서 하늘까지</tspan></text>
+    <text x="621" y="346.4" font-family="Apple SD Gothic Neo, Arial, sans-serif" font-size="30" font-weight="800" fill="#8D6E63" text-anchor="middle"><tspan x="621" dy="0">문제를 풀수록 지렁이가 한 단계씩</tspan><tspan x="621" dy="36.6">올라가요</tspan></text>
+    <g filter="url(#shadowiphone0)"><g transform="translate(112 591)">
+    <rect width="1018" height="1559" rx="56" fill="#2A1810" opacity=".18"/>
+    <rect x="0" y="-12" width="1018" height="1559" rx="56" fill="#fff" stroke="#F4D9CC" stroke-width="6"/>
+    <clipPath id="clip-iphone-0"><rect x="24" y="12" width="970" height="1511" rx="34"/></clipPath>
+    <g clip-path="url(#clip-iphone-0)" transform="translate(24 12)">
+      <rect width="970" height="1511" fill="#2A1810"/>
+    <rect y="831.0500000000001" width="970" height="679.95" fill="#1A0F08"/>
+    <path d="M0 1118.14 C 174.6 1027.48, 252.20000000000002 1299.46, 446.20000000000005 1178.58 S 776 997.26, 970 1148.36 L 970 1511 L0 1511Z" fill="#3A2418" opacity=".95"/>
+    <path d="M0 302.2 C 194 377.75, 339.5 120.88, 504.40000000000003 271.98 S 795.4 453.3, 970 271.98" stroke="#8A5A3A" stroke-width="18" fill="none" opacity=".38"/>
+    <rect x="42" y="46" width="190" height="58" rx="29" fill="rgba(255,248,240,.9)" stroke="#F0D5C8" stroke-width="3"/>
+    <g><circle cx="72" cy="75" r="17" fill="#DAA520" stroke="#B8860B" stroke-width="2.21"/><text x="72" y="81.12" font-family="Arial" font-size="18.700000000000003" font-weight="900" fill="#FFF5C2" text-anchor="middle">₩</text></g>
+    <text x="104" y="85" font-family="Apple SD Gothic Neo, Arial, sans-serif" font-size="28" font-weight="900" fill="#5D4037" text-anchor="start"><tspan x="104" dy="0">1,240</tspan></text>
+    <rect x="735" y="46" width="190" height="58" rx="29" fill="rgba(255,248,240,.9)" stroke="#F0D5C8" stroke-width="3"/>
+    <text x="830" y="83" font-family="Apple SD Gothic Neo, Arial, sans-serif" font-size="25" font-weight="900" fill="#A0522D" text-anchor="middle"><tspan x="830" dy="0">2학년 1학기</tspan></text>
+    <circle cx="485" cy="543.96" r="271.6" fill="#FFF3D0" opacity=".12"/>
+    <g transform="translate(375 438.74) scale(1.85)">
+    <ellipse cx="60" cy="72" rx="40" ry="4" fill="rgba(0,0,0,.18)"/>
+    <g><circle cx="28" cy="50" r="14" fill="#E89B7A"/><circle cx="24" cy="48" r="10" fill="#C87A5A" opacity=".35"/></g><g><circle cx="44" cy="50" r="14" fill="#E89B7A"/><circle cx="40" cy="48" r="10" fill="#C87A5A" opacity=".35"/></g><g><circle cx="60" cy="50" r="14" fill="#E89B7A"/><circle cx="56" cy="48" r="10" fill="#C87A5A" opacity=".35"/></g><g><circle cx="76" cy="50" r="14" fill="#E89B7A"/><circle cx="72" cy="48" r="10" fill="#C87A5A" opacity=".35"/></g><g><circle cx="90" cy="50" r="14" fill="#E89B7A"/><circle cx="86" cy="48" r="10" fill="#C87A5A" opacity=".35"/></g>
+    <circle cx="94" cy="46" r="13.5" fill="#E89B7A"/>
+    <circle cx="88" cy="44" r="4" fill="#FFE6D3" opacity=".8"/>
+    <circle cx="100" cy="54" r="3" fill="#F19C8A" opacity=".55"/>
+    <circle cx="98" cy="46" r="2.4" fill="#2A1810"/>
+    <circle cx="98.8" cy="45.4" r=".8" fill="#fff"/>
+    <path d="M96 52 Q99 54 102 52" stroke="#6B3A2A" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+    <ellipse cx="99" cy="32" rx="10" ry="8" fill="#C88454"/><path d="M89 28 Q99 18 109 28 Q105 32 99 32 Q93 32 89 28 Z" fill="#6B4226"/><circle cx="99" cy="20" r="1.8" fill="#3A2410"/>
+  </g>
+    <rect x="126.10000000000001" y="997.26" width="717.8" height="185" rx="30" fill="#FFF8F0" stroke="#F0D5C8" stroke-width="4"/>
+    <text x="194" y="1065.2549999999999" font-family="Apple SD Gothic Neo, Arial, sans-serif" font-size="25" font-weight="900" fill="#C0392B" text-anchor="start"><tspan x="194" dy="0">오늘의 개념</tspan></text>
+    <text x="194" y="1140.805" font-family="Apple SD Gothic Neo, Arial, sans-serif" font-size="34" font-weight="900" fill="#5D4037" text-anchor="start"><tspan x="194" dy="0">받아올림이 있는 덧셈</tspan></text>
+    <rect x="194" y="1261.685" width="582" height="20" rx="10" fill="#EAD3C8"/>
+    <rect x="194" y="1261.685" width="368.6" height="20" rx="10" fill="#DAA520"/>
+    <text x="485" y="1352.345" font-family="Apple SD Gothic Neo, Arial, sans-serif" font-size="24" font-weight="900" fill="#8D6E63" text-anchor="middle"><tspan x="485" dy="0">6 / 10 클리어</tspan></text>
+    </g>
+  </g></g>
+  </svg>
