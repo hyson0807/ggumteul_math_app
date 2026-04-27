@@ -11,7 +11,7 @@
     "lint": "expo lint",
     "build:preview": "eas build --platform all --profile preview",
     "build:production": "eas build --platform all --profile production",
-    "update:production": "eas update --branch production"
+    "update:production": "eas update --branch production --environment production --platform ios"
   },
   "dependencies": {
     "@expo-google-fonts/gowun-dodum": "^0.4.1",
