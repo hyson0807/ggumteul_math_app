@@ -195,7 +195,7 @@ export function FocusCard({
             }}
           >
             <Text style={{ color: Colors.text, fontSize: 13, fontWeight: "800" }}>
-              지도 보기
+              목록
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
