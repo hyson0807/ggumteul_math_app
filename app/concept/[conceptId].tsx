@@ -1,7 +1,8 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Image,
+  Keyboard,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -36,7 +37,24 @@ export default function ConceptScreen() {
   const [answerText, setAnswerText] = useState("");
   const [selectedChoice, setSelectedChoice] = useState<string | null>(null);
   const [resultModal, setResultModal] = useState<SubmitAnswerResponse | null>(null);
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
   const startedAtRef = useRef<number>(Date.now());
+  const scrollViewRef = useRef<ScrollView>(null);
+
+  useEffect(() => {
+    const showEvent = Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow";
+    const hideEvent = Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide";
+    const showSub = Keyboard.addListener(showEvent, () => setKeyboardVisible(true));
+    const hideSub = Keyboard.addListener(hideEvent, () => setKeyboardVisible(false));
+    const didShowSub = Keyboard.addListener("keyboardDidShow", () => {
+      scrollViewRef.current?.scrollToEnd({ animated: true });
+    });
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+      didShowSub.remove();
+    };
+  }, []);
 
   const problems = data?.problems ?? [];
   const currentProblem = problems[currentIndex];
@@ -144,6 +162,7 @@ export default function ConceptScreen() {
       </View>
 
       <ScrollView
+        ref={scrollViewRef}
         style={{ flex: 1 }}
         contentContainerStyle={{ paddingHorizontal: 18, paddingBottom: 20 }}
         keyboardShouldPersistTaps="handled"
@@ -229,7 +248,7 @@ export default function ConceptScreen() {
         style={{
           paddingHorizontal: 18,
           paddingTop: 8,
-          paddingBottom: insets.bottom + 18,
+          paddingBottom: keyboardVisible ? 8 : insets.bottom + 18,
         }}
       >
         <TouchableOpacity
