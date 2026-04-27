@@ -3,6 +3,7 @@ import { ActivityIndicator, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuthStore } from "@/stores/useAuthStore";
+import { useViewingStageStore } from "@/stores/useViewingStageStore";
 import { useWorm } from "@/hooks/useWorm";
 import { useStageNodes, useStages } from "@/hooks/useLearning";
 import { WormScene } from "@/components/worm/WormScene";
@@ -21,7 +22,11 @@ export default function HomeScreen() {
   const [devStage, setDevStage] = useState<StageId | null>(null);
 
   const realStage = worm ? clampStage(worm.stage) : 1;
-  const displayStage: StageId = __DEV__ && devStage != null ? devStage : realStage;
+  const viewingStage = useViewingStageStore((s) => s.viewingStage);
+  const safeViewing =
+    viewingStage != null && viewingStage <= realStage ? viewingStage : null;
+  const displayStage: StageId =
+    __DEV__ && devStage != null ? devStage : (safeViewing ?? realStage);
 
   const { data: stageNodesData } = useStageNodes(displayStage);
 
@@ -82,6 +87,7 @@ export default function HomeScreen() {
         total={totalNodes}
         topInset={insets.top}
         onMapPress={() => router.push("/map")}
+        onStagePress={() => router.push(`/stage/${displayStage}`)}
       />
 
       {focusOpen && (

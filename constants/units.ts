@@ -1,4 +1,5 @@
 import { Colors } from "./colors";
+import type { StageId } from "./stages";
 
 export type UnitId = "1-1" | "1-2" | "2-1" | "2-2" | "3-1" | "3-2";
 export const ALL_UNITS: UnitId[] = ["1-1", "1-2", "2-1", "2-2", "3-1", "3-2"];
@@ -57,7 +58,7 @@ export const STAGE_TO_UNIT: Record<number, UnitId> = {
   6: "3-2",
 };
 
-export const UNIT_TO_STAGE: Record<UnitId, number> = {
+export const UNIT_TO_STAGE: Record<UnitId, StageId> = {
   "1-1": 1,
   "1-2": 2,
   "2-1": 3,

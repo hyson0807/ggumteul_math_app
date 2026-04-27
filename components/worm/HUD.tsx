@@ -10,6 +10,7 @@ interface Props {
   total: number;
   topInset: number;
   onMapPress: () => void;
+  onStagePress: () => void;
 }
 
 export function HUD({
@@ -19,6 +20,7 @@ export function HUD({
   total,
   topInset,
   onMapPress,
+  onStagePress,
 }: Props) {
   const meta = UNIT_META[unit];
   const pct =
@@ -71,8 +73,10 @@ export function HUD({
       </View>
 
       {/* Stage progress card — flex fills remaining space */}
-      <View
-        pointerEvents="none"
+      <TouchableOpacity
+        accessibilityLabel="현재 스테이지 노드 보기"
+        onPress={onStagePress}
+        activeOpacity={0.85}
         style={{
           flex: 1,
           paddingHorizontal: 12,
@@ -121,7 +125,7 @@ export function HUD({
             }}
           />
         </View>
-      </View>
+      </TouchableOpacity>
 
       {/* Map button — icon only */}
       <TouchableOpacity

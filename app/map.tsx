@@ -21,6 +21,7 @@ import Svg, {
 } from "react-native-svg";
 import { useWorm } from "@/hooks/useWorm";
 import { useStages } from "@/hooks/useLearning";
+import { useViewingStageStore } from "@/stores/useViewingStageStore";
 import {
   UNIT_META,
   UNIT_TO_STAGE,
@@ -45,6 +46,7 @@ export default function MapScreen() {
   const router = useRouter();
   const { data: worm } = useWorm();
   const { data: stagesData } = useStages();
+  const setViewingStage = useViewingStageStore((s) => s.setViewingStage);
   const [bodySize, setBodySize] = useState({ w: 0, h: 0 });
 
   const currentUnit: UnitId = worm ? unitFromWorm(worm.stage) : "1-1";
@@ -332,8 +334,8 @@ export default function MapScreen() {
                     locked
                       ? undefined
                       : () => {
+                          setViewingStage(UNIT_TO_STAGE[n.id]);
                           router.dismiss();
-                          router.push(`/stage/${UNIT_TO_STAGE[n.id]}`);
                         }
                   }
                 >
