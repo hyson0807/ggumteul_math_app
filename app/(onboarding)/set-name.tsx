@@ -8,8 +8,8 @@ import {
   Alert,
 } from "react-native";
 import { useRouter } from "expo-router";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useAuthStore } from "@/stores/useAuthStore";
+import { WormSprite } from "@/components/worm/WormSprite";
 import { HOME_ROUTE, nextOnboardingRoute } from "@/utils/onboarding";
 
 export default function SetNameScreen() {
@@ -18,10 +18,6 @@ export default function SetNameScreen() {
   const updateProfile = useAuthStore((s) => s.updateProfile);
   const [name, setName] = useState(user?.name ?? "");
   const [isLoading, setIsLoading] = useState(false);
-
-  const tutorType = user?.tutorType;
-  const icon = tutorType === "cat" ? "cat" : "rabbit";
-  const color = tutorType === "cat" ? "#DAA520" : "#6B8E23";
 
   const handleComplete = async () => {
     if (!name.trim()) return;
@@ -38,7 +34,7 @@ export default function SetNameScreen() {
 
   return (
     <View className="flex-1 bg-[#FFE2DE] px-6 justify-center items-center">
-      <MaterialCommunityIcons name={icon} size={80} color={color} />
+      <WormSprite size={0.7} />
       <Text className="text-2xl font-bold text-[#5D4037] mt-4 mb-2">
         이름을 알려주세요!
       </Text>
