@@ -17,6 +17,9 @@ export interface User {
   equippedBodyId: string | null;
   equippedAccessoryId: string | null;
   createdAt: string;
+  diagnosticCompletedAt: string | null;
+  diagnosticScore: number | null;
+  diagnosticGrade: number | null;
 }
 
 interface AuthResponse {

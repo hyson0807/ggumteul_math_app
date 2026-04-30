@@ -9,6 +9,7 @@ import {
 import { useRouter } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useAuthStore } from "@/stores/useAuthStore";
+import { HOME_ROUTE, nextOnboardingRoute } from "@/utils/onboarding";
 
 const GRADES: { value: 1 | 2 | 3; label: string }[] = [
   { value: 1, label: "1학년" },
@@ -26,8 +27,8 @@ export default function SelectGradeScreen() {
     if (!selected) return;
     setIsLoading(true);
     try {
-      await updateProfile({ grade: selected });
-      router.push("/(onboarding)/set-name");
+      const updated = await updateProfile({ grade: selected });
+      router.replace(nextOnboardingRoute(updated) ?? HOME_ROUTE);
     } catch {
       Alert.alert("오류", "저장에 실패했습니다. 다시 시도해주세요.");
     } finally {

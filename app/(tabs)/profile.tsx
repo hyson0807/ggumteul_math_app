@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, ScrollView } from "react-native";
+import { View, Text, TouchableOpacity, ScrollView, Pressable } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { router } from "expo-router";
@@ -7,13 +7,7 @@ import { WORM_STAGE_LABELS, MAX_WORM_STAGE } from "@/constants/worm";
 import { WormSprite } from "@/components/worm/WormSprite";
 import { useWorm } from "@/hooks/useWorm";
 import { Colors } from "@/constants/colors";
-
-function formatJoinedDate(isoDate?: string) {
-  if (!isoDate) return "-";
-  const d = new Date(isoDate);
-  if (Number.isNaN(d.getTime())) return "-";
-  return `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일`;
-}
+import { formatJoinedDate, formatShortDate } from "@/utils/dateFormat";
 
 export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
@@ -96,6 +90,99 @@ export default function ProfileScreen() {
           <Divider />
           <StatRow label="가입일" value={formatJoinedDate(user?.createdAt)} />
         </View>
+
+        {user?.diagnosticCompletedAt && (
+          <Pressable
+            onPress={() => router.push("/diagnostic-result")}
+            style={({ pressed }) => ({
+              marginTop: 16,
+              borderRadius: 24,
+              backgroundColor: Colors.surface,
+              paddingHorizontal: 20,
+              paddingVertical: 16,
+              opacity: pressed ? 0.85 : 1,
+              shadowColor: "#000",
+              shadowOpacity: 0.05,
+              shadowRadius: 10,
+              shadowOffset: { width: 0, height: 2 },
+              elevation: 2,
+            })}
+          >
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <View style={{ flex: 1 }}>
+                <Text
+                  style={{
+                    fontSize: 11,
+                    color: Colors.textSecondary,
+                    fontWeight: "800",
+                    letterSpacing: 1,
+                  }}
+                >
+                  진단평가 · {formatShortDate(user.diagnosticCompletedAt)}
+                </Text>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "baseline",
+                    gap: 6,
+                    marginTop: 6,
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 28,
+                      fontWeight: "900",
+                      color: Colors.primary,
+                    }}
+                  >
+                    {user.diagnosticScore ?? 0}
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: 14,
+                      fontWeight: "700",
+                      color: Colors.textSecondary,
+                    }}
+                  >
+                    / 10
+                  </Text>
+                  {user.diagnosticGrade != null && (
+                    <Text
+                      style={{
+                        marginLeft: 10,
+                        fontSize: 13,
+                        fontWeight: "800",
+                        color: Colors.textSecondary,
+                      }}
+                    >
+                      {user.diagnosticGrade}학년 응시
+                    </Text>
+                  )}
+                </View>
+                <Text
+                  style={{
+                    marginTop: 6,
+                    fontSize: 12,
+                    color: Colors.textSecondary,
+                  }}
+                >
+                  탭해서 문제별 결과 보기
+                </Text>
+              </View>
+              <MaterialCommunityIcons
+                name="chevron-right"
+                size={28}
+                color={Colors.textSecondary}
+              />
+            </View>
+          </Pressable>
+        )}
       </ScrollView>
     </View>
   );

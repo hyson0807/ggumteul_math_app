@@ -16,10 +16,11 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Svg, { Path } from "react-native-svg";
 import { Colors } from "@/constants/colors";
-import { API_BASE_URL } from "@/services/api";
 import { useConceptProblems, useSubmitAnswer } from "@/hooks/useLearning";
 import { ErrorState } from "@/components/common/ErrorState";
-import type { ConceptProblem, SubmitAnswerResponse } from "@/types/learning";
+import { MCQChoices } from "@/components/learning/MCQChoices";
+import { resolveImageUrl } from "@/utils/imageUrl";
+import type { SubmitAnswerResponse } from "@/types/learning";
 
 const MAX_TIME_SPENT_SECONDS = 3600;
 
@@ -287,67 +288,6 @@ export default function ConceptScreen() {
   );
 }
 
-function MCQChoices({
-  problem,
-  selected,
-  onSelect,
-}: {
-  problem: ConceptProblem;
-  selected: string | null;
-  onSelect: (v: string) => void;
-}) {
-  const choices = [problem.choice1, problem.choice2, problem.choice3, problem.choice4].filter(
-    (c): c is string => !!c,
-  );
-  return (
-    <View style={{ gap: 10 }}>
-      {choices.map((c, i) => {
-        const active = selected === c;
-        return (
-          <TouchableOpacity
-            key={`${i}-${c}`}
-            onPress={() => onSelect(c)}
-            activeOpacity={0.8}
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 12,
-              paddingVertical: 14,
-              paddingHorizontal: 14,
-              borderRadius: 14,
-              backgroundColor: active ? Colors.primary : Colors.surface,
-              borderWidth: 2,
-              borderColor: active ? Colors.primary : Colors.surfaceBorder,
-            }}
-          >
-            <View
-              style={{
-                width: 28, height: 28, borderRadius: 999,
-                backgroundColor: active ? "#fff" : Colors.surfaceBorder,
-                alignItems: "center", justifyContent: "center",
-              }}
-            >
-              <Text style={{ fontSize: 13, fontWeight: "900", color: active ? Colors.primary : Colors.text }}>
-                {i + 1}
-              </Text>
-            </View>
-            <Text
-              style={{
-                flex: 1,
-                fontSize: 16,
-                fontWeight: "700",
-                color: active ? "#fff" : Colors.text,
-              }}
-            >
-              {c}
-            </Text>
-          </TouchableOpacity>
-        );
-      })}
-    </View>
-  );
-}
-
 function ResultSheet({
   result,
   isLast,
@@ -492,8 +432,3 @@ function formatDifficulty(d: number): string {
   return "아주 어려움";
 }
 
-function resolveImageUrl(url: string): string {
-  if (/^https?:\/\//.test(url)) return url;
-  const trimmed = url.startsWith("/") ? url : `/${url}`;
-  return `${API_BASE_URL}${trimmed}`;
-}

@@ -8,7 +8,11 @@ import { useAuthStore } from "@/stores/useAuthStore";
 import { Toast } from "@/components/common/Toast";
 import { BgmController } from "@/components/common/BgmController";
 import { preloadAllBgm } from "@/utils/bgm";
-import { isUserOnboarded } from "@/utils/onboarding";
+import {
+  HOME_ROUTE,
+  isUserOnboarded,
+  nextOnboardingRoute,
+} from "@/utils/onboarding";
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
@@ -37,7 +41,7 @@ export default function RootLayout() {
       }
     } else if (!isUserOnboarded(user)) {
       if (rootSegment !== "(onboarding)") {
-        router.replace("/(onboarding)/select-tutor");
+        router.replace(nextOnboardingRoute(user) ?? HOME_ROUTE);
       }
     } else {
       if (rootSegment === "(auth)") {
@@ -59,6 +63,7 @@ export default function RootLayout() {
           <Stack.Screen name="concept/[conceptId]" />
           <Stack.Screen name="bag" />
           <Stack.Screen name="settings" />
+          <Stack.Screen name="diagnostic-result" />
         </Stack>
         <BgmController />
         <Toast />

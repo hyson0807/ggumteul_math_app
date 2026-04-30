@@ -85,3 +85,55 @@ export interface SubmitAnswerResponse {
   explanation: string | null;
   user: User;
 }
+
+export interface DiagnosticProblem {
+  id: number;
+  conceptId: number;
+  problemType: ProblemType;
+  difficulty: number;
+  content: string;
+  imageUrl: string | null;
+  choice1: string | null;
+  choice2: string | null;
+  choice3: string | null;
+  choice4: string | null;
+}
+
+export interface DiagnosticAnswerPayload {
+  problemId: number;
+  answer: string;
+  timeSpent?: number;
+}
+
+export interface CompleteDiagnosticPayload {
+  grade: 1 | 2 | 3;
+  answers: DiagnosticAnswerPayload[];
+}
+
+export interface CompleteDiagnosticResponse {
+  user: User;
+  score: number;
+}
+
+export interface DiagnosticResultItem {
+  problemId: number;
+  problemType: ProblemType;
+  content: string;
+  imageUrl: string | null;
+  choice1: string | null;
+  choice2: string | null;
+  choice3: string | null;
+  choice4: string | null;
+  conceptName: string;
+  myAnswer: string;
+  correctAnswer: string;
+  correct: boolean;
+  explanation: string | null;
+}
+
+export interface DiagnosticResultResponse {
+  score: number;
+  grade: number;
+  completedAt: string;
+  items: DiagnosticResultItem[];
+}

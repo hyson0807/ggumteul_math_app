@@ -1,6 +1,10 @@
 import api from "./api";
 import type {
+  CompleteDiagnosticPayload,
+  CompleteDiagnosticResponse,
   ConceptProblemsResponse,
+  DiagnosticProblem,
+  DiagnosticResultResponse,
   StageNodesResponse,
   StagesResponse,
   SubmitAnswerPayload,
@@ -31,6 +35,28 @@ export const learningApi = {
     const { data } = await api.post<SubmitAnswerResponse>(
       "/learning/submit",
       payload,
+    );
+    return data;
+  },
+
+  getDiagnostic: async (grade: number) => {
+    const { data } = await api.get<DiagnosticProblem[]>(
+      `/learning/diagnostic/${grade}`,
+    );
+    return data;
+  },
+
+  completeDiagnostic: async (payload: CompleteDiagnosticPayload) => {
+    const { data } = await api.post<CompleteDiagnosticResponse>(
+      "/learning/diagnostic/complete",
+      payload,
+    );
+    return data;
+  },
+
+  getDiagnosticResult: async () => {
+    const { data } = await api.get<DiagnosticResultResponse>(
+      "/learning/diagnostic/result",
     );
     return data;
   },

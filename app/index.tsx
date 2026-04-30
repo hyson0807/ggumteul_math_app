@@ -8,7 +8,11 @@ import { useStartupFlow } from "@/hooks/useStartupFlow";
 import { StartupSplash } from "@/components/startup/StartupSplash";
 import { UpdateRequiredModal } from "@/components/startup/UpdateRequiredModal";
 import { useAuthStore } from "@/stores/useAuthStore";
-import { isUserOnboarded } from "@/utils/onboarding";
+import {
+  HOME_ROUTE,
+  isUserOnboarded,
+  nextOnboardingRoute,
+} from "@/utils/onboarding";
 
 export default function StartupScreen() {
   const router = useRouter();
@@ -33,9 +37,9 @@ export default function StartupScreen() {
     if (!isAuthenticated) {
       router.replace("/(auth)/login");
     } else if (!isUserOnboarded(user)) {
-      router.replace("/(onboarding)/select-tutor");
+      router.replace(nextOnboardingRoute(user) ?? HOME_ROUTE);
     } else {
-      router.replace("/(tabs)/home");
+      router.replace(HOME_ROUTE);
     }
   }, [isDone, fontsLoaded, updateRequired, router]);
 

@@ -10,6 +10,7 @@ import {
 import { useRouter } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useAuthStore } from "@/stores/useAuthStore";
+import { HOME_ROUTE, nextOnboardingRoute } from "@/utils/onboarding";
 
 export default function SetNameScreen() {
   const router = useRouter();
@@ -26,8 +27,8 @@ export default function SetNameScreen() {
     if (!name.trim()) return;
     setIsLoading(true);
     try {
-      await updateProfile({ name: name.trim() });
-      router.replace("/(tabs)/home");
+      const updated = await updateProfile({ name: name.trim() });
+      router.replace(nextOnboardingRoute(updated) ?? HOME_ROUTE);
     } catch {
       Alert.alert("오류", "저장에 실패했습니다. 다시 시도해주세요.");
     } finally {
