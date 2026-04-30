@@ -2,6 +2,7 @@ import { Text, TouchableOpacity, View } from "react-native";
 import Svg, { Path } from "react-native-svg";
 import { Colors } from "@/constants/colors";
 import { UNIT_META, type UnitId } from "@/constants/units";
+import { ProgressBar } from "@/components/common/ProgressBar";
 
 interface Props {
   unit: UnitId;
@@ -118,23 +119,7 @@ export function FocusCard({
               {clearedNodes} / {totalNodes}
             </Text>
           </View>
-          <View
-            style={{
-              height: 6,
-              borderRadius: 999,
-              backgroundColor: Colors.surfaceBorder,
-              overflow: "hidden",
-            }}
-          >
-            <View
-              style={{
-                height: "100%",
-                width: `${pct}%`,
-                backgroundColor: Colors.secondary,
-                borderRadius: 999,
-              }}
-            />
-          </View>
+          <ProgressBar percent={pct} color={Colors.secondary} />
         </View>
 
         <View

@@ -22,6 +22,7 @@ import {
   useDiagnosticProblems,
 } from "@/hooks/useLearning";
 import { ErrorState } from "@/components/common/ErrorState";
+import { ProgressBar } from "@/components/common/ProgressBar";
 import { MCQChoices } from "@/components/learning/MCQChoices";
 import { HOME_ROUTE, nextOnboardingRoute } from "@/utils/onboarding";
 import { resolveImageUrl } from "@/utils/imageUrl";
@@ -39,6 +40,7 @@ export default function DiagnosticScreen() {
     useDiagnosticProblems(grade);
   const completeMutation = useCompleteDiagnostic();
 
+  const [started, setStarted] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answerText, setAnswerText] = useState("");
   const [selectedChoice, setSelectedChoice] = useState<string | null>(null);
@@ -168,6 +170,99 @@ export default function DiagnosticScreen() {
 
   if (!currentProblem) return null;
 
+  if (!started) {
+    return (
+      <>
+        <Stack.Screen options={{ gestureEnabled: false }} />
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: Colors.background,
+            paddingTop: insets.top,
+            paddingBottom: insets.bottom + 18,
+            paddingHorizontal: 24,
+            justifyContent: "space-between",
+          }}
+        >
+          <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+            <View
+              style={{
+                width: 96,
+                height: 96,
+                borderRadius: 999,
+                backgroundColor: Colors.surface,
+                borderWidth: 2,
+                borderColor: Colors.surfaceBorder,
+                alignItems: "center",
+                justifyContent: "center",
+                marginBottom: 22,
+              }}
+            >
+              <Text style={{ fontSize: 44 }}>📝</Text>
+            </View>
+            <Text
+              style={{
+                fontSize: 11,
+                color: Colors.textSecondary,
+                fontWeight: "800",
+                letterSpacing: 2,
+                marginBottom: 8,
+              }}
+            >
+              {grade}학년 진단평가
+            </Text>
+            <Text
+              style={{
+                fontSize: 24,
+                fontWeight: "900",
+                color: Colors.text,
+                textAlign: "center",
+                marginBottom: 16,
+              }}
+            >
+              나의 학습 출발점을 알아봐요
+            </Text>
+            <View
+              style={{
+                backgroundColor: Colors.surface,
+                borderWidth: 1,
+                borderColor: Colors.surfaceBorder,
+                borderRadius: 16,
+                paddingVertical: 16,
+                paddingHorizontal: 18,
+                gap: 10,
+                width: "100%",
+              }}
+            >
+              <IntroLine icon="📚" text={`총 ${total}문제, 약 5~10분 소요`} />
+              <IntroLine icon="🎯" text="정답·오답 즉시 알림 없이 끝까지 풀어요" />
+              <IntroLine icon="🌱" text="결과는 프로필에서 다시 볼 수 있어요" />
+            </View>
+          </View>
+
+          <TouchableOpacity
+            onPress={() => {
+              startedAtRef.current = Date.now();
+              setStarted(true);
+            }}
+            activeOpacity={0.9}
+            style={{
+              height: 56,
+              borderRadius: 18,
+              backgroundColor: Colors.cta,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Text style={{ color: "#fff", fontSize: 17, fontWeight: "900" }}>
+              진단평가 시작하기
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </>
+    );
+  }
+
   return (
     <>
       <Stack.Screen options={{ gestureEnabled: false }} />
@@ -222,24 +317,8 @@ export default function DiagnosticScreen() {
           </View>
         </View>
 
-        {/* Progress bar */}
-        <View
-          style={{
-            marginHorizontal: 18,
-            height: 6,
-            borderRadius: 999,
-            backgroundColor: Colors.surfaceBorder,
-            overflow: "hidden",
-            marginBottom: 8,
-          }}
-        >
-          <View
-            style={{
-              width: `${((currentIndex + 1) / total) * 100}%`,
-              height: "100%",
-              backgroundColor: Colors.primary,
-            }}
-          />
+        <View style={{ marginHorizontal: 18, marginBottom: 8 }}>
+          <ProgressBar percent={((currentIndex + 1) / total) * 100} />
         </View>
 
         <ScrollView
@@ -385,6 +464,24 @@ export default function DiagnosticScreen() {
         </View>
       </KeyboardAvoidingView>
     </>
+  );
+}
+
+function IntroLine({ icon, text }: { icon: string; text: string }) {
+  return (
+    <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+      <Text style={{ fontSize: 18 }}>{icon}</Text>
+      <Text
+        style={{
+          flex: 1,
+          fontSize: 14,
+          color: Colors.text,
+          fontWeight: "600",
+        }}
+      >
+        {text}
+      </Text>
+    </View>
   );
 }
 

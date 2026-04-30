@@ -30,7 +30,7 @@ export const nextOnboardingRoute = (
 ): OnboardingRoute | null => {
   if (!user?.tutorType) return ONBOARDING_ROUTES.selectTutor;
   if (!user?.grade) return ONBOARDING_ROUTES.selectGrade;
-  if (!user?.diagnosticCompletedAt) return ONBOARDING_ROUTES.diagnostic;
   if (!user?.name) return ONBOARDING_ROUTES.setName;
+  if (!user?.diagnosticCompletedAt) return ONBOARDING_ROUTES.diagnostic;
   return null;
 };
