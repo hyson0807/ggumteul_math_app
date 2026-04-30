@@ -23,7 +23,6 @@ interface AuthState {
   deleteAccount: () => Promise<void>;
   updateProfile: (data: {
     name?: string;
-    tutorType?: string;
     grade?: number;
   }) => Promise<User>;
   syncUser: (user: User) => void;

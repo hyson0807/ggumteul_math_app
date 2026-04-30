@@ -10,7 +10,6 @@ export interface User {
   level: number;
   coins: number;
   stars: number;
-  tutorType: "cat" | "rabbit" | null;
   wormStage: number;
   wormProgress: number;
   equippedHatId: string | null;
@@ -94,7 +93,6 @@ export const authApi = {
 
   updateProfile: async (body: {
     name?: string;
-    tutorType?: string;
     grade?: number;
   }) => {
     const { data } = await api.patch<User>("/users/me", body);
