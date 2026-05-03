@@ -159,7 +159,6 @@ export default function DiagnosticResultScreen() {
           </Text>
         </View>
 
-        {/* AI 분석 결과 (강·약점 프로파일) */}
         <DiagnosticProfileSection />
 
         {/* Per-item review */}
