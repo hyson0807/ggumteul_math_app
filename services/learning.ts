@@ -4,6 +4,7 @@ import type {
   CompleteDiagnosticResponse,
   ConceptProblemsResponse,
   DiagnosticProblem,
+  DiagnosticProfileResponse,
   DiagnosticResultResponse,
   StageNodesResponse,
   StagesResponse,
@@ -57,6 +58,13 @@ export const learningApi = {
   getDiagnosticResult: async () => {
     const { data } = await api.get<DiagnosticResultResponse>(
       "/learning/diagnostic/result",
+    );
+    return data;
+  },
+
+  getDiagnosticProfile: async () => {
+    const { data } = await api.get<DiagnosticProfileResponse>(
+      "/learning/diagnostic/profile",
     );
     return data;
   },

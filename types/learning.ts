@@ -137,3 +137,18 @@ export interface DiagnosticResultResponse {
   completedAt: string;
   items: DiagnosticResultItem[];
 }
+
+export interface DiagnosticProfileItem {
+  conceptId: number;
+  conceptName: string;
+  grade: number;
+  semester: number;
+  knowledgeTag: number;
+  probability: number;
+}
+
+export interface DiagnosticProfileResponse {
+  strong: DiagnosticProfileItem[];
+  weak: DiagnosticProfileItem[];
+  fetchedAt: string;
+}

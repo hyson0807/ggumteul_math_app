@@ -12,6 +12,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors } from "@/constants/colors";
 import { useDiagnosticResult } from "@/hooks/useLearning";
 import { ErrorState } from "@/components/common/ErrorState";
+import { DiagnosticProfileSection } from "@/components/learning/DiagnosticProfileSection";
 import { resolveImageUrl } from "@/utils/imageUrl";
 import { formatJoinedDate } from "@/utils/dateFormat";
 import type { DiagnosticResultItem } from "@/types/learning";
@@ -157,6 +158,9 @@ export default function DiagnosticResultScreen() {
             응시일 · {formatJoinedDate(data.completedAt)}
           </Text>
         </View>
+
+        {/* AI 분석 결과 (강·약점 프로파일) */}
+        <DiagnosticProfileSection />
 
         {/* Per-item review */}
         {data.items.map((item, idx) => (
