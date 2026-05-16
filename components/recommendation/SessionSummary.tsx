@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -21,9 +22,17 @@ export function SessionSummary({
   onRestart: () => void;
 }) {
   const insets = useSafeAreaInsets();
-  const problems = useRecommendationSession((s) => s.problems);
-  const results = useRecommendationSession((s) => s.results);
-  const totalCoinsEarned = useRecommendationSession((s) => s.totalCoinsEarned);
+  // mount 시점의 store 값을 스냅샷으로 잠금 — "한 번 더" 가 store 를 갱신해도
+  // 닫히는 동안 새 세션 데이터가 모달에 새어나오지 않게 한다.
+  const [problems] = useState(
+    () => useRecommendationSession.getState().problems,
+  );
+  const [results] = useState(
+    () => useRecommendationSession.getState().results,
+  );
+  const [totalCoinsEarned] = useState(
+    () => useRecommendationSession.getState().totalCoinsEarned,
+  );
 
   const correctCount = results.filter((r) => r.correct).length;
   const total = problems.length;

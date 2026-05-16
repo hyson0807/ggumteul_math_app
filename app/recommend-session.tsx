@@ -425,7 +425,12 @@ export default function RecommendSessionScreen() {
         animationType="fade"
         onRequestClose={() => {}}
       >
-        <SessionSummary onClose={handleCloseSummary} onRestart={handleRestart} />
+        {summaryOpen && (
+          <SessionSummary
+            onClose={handleCloseSummary}
+            onRestart={handleRestart}
+          />
+        )}
       </Modal>
     </KeyboardAvoidingView>
   );
