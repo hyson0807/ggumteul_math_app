@@ -4,6 +4,8 @@ import { pauseBgm, playBgm, type BgmKey } from "@/utils/bgm";
 
 const BGM_BY_PATH: Record<string, BgmKey> = {
   "/home": "home",
+  "/recommend": "home",
+  "/recommend-session": "home",
   "/shop": "shop",
   "/bag": "shop",
   "/map": "map",

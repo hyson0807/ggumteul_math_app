@@ -61,6 +61,7 @@ export default function RootLayout() {
           <Stack.Screen name="map" options={{ presentation: "modal" }} />
           <Stack.Screen name="stage/[stage]" />
           <Stack.Screen name="concept/[conceptId]" />
+          <Stack.Screen name="recommend-session" />
           <Stack.Screen name="bag" />
           <Stack.Screen name="settings" />
           <Stack.Screen name="diagnostic-result" />

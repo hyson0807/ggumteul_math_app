@@ -30,6 +30,15 @@ export default function TabsLayout() {
             }}
           />
           <Tabs.Screen
+            name="recommend"
+            options={{
+              title: "추천",
+              tabBarIcon: ({ color, size }) => (
+                <MaterialCommunityIcons name="lightbulb-on" size={size} color={color} />
+              ),
+            }}
+          />
+          <Tabs.Screen
             name="shop"
             options={{
               title: "상점",
