@@ -41,8 +41,11 @@ export function SessionSummary({
 
   const handleAgain = () => {
     if (startMutation.isPending) return;
+    // mutation 의 onSuccess 콜백을 기다리지 않고 클릭 즉시 모달 닫음.
+    // 옛 코드에선 onSuccess 콜백이 어떤 이유로 fire 되지 않아 모달이 stuck 되는
+    // 버그가 있었음. 동기적으로 닫아서 race 자체를 제거한다.
+    onRestart();
     startMutation.mutate(undefined, {
-      onSuccess: onRestart,
       onError: (err) => {
         Alert.alert(
           "추천 시작 실패",

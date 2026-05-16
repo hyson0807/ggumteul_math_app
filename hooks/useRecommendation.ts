@@ -6,14 +6,11 @@ import type { SubmitRecommendationAnswerPayload } from "@/types/recommendation";
 
 export const useStartRecommendationSession = () => {
   const startStore = useRecommendationSession((s) => s.start);
-  const resetStore = useRecommendationSession((s) => s.reset);
   return useMutation({
-    mutationFn: async () => {
-      // 동시 시작 누수 방지 — 새 세션 시작 전 이전 상태 폐기
-      resetStore();
-      return recommendationApi.startSession();
-    },
+    mutationFn: () => recommendationApi.startSession(),
     onSuccess: (data) => {
+      // start() 가 problems/currentIndex/results/totalCoins 를 모두 reset 하므로
+      // mutation 전에 별도 reset 불필요.
       startStore(data);
     },
   });
