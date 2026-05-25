@@ -41,8 +41,8 @@ export function GoldHalo({ top }: { top: number }) {
       <Svg width={360} height={360}>
         <Defs>
           <RadialGradient id="halo" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
-            <Stop offset="0%" stopColor="#DAA520" stopOpacity={0.27} />
-            <Stop offset="65%" stopColor="#DAA520" stopOpacity={0} />
+            <Stop offset="0%" stopColor="#3F8F6B" stopOpacity={0.27} />
+            <Stop offset="65%" stopColor="#3F8F6B" stopOpacity={0} />
           </RadialGradient>
         </Defs>
         <Circle cx={180} cy={180} r={180} fill="url(#halo)" />

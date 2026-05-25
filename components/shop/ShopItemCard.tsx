@@ -1,5 +1,6 @@
 import { View, Text, TouchableOpacity, ActivityIndicator } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Colors } from "@/constants/colors";
 import type { ShopItemWithStatus } from "@/types/shop";
 
 interface Props {
@@ -59,7 +60,7 @@ export function ShopItemCard({
                 : "bag-personal-outline"
           }
           size={42}
-          color={locked ? "#CDAB8F" : "#A0522D"}
+          color={locked ? Colors.inactive : Colors.primary}
         />
       </View>
 
@@ -86,7 +87,7 @@ export function ShopItemCard({
               <MaterialCommunityIcons
                 name="circle"
                 size={12}
-                color="#FFD700"
+                color={Colors.star}
                 style={{ marginRight: 4 }}
               />
             )}

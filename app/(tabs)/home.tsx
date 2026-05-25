@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ActivityIndicator, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Colors } from "@/constants/colors";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useViewingStageStore } from "@/stores/useViewingStageStore";
 import { useWorm } from "@/hooks/useWorm";
@@ -40,7 +41,7 @@ export default function HomeScreen() {
           justifyContent: "center",
         }}
       >
-        <ActivityIndicator size="large" color="#DAA520" />
+        <ActivityIndicator size="large" color={Colors.coin} />
       </View>
     );
   }

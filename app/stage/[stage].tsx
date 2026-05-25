@@ -325,7 +325,7 @@ function CheckIcon({ color = "#fff" }: { color?: string }) {
   );
 }
 
-function LockIcon({ size = 22, color = "#8D6E63" }: { size?: number; color?: string }) {
+function LockIcon({ size = 22, color = Colors.textSecondary }: { size?: number; color?: string }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 22 22">
       <Rect x={6} y={10} width={10} height={8} rx={1.5} fill={color} />

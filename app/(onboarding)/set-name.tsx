@@ -33,17 +33,17 @@ export default function SetNameScreen() {
   };
 
   return (
-    <View className="flex-1 bg-[#FFE2DE] px-6 justify-center items-center">
+    <View className="flex-1 bg-[#F6FAF8] px-6 justify-center items-center">
       <WormSprite size={0.7} />
-      <Text className="text-2xl font-bold text-[#5D4037] mt-4 mb-2">
+      <Text className="text-2xl font-bold text-[#1F2A26] mt-4 mb-2">
         이름을 알려주세요!
       </Text>
-      <Text className="text-base text-[#8D6E63] mb-8">
+      <Text className="text-base text-[#5F6E68] mb-8">
         지렁이 친구에게 불러줄 이름을 입력해주세요
       </Text>
 
       <TextInput
-        className="w-full bg-[#FFF8F0] rounded-xl px-4 py-3 mb-8 text-lg text-center border border-[#F0D5C8]"
+        className="w-full bg-white rounded-xl px-4 py-3 mb-8 text-lg text-center border border-[#E2EBE6]"
         placeholder="이름을 입력하세요"
         value={name}
         onChangeText={setName}
@@ -53,7 +53,7 @@ export default function SetNameScreen() {
 
       <TouchableOpacity
         className={`w-full py-4 rounded-xl items-center ${
-          name.trim() && !isLoading ? "bg-[#A0522D]" : "bg-[#CDAB8F]"
+          name.trim() && !isLoading ? "bg-[#3F8F6B]" : "bg-[#9FB2AA]"
         }`}
         onPress={handleComplete}
         disabled={!name.trim() || isLoading}

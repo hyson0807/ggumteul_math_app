@@ -6,7 +6,7 @@ import { WormTabIcon } from "@/components/navigation/WormTabIcon";
 
 export default function TabsLayout() {
   return (
-    <View className="flex-1 bg-[#FFE2DE]">
+    <View className="flex-1 bg-[#F6FAF8]">
       <View className="flex-1">
         <Tabs
           tabBar={(props) => <LiquidGlassTabBar {...props} />}

@@ -145,11 +145,11 @@ export default function MapScreen() {
           marginTop: 8,
           padding: 12,
           borderRadius: 16,
-          backgroundColor: "rgba(192,57,43,0.95)",
+          backgroundColor: "rgba(231,111,81,0.95)",
           flexDirection: "row",
           alignItems: "center",
           gap: 12,
-          shadowColor: "#C0392B",
+          shadowColor: "#E76F51",
           shadowOffset: { width: 0, height: 8 },
           shadowOpacity: 0.3,
           shadowRadius: 18,
@@ -163,7 +163,7 @@ export default function MapScreen() {
             stroke="rgba(0,0,0,0.1)"
             strokeWidth={1}
           />
-          <Circle cx={19} cy={15} r={5} fill="#C0392B" />
+          <Circle cx={19} cy={15} r={5} fill="#E76F51" />
         </Svg>
         <View style={{ flex: 1 }}>
           <Text
@@ -343,14 +343,14 @@ export default function MapScreen() {
                     <Circle
                       r={28}
                       fill="none"
-                      stroke="#C0392B"
+                      stroke="#E76F51"
                       strokeWidth={2}
                       opacity={0.5}
                     />
                   )}
                   <Circle
                     r={20}
-                    fill={isCurrent ? "#C0392B" : done ? "#DAA520" : "#FFF8F0"}
+                    fill={isCurrent ? "#E76F51" : done ? "#C99A2E" : "#FFFFFF"}
                     stroke="#5A3822"
                     strokeWidth={2}
                   />
@@ -415,9 +415,9 @@ export default function MapScreen() {
           gap: 14,
         }}
       >
-        <LegendDot color="#DAA520" label="완료" />
-        <LegendDot color="#C0392B" label="지금" />
-        <LegendDot color="#FFF8F0" label="잠김" bordered />
+        <LegendDot color="#C99A2E" label="완료" />
+        <LegendDot color="#E76F51" label="지금" />
+        <LegendDot color="#FFFFFF" label="잠김" bordered />
       </View>
     </SafeAreaView>
   );

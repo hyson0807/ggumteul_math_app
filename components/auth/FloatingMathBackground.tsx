@@ -13,16 +13,16 @@ type FloatingItem = {
 };
 
 const FLOATING_ITEMS: FloatingItem[] = [
-  { char: "+", left: "6%", top: "7%", size: 44, color: "#FFFFFF", duration: 4200, delay: 0, range: 14 },
-  { char: "3", left: "84%", top: "9%", size: 48, color: "#E8C860", duration: 5200, delay: 600, range: 18 },
-  { char: "×", left: "70%", top: "26%", size: 34, color: "#FFFFFF", duration: 4600, delay: 1200, range: 14 },
-  { char: "7", left: "4%", top: "32%", size: 40, color: "#E8C860", duration: 5000, delay: 300, range: 16 },
-  { char: "−", left: "88%", top: "44%", size: 42, color: "#FFFFFF", duration: 4400, delay: 900, range: 16 },
-  { char: "5", left: "10%", top: "54%", size: 36, color: "#E8C860", duration: 5400, delay: 200, range: 18 },
-  { char: "÷", left: "80%", top: "66%", size: 38, color: "#FFFFFF", duration: 4800, delay: 1500, range: 14 },
-  { char: "9", left: "3%", top: "76%", size: 44, color: "#E8C860", duration: 5200, delay: 700, range: 16 },
-  { char: "=", left: "84%", top: "85%", size: 32, color: "#FFFFFF", duration: 4500, delay: 1100, range: 12 },
-  { char: "2", left: "22%", top: "92%", size: 38, color: "#E8C860", duration: 5100, delay: 400, range: 16 },
+  { char: "+", left: "6%", top: "7%", size: 44, color: "#3F8F6B", duration: 4200, delay: 0, range: 14 },
+  { char: "3", left: "84%", top: "9%", size: 48, color: "#3F8F6B", duration: 5200, delay: 600, range: 18 },
+  { char: "×", left: "70%", top: "26%", size: 34, color: "#3F8F6B", duration: 4600, delay: 1200, range: 14 },
+  { char: "7", left: "4%", top: "32%", size: 40, color: "#3F8F6B", duration: 5000, delay: 300, range: 16 },
+  { char: "−", left: "88%", top: "44%", size: 42, color: "#3F8F6B", duration: 4400, delay: 900, range: 16 },
+  { char: "5", left: "10%", top: "54%", size: 36, color: "#3F8F6B", duration: 5400, delay: 200, range: 18 },
+  { char: "÷", left: "80%", top: "66%", size: 38, color: "#3F8F6B", duration: 4800, delay: 1500, range: 14 },
+  { char: "9", left: "3%", top: "76%", size: 44, color: "#3F8F6B", duration: 5200, delay: 700, range: 16 },
+  { char: "=", left: "84%", top: "85%", size: 32, color: "#3F8F6B", duration: 4500, delay: 1100, range: 12 },
+  { char: "2", left: "22%", top: "92%", size: 38, color: "#3F8F6B", duration: 5100, delay: 400, range: 16 },
 ];
 
 function FloatingMathItem({ item }: { item: FloatingItem }) {

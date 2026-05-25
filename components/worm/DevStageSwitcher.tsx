@@ -78,9 +78,9 @@ export function DevStageSwitcher({
                 borderRadius: 8,
                 alignItems: "center",
                 justifyContent: "center",
-                backgroundColor: active ? "#C0392B" : "rgba(255,255,255,0.08)",
+                backgroundColor: active ? "#E76F51" : "rgba(255,255,255,0.08)",
                 borderWidth: 1,
-                borderColor: active ? "#C0392B" : "rgba(255,255,255,0.2)",
+                borderColor: active ? "#E76F51" : "rgba(255,255,255,0.2)",
               }}
             >
               <Text

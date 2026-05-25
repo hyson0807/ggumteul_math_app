@@ -35,28 +35,28 @@ GoogleSignin.configure({
 });
 
 const COLORS = {
-  gradTop: "#2A1810",
-  gradMid: "#1A0F08",
-  gradBottom: "#0A0604",
-  cream: "#F5E6DD",
-  creamAccent: "#FFE2DE",
-  subCopy: "#C8AA9C",
-  mute: "#A68C80",
-  placeholder: "#8A7066",
-  cardBg: "rgba(42,24,16,0.72)",
-  cardBorder: "rgba(218,165,32,0.35)",
-  inputBg: "rgba(0,0,0,0.35)",
-  inputBorder: "rgba(255,226,222,0.2)",
-  tabTrack: "rgba(0,0,0,0.35)",
-  tabTrackBorder: "rgba(218,165,32,0.2)",
-  divider: "rgba(218,165,32,0.25)",
-  dark: "#2A1810",
-  shadowDark: "rgba(122,62,32,0.6)",
-  shadowSocial: "rgba(122,62,32,0.55)",
-  gold: "#DAA520",
-  errorBg: "rgba(205,92,92,0.18)",
-  errorBorder: "rgba(205,92,92,0.5)",
-  errorText: "#FFD6D2",
+  gradTop: "#F6FAF8",
+  gradMid: "#ECF3EF",
+  gradBottom: "#E2EBE6",
+  cream: "#FFFFFF",
+  creamAccent: "#3F8F6B",
+  subCopy: "#5F6E68",
+  mute: "#9FB2AA",
+  placeholder: "#9FB2AA",
+  cardBg: "rgba(255,255,255,0.92)",
+  cardBorder: "rgba(63,143,107,0.25)",
+  inputBg: "#FFFFFF",
+  inputBorder: "#E2EBE6",
+  tabTrack: "#F6FAF8",
+  tabTrackBorder: "#E2EBE6",
+  divider: "rgba(31,42,38,0.12)",
+  dark: "#1F2A26",
+  shadowDark: "rgba(63,143,107,0.25)",
+  shadowSocial: "rgba(31,42,38,0.12)",
+  gold: "#C99A2E",
+  errorBg: "rgba(214,96,77,0.10)",
+  errorBorder: "rgba(214,96,77,0.45)",
+  errorText: "#B14530",
 };
 
 type Mode = "login" | "signup";
@@ -233,7 +233,7 @@ export default function LoginScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.gradBottom }}>
-      <StatusBar barStyle="light-content" />
+      <StatusBar barStyle="dark-content" />
       <LinearGradient
         colors={[COLORS.gradTop, COLORS.gradMid, COLORS.gradBottom]}
         style={StyleSheet.absoluteFill}
@@ -265,8 +265,8 @@ export default function LoginScreen() {
                   fontFamily: "Jua",
                   fontSize: 38,
                   letterSpacing: 0.2,
-                  color: COLORS.cream,
-                  textShadowColor: "rgba(0,0,0,0.5)",
+                  color: COLORS.dark,
+                  textShadowColor: "rgba(0,0,0,0.08)",
                   textShadowOffset: { width: 0, height: 2 },
                   textShadowRadius: 0,
                 }}
@@ -411,7 +411,7 @@ export default function LoginScreen() {
             paddingVertical: 14,
             paddingHorizontal: 18,
             borderRadius: 999,
-            backgroundColor: COLORS.cream,
+            backgroundColor: COLORS.creamAccent,
             alignItems: "center",
             shadowColor: COLORS.shadowDark,
             shadowOpacity: 1,
@@ -421,14 +421,14 @@ export default function LoginScreen() {
           }}
         >
           {isLoading ? (
-            <ActivityIndicator color={COLORS.dark} />
+            <ActivityIndicator color="#FFFFFF" />
           ) : (
             <Text
               style={{
                 fontFamily: "Jua",
                 fontSize: 16.5,
                 letterSpacing: 0.4,
-                color: COLORS.dark,
+                color: "#FFFFFF",
               }}
             >
               {ctaLabel}
@@ -587,7 +587,7 @@ function FieldRow({
         keyboardType={keyboardType}
         autoCapitalize={autoCapitalize}
         editable={editable}
-        keyboardAppearance="dark"
+        keyboardAppearance="light"
         autoCorrect={false}
         autoComplete="off"
         spellCheck={false}
@@ -600,7 +600,7 @@ function FieldRow({
           paddingRight: 16,
           fontSize: 15,
           fontFamily: "GowunDodum",
-          color: COLORS.cream,
+          color: COLORS.dark,
           backgroundColor: COLORS.inputBg,
           borderWidth: 1.5,
           borderColor: focused ? COLORS.creamAccent : COLORS.inputBorder,

@@ -54,7 +54,7 @@ export function HUD({
         }}
       >
         <Svg width={22} height={22} viewBox="0 0 22 22">
-          <Circle cx={11} cy={11} r={9} fill="#DAA520" stroke="#B8842A" strokeWidth={1.2} />
+          <Circle cx={11} cy={11} r={9} fill="#C99A2E" stroke="#A07F25" strokeWidth={1.2} />
           <Circle cx={11} cy={11} r={6.5} fill="#FFD36A" />
           <SvgText
             x={11}
@@ -153,7 +153,7 @@ export function HUD({
           />
           <Path d="M9 4 L9 18" stroke="#8A5A3A" strokeWidth={1} />
           <Path d="M15 6 L15 20" stroke="#8A5A3A" strokeWidth={1} />
-          <Circle cx={12} cy={11} r={1.8} fill="#C0392B" />
+          <Circle cx={12} cy={11} r={1.8} fill="#E76F51" />
         </Svg>
       </TouchableOpacity>
     </View>

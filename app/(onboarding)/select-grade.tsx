@@ -37,11 +37,11 @@ export default function SelectGradeScreen() {
   };
 
   return (
-    <View className="flex-1 bg-[#FFE2DE] px-6 justify-center items-center">
-      <Text className="text-2xl font-bold text-[#5D4037] mb-2">
+    <View className="flex-1 bg-[#F6FAF8] px-6 justify-center items-center">
+      <Text className="text-2xl font-bold text-[#1F2A26] mb-2">
         몇 학년인가요?
       </Text>
-      <Text className="text-base text-[#8D6E63] mb-10">
+      <Text className="text-base text-[#5F6E68] mb-10">
         학년에 맞는 문제를 풀 수 있어요
       </Text>
 
@@ -53,8 +53,8 @@ export default function SelectGradeScreen() {
               key={g.value}
               className={`w-full h-20 rounded-2xl items-center justify-center mb-4 border-2 ${
                 isSelected
-                  ? "bg-[#FFF8F0] border-[#DAA520]"
-                  : "bg-[#FFF8F0] border-[#F0D5C8]"
+                  ? "bg-white border-[#3F8F6B]"
+                  : "bg-white border-[#E2EBE6]"
               }`}
               onPress={() => setSelected(g.value)}
               disabled={isLoading}
@@ -63,11 +63,11 @@ export default function SelectGradeScreen() {
                 <MaterialCommunityIcons
                   name="school"
                   size={32}
-                  color={isSelected ? "#DAA520" : "#CDAB8F"}
+                  color={isSelected ? "#3F8F6B" : "#9FB2AA"}
                 />
                 <Text
                   className={`text-xl font-bold ml-3 ${
-                    isSelected ? "text-[#DAA520]" : "text-[#8D6E63]"
+                    isSelected ? "text-[#3F8F6B]" : "text-[#5F6E68]"
                   }`}
                 >
                   {g.label}
@@ -80,7 +80,7 @@ export default function SelectGradeScreen() {
 
       <TouchableOpacity
         className={`w-full py-4 rounded-xl items-center ${
-          selected && !isLoading ? "bg-[#A0522D]" : "bg-[#CDAB8F]"
+          selected && !isLoading ? "bg-[#3F8F6B]" : "bg-[#9FB2AA]"
         }`}
         onPress={handleNext}
         disabled={!selected || isLoading}
