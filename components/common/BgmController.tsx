@@ -6,9 +6,9 @@ const BGM_BY_PATH: Record<string, BgmKey> = {
   "/home": "home",
   "/recommend": "home",
   "/recommend-session": "home",
+  "/concept-learning": "home",
   "/shop": "shop",
   "/bag": "shop",
-  "/map": "map",
 };
 
 export function BgmController() {

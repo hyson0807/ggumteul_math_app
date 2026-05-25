@@ -1,118 +1,158 @@
-import { useState } from "react";
-import { ActivityIndicator, View } from "react-native";
+import { useEffect, useRef } from "react";
+import {
+  ActivityIndicator,
+  Animated,
+  Easing,
+  Pressable,
+  View,
+} from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Colors } from "@/constants/colors";
+import { feedback } from "@/utils/feedback";
 import { useAuthStore } from "@/stores/useAuthStore";
-import { useViewingStageStore } from "@/stores/useViewingStageStore";
 import { useWorm } from "@/hooks/useWorm";
-import { useStageNodes, useStages } from "@/hooks/useLearning";
-import { WormScene } from "@/components/worm/WormScene";
-import { HUD } from "@/components/worm/HUD";
-import { FocusCard } from "@/components/worm/FocusCard";
-import { DevStageSwitcher } from "@/components/worm/DevStageSwitcher";
-import { STAGE_SCENES, clampStage, type StageId } from "@/constants/stages";
+import { WormSprite } from "@/components/worm/WormSprite";
+import { HomeHeader } from "@/components/home/HomeHeader";
+import { ActionCard } from "@/components/home/ActionCard";
 
 export default function HomeScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const user = useAuthStore((s) => s.user);
   const { data: worm, isLoading } = useWorm();
-  const { data: stagesData } = useStages();
-  const [focusOpen, setFocusOpen] = useState(false);
-  const [devStage, setDevStage] = useState<StageId | null>(null);
 
-  const realStage = worm ? clampStage(worm.stage) : 1;
-  const viewingStage = useViewingStageStore((s) => s.viewingStage);
-  const safeViewing =
-    viewingStage != null && viewingStage <= realStage ? viewingStage : null;
-  const displayStage: StageId =
-    __DEV__ && devStage != null ? devStage : (safeViewing ?? realStage);
-
-  const { data: stageNodesData } = useStageNodes(displayStage);
-
-  if (isLoading || !worm) {
+  if (isLoading) {
     return (
       <View
         style={{
           flex: 1,
-          backgroundColor: "#2A1810",
+          backgroundColor: Colors.background,
           alignItems: "center",
           justifyContent: "center",
         }}
       >
-        <ActivityIndicator size="large" color={Colors.coin} />
+        <ActivityIndicator size="large" color={Colors.primary} />
       </View>
     );
   }
 
-  const sceneConfig = STAGE_SCENES[displayStage];
-  const currentUnit = sceneConfig.unitId;
-  const stageInfo = stagesData?.stages.find((s) => s.stage === displayStage);
-  const totalNodes = stageInfo?.totalNodes ?? 0;
-  const clearedNodes = stageInfo?.clearedNodes ?? 0;
-  const activeNode =
-    stageNodesData?.nodes.find((n) => n.playable && !n.locked && !n.cleared) ??
-    null;
+  return (
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: Colors.background,
+        paddingTop: insets.top,
+      }}
+    >
+      <HomeHeader
+        name={user?.name ?? "친구"}
+        coins={user?.coins ?? 0}
+      />
 
-  const handleWormPress = () => {
-    setFocusOpen((open) => !open);
+      <View
+        style={{
+          flex: 1,
+          alignItems: "center",
+          justifyContent: "center",
+          paddingHorizontal: 20,
+          paddingBottom: insets.bottom + 64,
+          gap: 28,
+        }}
+      >
+        <WormStage equipped={worm?.equipped} />
+
+        <View style={{ flexDirection: "row", gap: 12, width: "100%" }}>
+          <ActionCard
+            title="개념 학습"
+            subtitle="학년별·개념별로 풀기"
+            icon="book-open-variant"
+            onPress={() => router.push("/concept-learning")}
+          />
+          <ActionCard
+            title="문제 추천"
+            subtitle="오늘의 맞춤 학습"
+            icon="lightbulb-on-outline"
+            onPress={() => router.push("/recommend")}
+          />
+        </View>
+      </View>
+    </View>
+  );
+}
+
+function WormStage({
+  equipped,
+}: {
+  equipped?: NonNullable<ReturnType<typeof useWorm>["data"]>["equipped"];
+}) {
+  const bob = useRef(new Animated.Value(0)).current;
+  const tapScale = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(bob, {
+          toValue: -4,
+          duration: 1600,
+          easing: Easing.inOut(Easing.sin),
+          useNativeDriver: true,
+        }),
+        Animated.timing(bob, {
+          toValue: 0,
+          duration: 1600,
+          easing: Easing.inOut(Easing.sin),
+          useNativeDriver: true,
+        }),
+      ]),
+    );
+    loop.start();
+    return () => loop.stop();
+  }, [bob]);
+
+  const onPressIn = () => {
+    Animated.spring(tapScale, {
+      toValue: 0.94,
+      useNativeDriver: true,
+      speed: 50,
+      bounciness: 8,
+    }).start();
   };
-
-  const goToStage = () => {
-    setFocusOpen(false);
-    router.push(`/stage/${displayStage}`);
-  };
-
-  const goToActiveConcept = () => {
-    if (!activeNode) {
-      goToStage();
-      return;
-    }
-    setFocusOpen(false);
-    router.push(`/concept/${activeNode.conceptId}`);
+  const onPressOut = () => {
+    Animated.spring(tapScale, {
+      toValue: 1,
+      useNativeDriver: true,
+      speed: 30,
+      bounciness: 10,
+    }).start();
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#2A1810" }}>
-      <WormScene
-        worm={worm}
-        displayStage={displayStage}
-        onWormPress={handleWormPress}
+    <View style={{ alignItems: "center" }}>
+      <Pressable
+        accessibilityLabel="지렁이 꿈틀이"
+        hitSlop={16}
+        onPress={() => feedback.wormTap()}
+        onPressIn={onPressIn}
+        onPressOut={onPressOut}
+      >
+        <Animated.View
+          style={{ transform: [{ translateY: bob }, { scale: tapScale }] }}
+        >
+          <WormSprite equipped={equipped} size={1.4} />
+        </Animated.View>
+      </Pressable>
+      <View
+        pointerEvents="none"
+        style={{
+          marginTop: 8,
+          width: 130,
+          height: 10,
+          borderRadius: 999,
+          backgroundColor: Colors.surfaceBorder,
+          opacity: 0.6,
+        }}
       />
-
-      <HUD
-        coins={user?.coins ?? 0}
-        unit={currentUnit}
-        progress={clearedNodes}
-        total={totalNodes}
-        topInset={insets.top}
-        onMapPress={() => router.push("/map")}
-        onStagePress={() => router.push(`/stage/${displayStage}`)}
-      />
-
-      {focusOpen && (
-        <FocusCard
-          unit={currentUnit}
-          activeConceptName={activeNode?.name ?? null}
-          clearedNodes={clearedNodes}
-          totalNodes={totalNodes}
-          stageCleared={stageInfo?.cleared ?? false}
-          bottomOffset={insets.bottom + 96}
-          onClose={() => setFocusOpen(false)}
-          onStartSolve={goToActiveConcept}
-          onViewStage={goToStage}
-        />
-      )}
-
-      {__DEV__ && (
-        <DevStageSwitcher
-          currentStage={displayStage}
-          realStage={realStage}
-          onChange={setDevStage}
-          bottomOffset={Math.max(insets.bottom, 12) + 64 + 12}
-        />
-      )}
     </View>
   );
 }

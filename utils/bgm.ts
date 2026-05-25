@@ -1,18 +1,16 @@
 import { AppState, type AppStateStatus, type NativeEventSubscription } from "react-native";
 import { createAudioPlayer, type AudioPlayer } from "expo-audio";
 
-export type BgmKey = "home" | "shop" | "map";
+export type BgmKey = "home" | "shop";
 
 const SOURCES: Record<BgmKey, number> = {
   home: require("@/assets/music/home-bgm.mp3"),
   shop: require("@/assets/music/shop-bgm.mp3"),
-  map: require("@/assets/music/map-bgm.mp3"),
 };
 
 const VOLUMES: Record<BgmKey, number> = {
   home: 0.35,
   shop: 0.35,
-  map: 0.35,
 };
 
 const players: Partial<Record<BgmKey, AudioPlayer>> = {};
