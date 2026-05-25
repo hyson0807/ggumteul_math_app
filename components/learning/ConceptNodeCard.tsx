@@ -1,4 +1,4 @@
-import { Pressable, Text, View } from "react-native";
+import { Pressable, Text, View, type ViewStyle } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors } from "@/constants/colors";
 import { feedback } from "@/utils/feedback";
@@ -27,12 +27,110 @@ const STATUS_LABEL: Record<NodeStatus, string> = {
   unavailable: "준비 중",
 };
 
+interface StatusStyle {
+  cardBg: string;
+  cardBorder: string;
+  cardBorderWidth: number;
+  labelColor: string;
+  shadowColor: string;
+  shadowOpacity: number;
+  shadowRadius: number;
+  elevation: number;
+  circle: ViewStyle;
+}
+
 const NODE_CIRCLE_SIZE = 52;
 const CONNECTOR_WIDTH = 2;
+const LOCKED_BG = "#F4F8F6";
+const CLEARED_BG = "#F0F7F3";
+
+const BASE_CIRCLE: ViewStyle = {
+  width: NODE_CIRCLE_SIZE,
+  height: NODE_CIRCLE_SIZE,
+  borderRadius: 999,
+  alignItems: "center",
+  justifyContent: "center",
+};
+
+const STATUS_STYLE: Record<NodeStatus, StatusStyle> = {
+  active: {
+    cardBg: Colors.surface,
+    cardBorder: Colors.primary,
+    cardBorderWidth: 1.5,
+    labelColor: Colors.primary,
+    shadowColor: Colors.primary,
+    shadowOpacity: 0.12,
+    shadowRadius: 12,
+    elevation: 4,
+    circle: {
+      ...BASE_CIRCLE,
+      backgroundColor: "#fff",
+      borderWidth: 2.5,
+      borderColor: Colors.primary,
+      shadowColor: Colors.primary,
+      shadowOpacity: 0.3,
+      shadowRadius: 10,
+      shadowOffset: { width: 0, height: 3 },
+      elevation: 4,
+    },
+  },
+  cleared: {
+    cardBg: CLEARED_BG,
+    cardBorder: Colors.surfaceBorder,
+    cardBorderWidth: 1,
+    labelColor: Colors.primary,
+    shadowColor: "#000",
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 1,
+    circle: {
+      ...BASE_CIRCLE,
+      backgroundColor: Colors.primary,
+      shadowColor: Colors.primary,
+      shadowOpacity: 0.25,
+      shadowRadius: 8,
+      shadowOffset: { width: 0, height: 3 },
+      elevation: 3,
+    },
+  },
+  locked: {
+    cardBg: LOCKED_BG,
+    cardBorder: Colors.surfaceBorder,
+    cardBorderWidth: 1,
+    labelColor: Colors.inactive,
+    shadowColor: "#000",
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 1,
+    circle: {
+      ...BASE_CIRCLE,
+      backgroundColor: LOCKED_BG,
+      borderWidth: 1.5,
+      borderColor: Colors.surfaceBorder,
+    },
+  },
+  unavailable: {
+    cardBg: LOCKED_BG,
+    cardBorder: Colors.surfaceBorder,
+    cardBorderWidth: 1,
+    labelColor: Colors.inactive,
+    shadowColor: "#000",
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 1,
+    circle: {
+      ...BASE_CIRCLE,
+      backgroundColor: LOCKED_BG,
+      borderWidth: 1.5,
+      borderColor: Colors.surfaceBorder,
+    },
+  },
+};
 
 export function ConceptNodeCard({ node, index, isLast, onPress }: Props) {
   const status = resolveStatus(node);
   const disabled = status === "locked" || status === "unavailable";
+  const style = STATUS_STYLE[status];
 
   const handlePress = () => {
     if (disabled) return;
@@ -42,9 +140,10 @@ export function ConceptNodeCard({ node, index, isLast, onPress }: Props) {
 
   return (
     <View style={{ flexDirection: "row", gap: 14, alignItems: "stretch" }}>
-      {/* Left column: circle node + connector */}
       <View style={{ width: NODE_CIRCLE_SIZE, alignItems: "center" }}>
-        <NodeCircle status={status} index={index} />
+        <View style={style.circle}>
+          <NodeCircleContent status={status} index={index} />
+        </View>
         {!isLast && (
           <View
             style={{
@@ -62,7 +161,6 @@ export function ConceptNodeCard({ node, index, isLast, onPress }: Props) {
         )}
       </View>
 
-      {/* Right side: card */}
       <Pressable
         onPress={handlePress}
         disabled={disabled}
@@ -71,17 +169,17 @@ export function ConceptNodeCard({ node, index, isLast, onPress }: Props) {
         style={({ pressed }) => ({
           flex: 1,
           marginBottom: 14,
-          backgroundColor: cardBg(status),
+          backgroundColor: style.cardBg,
           borderRadius: 18,
-          borderWidth: status === "active" ? 1.5 : 1,
-          borderColor: cardBorder(status),
+          borderWidth: style.cardBorderWidth,
+          borderColor: style.cardBorder,
           paddingVertical: 14,
           paddingHorizontal: 16,
-          shadowColor: status === "active" ? Colors.primary : "#000",
-          shadowOpacity: status === "active" ? 0.12 : 0.04,
-          shadowRadius: status === "active" ? 12 : 8,
+          shadowColor: style.shadowColor,
+          shadowOpacity: style.shadowOpacity,
+          shadowRadius: style.shadowRadius,
           shadowOffset: { width: 0, height: 3 },
-          elevation: status === "active" ? 4 : 1,
+          elevation: style.elevation,
           opacity: pressed && !disabled ? 0.9 : 1,
         })}
       >
@@ -98,7 +196,7 @@ export function ConceptNodeCard({ node, index, isLast, onPress }: Props) {
               fontFamily: "Jua",
               fontSize: 10,
               letterSpacing: 2,
-              color: labelColor(status),
+              color: style.labelColor,
             }}
           >
             {STATUS_LABEL[status].toUpperCase()}
@@ -166,7 +264,7 @@ export function ConceptNodeCard({ node, index, isLast, onPress }: Props) {
   );
 }
 
-function NodeCircle({
+function NodeCircleContent({
   status,
   index,
 }: {
@@ -174,95 +272,20 @@ function NodeCircle({
   index: number;
 }) {
   if (status === "cleared") {
-    return (
-      <View
-        style={{
-          width: NODE_CIRCLE_SIZE,
-          height: NODE_CIRCLE_SIZE,
-          borderRadius: 999,
-          backgroundColor: Colors.primary,
-          alignItems: "center",
-          justifyContent: "center",
-          shadowColor: Colors.primary,
-          shadowOpacity: 0.25,
-          shadowRadius: 8,
-          shadowOffset: { width: 0, height: 3 },
-          elevation: 3,
-        }}
-      >
-        <MaterialCommunityIcons name="check" size={26} color="#fff" />
-      </View>
-    );
+    return <MaterialCommunityIcons name="check" size={26} color="#fff" />;
   }
-
   if (status === "active") {
     return (
-      <View
-        style={{
-          width: NODE_CIRCLE_SIZE,
-          height: NODE_CIRCLE_SIZE,
-          borderRadius: 999,
-          backgroundColor: "#fff",
-          borderWidth: 2.5,
-          borderColor: Colors.primary,
-          alignItems: "center",
-          justifyContent: "center",
-          shadowColor: Colors.primary,
-          shadowOpacity: 0.3,
-          shadowRadius: 10,
-          shadowOffset: { width: 0, height: 3 },
-          elevation: 4,
-        }}
-      >
-        <Text
-          style={{
-            fontFamily: "Jua",
-            fontSize: 18,
-            color: Colors.primary,
-          }}
-        >
-          {index + 1}
-        </Text>
-      </View>
+      <Text style={{ fontFamily: "Jua", fontSize: 18, color: Colors.primary }}>
+        {index + 1}
+      </Text>
     );
   }
-
-  // locked / unavailable
   return (
-    <View
-      style={{
-        width: NODE_CIRCLE_SIZE,
-        height: NODE_CIRCLE_SIZE,
-        borderRadius: 999,
-        backgroundColor: "#F4F8F6",
-        borderWidth: 1.5,
-        borderColor: Colors.surfaceBorder,
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
-      <MaterialCommunityIcons
-        name="lock-outline"
-        size={22}
-        color={Colors.inactive}
-      />
-    </View>
+    <MaterialCommunityIcons
+      name="lock-outline"
+      size={22}
+      color={Colors.inactive}
+    />
   );
-}
-
-function cardBg(status: NodeStatus): string {
-  if (status === "cleared") return "#F0F7F3";
-  if (status === "locked" || status === "unavailable") return "#F4F8F6";
-  return Colors.surface;
-}
-
-function cardBorder(status: NodeStatus): string {
-  if (status === "active") return Colors.primary;
-  return Colors.surfaceBorder;
-}
-
-function labelColor(status: NodeStatus): string {
-  if (status === "active") return Colors.primary;
-  if (status === "cleared") return Colors.primary;
-  return Colors.inactive;
 }

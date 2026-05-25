@@ -34,6 +34,7 @@ export const useStageNodes = (stage: number) =>
     queryKey: LEARNING_QUERY_KEYS.stageNodes(stage),
     queryFn: () => learningApi.getStageNodes(stage),
     enabled: Number.isFinite(stage) && stage > 0,
+    staleTime: 5 * 60_000,
   });
 
 export const useConceptProblems = (conceptId: number | null) =>

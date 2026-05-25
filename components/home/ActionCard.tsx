@@ -56,7 +56,7 @@ export function ActionCard({ title, subtitle, icon, onPress }: Props) {
             width: 44,
             height: 44,
             borderRadius: 14,
-            backgroundColor: "rgba(63,143,107,0.10)",
+            backgroundColor: `${Colors.primary}1A`,
             alignItems: "center",
             justifyContent: "center",
           }}

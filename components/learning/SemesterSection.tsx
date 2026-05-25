@@ -15,17 +15,12 @@ export function SemesterSection({ stage, gradeLabel }: Props) {
   const router = useRouter();
   const { data, isLoading, isError } = useStageNodes(stage);
 
-  const total = data?.totalNodes ?? 0;
-  const cleared = data?.clearedNodes ?? 0;
-  const percent = total > 0 ? Math.min(100, (cleared / total) * 100) : 0;
-
   return (
     <View style={{ marginBottom: 26 }}>
       <SemesterHeader
         gradeLabel={gradeLabel}
-        cleared={cleared}
-        total={total}
-        percent={percent}
+        cleared={data?.clearedNodes ?? 0}
+        total={data?.totalNodes ?? 0}
         stageLocked={data?.stageLocked ?? false}
         loading={isLoading}
       />
@@ -69,18 +64,17 @@ function SemesterHeader({
   gradeLabel,
   cleared,
   total,
-  percent,
   stageLocked,
   loading,
 }: {
   gradeLabel: string;
   cleared: number;
   total: number;
-  percent: number;
   stageLocked: boolean;
   loading: boolean;
 }) {
   const showProgress = !loading && !stageLocked && total > 0;
+  const percent = showProgress ? Math.min(100, (cleared / total) * 100) : 0;
   return (
     <View style={{ marginBottom: 14 }}>
       <View

@@ -1,11 +1,5 @@
 import { useEffect, useRef } from "react";
-import {
-  ActivityIndicator,
-  Animated,
-  Easing,
-  Pressable,
-  View,
-} from "react-native";
+import { Animated, Easing, Pressable, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Colors } from "@/constants/colors";
@@ -20,22 +14,7 @@ export default function HomeScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const user = useAuthStore((s) => s.user);
-  const { data: worm, isLoading } = useWorm();
-
-  if (isLoading) {
-    return (
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: Colors.background,
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <ActivityIndicator size="large" color={Colors.primary} />
-      </View>
-    );
-  }
+  const { data: worm } = useWorm();
 
   return (
     <View
