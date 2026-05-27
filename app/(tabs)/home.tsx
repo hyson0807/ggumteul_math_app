@@ -41,17 +41,19 @@ export default function HomeScreen() {
       >
         <WormStage equipped={worm?.equipped} />
 
-        <View style={{ flexDirection: "row", gap: 12, width: "100%" }}>
+        <View style={{ flexDirection: "row", gap: 14, width: "100%" }}>
           <ActionCard
             title="개념 학습"
-            subtitle="학년별·개념별로 풀기"
-            icon="book-open-variant"
+            subtitle="차근차근 배우기"
+            icon="school-outline"
+            accent={Colors.primary}
             onPress={() => router.push("/concept-learning")}
           />
           <ActionCard
             title="문제 추천"
-            subtitle="오늘의 맞춤 학습"
-            icon="lightbulb-on-outline"
+            subtitle="약점 극복하기"
+            icon="bullseye-arrow"
+            accent={Colors.cta}
             onPress={() => router.push("/recommend")}
           />
         </View>

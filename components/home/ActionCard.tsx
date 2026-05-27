@@ -8,10 +8,17 @@ interface Props {
   title: string;
   subtitle: string;
   icon: keyof typeof MaterialCommunityIcons.glyphMap;
+  accent?: string;
   onPress: () => void;
 }
 
-export function ActionCard({ title, subtitle, icon, onPress }: Props) {
+export function ActionCard({
+  title,
+  subtitle,
+  icon,
+  accent = Colors.primary,
+  onPress,
+}: Props) {
   const scale = useRef(new Animated.Value(1)).current;
 
   const animateTo = (value: number) => {
@@ -32,62 +39,78 @@ export function ActionCard({ title, subtitle, icon, onPress }: Props) {
     <Animated.View style={{ flex: 1, transform: [{ scale }] }}>
       <Pressable
         onPress={handlePress}
-        onPressIn={() => animateTo(0.97)}
+        onPressIn={() => animateTo(0.96)}
         onPressOut={() => animateTo(1)}
         accessibilityRole="button"
         accessibilityLabel={title}
-        style={({ pressed }) => ({
+        style={{
           backgroundColor: Colors.surface,
           borderRadius: 24,
-          padding: 16,
-          borderWidth: pressed ? 1.5 : 1,
-          borderColor: pressed ? Colors.primary : Colors.surfaceBorder,
-          shadowColor: "#000",
-          shadowOpacity: 0.06,
-          shadowRadius: 12,
-          shadowOffset: { width: 0, height: 4 },
-          elevation: 3,
-          minHeight: 132,
-          justifyContent: "space-between",
-        })}
+          paddingVertical: 22,
+          paddingHorizontal: 16,
+          borderWidth: 2,
+          borderColor: accent,
+          alignItems: "center",
+          shadowColor: accent,
+          shadowOpacity: 0.22,
+          shadowRadius: 16,
+          shadowOffset: { width: 0, height: 6 },
+          elevation: 5,
+          minHeight: 158,
+        }}
       >
         <View
           style={{
-            width: 44,
-            height: 44,
-            borderRadius: 14,
-            backgroundColor: `${Colors.primary}1A`,
+            width: 60,
+            height: 60,
+            borderRadius: 20,
+            backgroundColor: `${accent}1F`,
             alignItems: "center",
             justifyContent: "center",
+            marginBottom: 14,
+            shadowColor: accent,
+            shadowOpacity: 0.18,
+            shadowRadius: 8,
+            shadowOffset: { width: 0, height: 3 },
           }}
         >
-          <MaterialCommunityIcons name={icon} size={24} color={Colors.primary} />
+          <View
+            style={{
+              position: "absolute",
+              top: 6,
+              left: 10,
+              width: 14,
+              height: 6,
+              borderRadius: 999,
+              backgroundColor: "#FFFFFF",
+              opacity: 0.55,
+            }}
+          />
+          <MaterialCommunityIcons name={icon} size={30} color={accent} />
         </View>
 
-        <View style={{ marginTop: 12 }}>
-          <Text
-            numberOfLines={1}
-            style={{
-              fontFamily: "Jua",
-              fontSize: 17,
-              color: Colors.text,
-              letterSpacing: 0.1,
-            }}
-          >
-            {title}
-          </Text>
-          <Text
-            numberOfLines={1}
-            style={{
-              marginTop: 3,
-              fontFamily: "GowunDodum",
-              fontSize: 12,
-              color: Colors.textSecondary,
-            }}
-          >
-            {subtitle}
-          </Text>
-        </View>
+        <Text
+          numberOfLines={1}
+          style={{
+            fontFamily: "Jua",
+            fontSize: 18,
+            color: accent,
+            letterSpacing: 0.2,
+          }}
+        >
+          {title}
+        </Text>
+        <Text
+          numberOfLines={1}
+          style={{
+            marginTop: 4,
+            fontFamily: "GowunDodum",
+            fontSize: 12,
+            color: Colors.textSecondary,
+          }}
+        >
+          {subtitle}
+        </Text>
       </Pressable>
     </Animated.View>
   );
