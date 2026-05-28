@@ -1,5 +1,6 @@
 import { useMemo } from "react";
-import { View, Image, Text } from "react-native";
+import { View, Text } from "react-native";
+import { Image } from "expo-image";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { API_BASE_URL } from "@/services/api";
 import { Colors } from "@/constants/colors";
@@ -86,7 +87,9 @@ function FurnitureImage({
           height: "100%",
           transform: buildTransform(layout),
         }}
-        resizeMode="contain"
+        contentFit="contain"
+        cachePolicy="memory-disk"
+        transition={150}
       />
     </View>
   );
@@ -163,7 +166,9 @@ export function RoomCanvas({
           height: "100%",
           zIndex: 0,
         }}
-        resizeMode="cover"
+        contentFit="cover"
+        cachePolicy="memory-disk"
+        transition={150}
       />
 
       {/* 가구 슬롯 */}

@@ -1,4 +1,4 @@
-import { Fragment, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import {
   View,
   Text,
@@ -6,6 +6,7 @@ import {
   ActivityIndicator,
   Alert,
 } from "react-native";
+import { Image } from "expo-image";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useShopItems, usePurchaseItem } from "@/hooks/useShop";
@@ -13,7 +14,7 @@ import { useRoom, useEquipFurniture, useUnequipFurniture } from "@/hooks/useRoom
 import { useWorm, useEquipItem, useUnequipItem } from "@/hooks/useWorm";
 import { useToastStore } from "@/stores/useToastStore";
 import { useAuthStore } from "@/stores/useAuthStore";
-import { getApiErrorMessage } from "@/services/api";
+import { API_BASE_URL, getApiErrorMessage } from "@/services/api";
 import { ROOM_TAB_CONFIG, type RoomTabKey } from "@/constants/shop";
 import { Colors } from "@/constants/colors";
 import { CategoryTabBar } from "@/components/shop/CategoryTabBar";
@@ -39,6 +40,13 @@ export default function RoomScreen() {
   const equipWorm = useEquipItem();
   const unequipWorm = useUnequipItem();
   const [category, setCategory] = useState<RoomTabKey>("wallpaper");
+
+  useEffect(() => {
+    const urls = items
+      .filter((i) => isFurnitureCategory(i.category) && i.imageUrl)
+      .map((i) => `${API_BASE_URL}${i.imageUrl}`);
+    if (urls.length > 0) Image.prefetch(urls, "memory-disk");
+  }, [items]);
 
   const { owned, purchasable, sorted } = useMemo(() => {
     const filtered = items.filter((i) => {

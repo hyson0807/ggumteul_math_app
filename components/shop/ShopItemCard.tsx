@@ -1,4 +1,5 @@
-import { View, Text, TouchableOpacity, ActivityIndicator, Image } from "react-native";
+import { View, Text, TouchableOpacity, ActivityIndicator } from "react-native";
+import { Image } from "expo-image";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors } from "@/constants/colors";
 import { API_BASE_URL } from "@/services/api";
@@ -105,7 +106,9 @@ export function ShopItemCard({ item, currentStage, onPress, busy }: Props) {
           <Image
             source={{ uri: `${API_BASE_URL}${item.imageUrl}` }}
             style={{ width: "85%", height: "85%", opacity: locked ? 0.4 : 1 }}
-            resizeMode="contain"
+            contentFit="contain"
+            cachePolicy="memory-disk"
+            transition={150}
           />
         ) : (
           <MaterialCommunityIcons
