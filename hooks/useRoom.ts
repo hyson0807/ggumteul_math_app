@@ -15,8 +15,9 @@ export const useEquipFurniture = () => {
   return useMutation({
     mutationFn: ({ slot, shopItemId }: { slot: RoomSlot; shopItemId: string }) =>
       roomApi.equip(slot, shopItemId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ROOM_QUERY_KEY });
+    onSuccess: (data) => {
+      queryClient.setQueryData(ROOM_QUERY_KEY, data);
+      queryClient.invalidateQueries({ queryKey: ["shop", "items"] });
       queryClient.invalidateQueries({ queryKey: ["inventory"] });
     },
   });
@@ -26,8 +27,9 @@ export const useUnequipFurniture = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ slot }: { slot: RoomSlot }) => roomApi.unequip(slot),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ROOM_QUERY_KEY });
+    onSuccess: (data) => {
+      queryClient.setQueryData(ROOM_QUERY_KEY, data);
+      queryClient.invalidateQueries({ queryKey: ["shop", "items"] });
       queryClient.invalidateQueries({ queryKey: ["inventory"] });
     },
   });
