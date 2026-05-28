@@ -1,22 +1,26 @@
 import { View, Text, TouchableOpacity, ScrollView } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors } from "@/constants/colors";
-import type { ShopCategoryConfig } from "@/constants/shop";
-import type { ShopCategory } from "@/types/shop";
 
-interface Props {
-  value: ShopCategory;
-  onChange: (next: ShopCategory) => void;
-  categories: ShopCategoryConfig[];
+export type TabConfig<K extends string> = {
+  key: K;
+  label: string;
+  icon: string;
+};
+
+interface Props<K extends string> {
+  value: K;
+  onChange: (next: K) => void;
+  categories: TabConfig<K>[];
   scrollable?: boolean;
 }
 
-export function CategoryTabBar({
+export function CategoryTabBar<K extends string>({
   value,
   onChange,
   categories,
   scrollable,
-}: Props) {
+}: Props<K>) {
   const Container = scrollable ? ScrollView : View;
   const containerProps = scrollable
     ? {

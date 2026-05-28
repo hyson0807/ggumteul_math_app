@@ -15,20 +15,24 @@ import { useInventory } from "@/hooks/useInventory";
 import { useToastStore } from "@/stores/useToastStore";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { getApiErrorMessage } from "@/services/api";
-import {
-  FURNITURE_CATEGORY_CONFIG,
-  DEFAULT_FURNITURE_CATEGORY,
-} from "@/constants/shop";
+import { FURNITURE_CATEGORY_CONFIG } from "@/constants/shop";
 import { Colors } from "@/constants/colors";
-import { CategoryTabBar } from "@/components/shop/CategoryTabBar";
+import { CategoryTabBar, type TabConfig } from "@/components/shop/CategoryTabBar";
 import { RoomCanvas } from "@/components/room/RoomCanvas";
 import { RoomFurnitureCard } from "@/components/room/RoomFurnitureCard";
-import type {
-  FurnitureCategory,
-  InventoryEntry,
-  ShopCategory,
-} from "@/types/shop";
+import type { FurnitureCategory, InventoryEntry } from "@/types/shop";
 import { isFurnitureCategory } from "@/types/shop";
+
+type RoomTabKey = FurnitureCategory | "all";
+
+const ROOM_TAB_CONFIG: TabConfig<RoomTabKey>[] = [
+  { key: "all", label: "전체", icon: "view-grid-outline" },
+  ...FURNITURE_CATEGORY_CONFIG.map((c) => ({
+    key: c.key as FurnitureCategory,
+    label: c.label,
+    icon: c.icon,
+  })),
+];
 
 export default function RoomScreen() {
   const insets = useSafeAreaInsets();
@@ -39,9 +43,7 @@ export default function RoomScreen() {
   const { data: inventory = [], isLoading: invLoading } = useInventory();
   const equip = useEquipFurniture();
   const unequip = useUnequipFurniture();
-  const [category, setCategory] = useState<FurnitureCategory>(
-    DEFAULT_FURNITURE_CATEGORY,
-  );
+  const [category, setCategory] = useState<RoomTabKey>("all");
 
   const furnitureInventory = useMemo<InventoryEntry[]>(
     () => inventory.filter((e) => isFurnitureCategory(e.item.category)),
@@ -49,7 +51,10 @@ export default function RoomScreen() {
   );
 
   const filtered = useMemo<InventoryEntry[]>(
-    () => furnitureInventory.filter((e) => e.item.category === category),
+    () =>
+      category === "all"
+        ? furnitureInventory
+        : furnitureInventory.filter((e) => e.item.category === category),
     [furnitureInventory, category],
   );
 
@@ -133,14 +138,12 @@ export default function RoomScreen() {
           <RoomCanvas room={room?.equipped} worm={worm?.equipped} />
         </View>
 
-        {/* 카테고리 탭 */}
+        {/* 카테고리 탭 (전체 + 6개 가구) */}
         <View className="px-5 mb-3">
           <CategoryTabBar
             value={category}
-            onChange={(c: ShopCategory) => {
-              if (isFurnitureCategory(c)) setCategory(c);
-            }}
-            categories={FURNITURE_CATEGORY_CONFIG}
+            onChange={setCategory}
+            categories={ROOM_TAB_CONFIG}
             scrollable
           />
         </View>
@@ -179,11 +182,22 @@ export default function RoomScreen() {
           ) : filtered.length === 0 ? (
             <View className="py-12 items-center justify-center">
               <Text className="text-sm text-village-text-secondary">
-                이 카테고리의 가구가 아직 없어요.
+                {category === "all"
+                  ? "보유한 가구가 없어요."
+                  : "이 카테고리의 가구가 아직 없어요."}
               </Text>
             </View>
           ) : (
-            <View className="flex-row flex-wrap -mx-1">
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{
+                paddingTop: 10,
+                paddingRight: 8,
+                paddingLeft: 4,
+                paddingBottom: 4,
+              }}
+            >
               {filtered.map((entry) => {
                 const slot = entry.item.category as FurnitureCategory;
                 const isEquippedHere =
@@ -195,7 +209,10 @@ export default function RoomScreen() {
                     unequip.variables?.slot === slot &&
                     isEquippedHere);
                 return (
-                  <View key={entry.inventoryId} className="w-1/3 px-1 mb-2">
+                  <View
+                    key={entry.inventoryId}
+                    style={{ width: 110, marginRight: 8 }}
+                  >
                     <RoomFurnitureCard
                       item={entry.item}
                       equipped={isEquippedHere}
@@ -205,7 +222,7 @@ export default function RoomScreen() {
                   </View>
                 );
               })}
-            </View>
+            </ScrollView>
           )}
         </View>
       </ScrollView>
