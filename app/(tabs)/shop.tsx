@@ -87,6 +87,7 @@ export default function ShopScreen() {
       bed: roomPreview.bed ?? room?.equipped.bed ?? null,
       light: roomPreview.light ?? room?.equipped.light ?? null,
       rug: roomPreview.rug ?? room?.equipped.rug ?? null,
+      wallpaper: roomPreview.wallpaper ?? room?.equipped.wallpaper ?? null,
     }),
     [roomPreview, room?.equipped],
   );

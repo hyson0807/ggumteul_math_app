@@ -5,7 +5,8 @@ export type FurnitureCategory =
   | "clock"
   | "bed"
   | "light"
-  | "rug";
+  | "rug"
+  | "wallpaper";
 
 export type ShopCategory = WormCategory | FurnitureCategory;
 
@@ -24,6 +25,7 @@ export const FURNITURE_CATEGORY_KEYS: readonly FurnitureCategory[] = [
   "bed",
   "light",
   "rug",
+  "wallpaper",
 ];
 
 export function isFurnitureCategory(

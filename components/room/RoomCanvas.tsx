@@ -35,7 +35,10 @@ type SlotLayout = {
  *  - 뒷벽에 붙는 아이템: 시계 (창문 좌측 빈 공간)
  *  - 바닥에 놓이는 아이템: 책장/조명/책상/의자/침대/러그
  * -------------------------------------------------------------------------- */
-const SLOT_LAYOUT: Record<RoomSlot, SlotLayout> = {
+// wallpaper 는 배경 교체 슬롯이라 절대좌표 가구 슬롯에서 제외
+type PlacedSlot = Exclude<RoomSlot, "wallpaper">;
+
+const SLOT_LAYOUT: Record<PlacedSlot, SlotLayout> = {
   // 벽
   clock: { left: "32%", top: "8%", width: "18%", zIndex: 3 },
   // 가구 (바닥)
@@ -45,10 +48,10 @@ const SLOT_LAYOUT: Record<RoomSlot, SlotLayout> = {
   desk: { left: "-5%", top: "40%", width: "45%", zIndex: 5, flipX: true, rotate:3 },
   // 침대: PNG 는 머리판이 좌측인데, 우리 방의 뒷벽은 우상단이라 머리판이 우측을 향해야 함 → flipX
   bed: { left: "56%", top: "40%", width: "49%", zIndex: 4, flipX: true, rotate:6 },
-  rug: { left: "12%", top: "50%", width: "70%", zIndex: 1 },
+  rug: { left: "12%", top: "50%", width: "70%", zIndex: 1, rotate:6 },
 };
 
-const SLOT_ORDER: RoomSlot[] = [
+const SLOT_ORDER: PlacedSlot[] = [
   "clock",
   "shelf",
   "light",
@@ -100,7 +103,7 @@ function EmptySlot({
   slot,
   layout,
 }: {
-  slot: RoomSlot;
+  slot: PlacedSlot;
   layout: SlotLayout;
 }) {
   return (
@@ -138,14 +141,20 @@ export function RoomCanvas({
 }: Props) {
   const placed = useMemo(() => room ?? null, [room]);
 
+  // 장착된 벽지가 있으면 그 PNG 를 배경으로, 없으면 기본 빈 방
+  const wallpaper = placed?.wallpaper ?? null;
+  const backgroundSource = wallpaper
+    ? { uri: `${API_BASE_URL}${wallpaper.imageUrl}` }
+    : require("@/assets/images/room-empty-card.png");
+
   return (
     <View
       className="relative w-full overflow-hidden rounded-3xl border border-village-border"
       style={{ aspectRatio: 5 / 4, backgroundColor: "#F5C7BC" }}
     >
-      {/* 빈 방 배경 일러스트 (벽 + 바닥 + 창문 + 모서리 모두 포함) */}
+      {/* 방 배경 — 벽지 장착 시 교체됨 */}
       <Image
-        source={require("@/assets/images/room-empty-card.png")}
+        source={backgroundSource}
         style={{
           position: "absolute",
           left: 0,

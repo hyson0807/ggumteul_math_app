@@ -17,6 +17,7 @@ export const WORM_CATEGORY_CONFIG: ShopCategoryConfig[] = [
 ];
 
 export const FURNITURE_CATEGORY_CONFIG: ShopCategoryConfig[] = [
+  { key: "wallpaper", label: "벽지", icon: "wallpaper" },
   { key: "desk", label: "책상", icon: "desk" },
   { key: "shelf", label: "책장", icon: "bookshelf" },
   { key: "clock", label: "시계", icon: "clock-outline" },
