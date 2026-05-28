@@ -1,7 +1,9 @@
-import { View, Text, TouchableOpacity, ActivityIndicator } from "react-native";
+import { View, Text, TouchableOpacity, ActivityIndicator, Image } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors } from "@/constants/colors";
-import type { ShopItemWithStatus } from "@/types/shop";
+import { API_BASE_URL } from "@/services/api";
+import { SHOP_CATEGORY_BY_KEY } from "@/constants/shop";
+import { isFurnitureCategory, type ShopItemWithStatus } from "@/types/shop";
 
 interface Props {
   item: ShopItemWithStatus;
@@ -51,17 +53,19 @@ export function ShopItemCard({
       )}
 
       <View className="h-24 items-center justify-center bg-white/60 rounded-xl mb-2">
-        <MaterialCommunityIcons
-          name={
-            item.category === "hat"
-              ? "hat-fedora"
-              : item.category === "body"
-                ? "tshirt-crew"
-                : "bag-personal-outline"
-          }
-          size={42}
-          color={locked ? Colors.inactive : Colors.primary}
-        />
+        {isFurnitureCategory(item.category) ? (
+          <Image
+            source={{ uri: `${API_BASE_URL}${item.imageUrl}` }}
+            style={{ width: "85%", height: "85%", opacity: locked ? 0.4 : 1 }}
+            resizeMode="contain"
+          />
+        ) : (
+          <MaterialCommunityIcons
+            name={(SHOP_CATEGORY_BY_KEY[item.category]?.icon ?? "help-circle") as never}
+            size={42}
+            color={locked ? Colors.inactive : Colors.primary}
+          />
+        )}
       </View>
 
       <Text className="text-sm font-bold text-village-text" numberOfLines={1}>

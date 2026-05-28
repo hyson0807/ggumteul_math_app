@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
+  InteractionManager,
   Pressable,
   ScrollView,
   Text,
@@ -20,6 +21,14 @@ export default function ConceptLearningScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const [mode, setMode] = useState<Mode>("concept");
+  const [contentReady, setContentReady] = useState(false);
+
+  useEffect(() => {
+    const handle = InteractionManager.runAfterInteractions(() => {
+      setContentReady(true);
+    });
+    return () => handle.cancel();
+  }, []);
 
   const switchMode = (next: Mode) => {
     if (next === mode) return;
@@ -136,13 +145,19 @@ export default function ConceptLearningScreen() {
       {mode === "grade" ? (
         <GradeTabPlaceholder bottomInset={insets.bottom} />
       ) : (
-        <ConceptTab bottomInset={insets.bottom} />
+        <ConceptTab bottomInset={insets.bottom} ready={contentReady} />
       )}
     </View>
   );
 }
 
-function ConceptTab({ bottomInset }: { bottomInset: number }) {
+function ConceptTab({
+  bottomInset,
+  ready,
+}: {
+  bottomInset: number;
+  ready: boolean;
+}) {
   return (
     <ScrollView
       contentContainerStyle={{
@@ -152,13 +167,14 @@ function ConceptTab({ bottomInset }: { bottomInset: number }) {
       }}
       showsVerticalScrollIndicator={false}
     >
-      {ALL_STAGES.map((stage) => (
-        <SemesterSection
-          key={stage}
-          stage={stage}
-          gradeLabel={STAGE_SCENES[stage].grade}
-        />
-      ))}
+      {ready &&
+        ALL_STAGES.map((stage) => (
+          <SemesterSection
+            key={stage}
+            stage={stage}
+            gradeLabel={STAGE_SCENES[stage].grade}
+          />
+        ))}
     </ScrollView>
   );
 }

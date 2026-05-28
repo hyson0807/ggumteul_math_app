@@ -5,57 +5,166 @@ import {
   ScrollView,
   TouchableOpacity,
   ActivityIndicator,
+  Image,
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { useInventory } from "@/hooks/useInventory";
 import { useEquipItem, useUnequipItem, useWorm } from "@/hooks/useWorm";
+import {
+  useEquipFurniture,
+  useRoom,
+  useUnequipFurniture,
+} from "@/hooks/useRoom";
 import { useToastStore } from "@/stores/useToastStore";
 import { useAuthStore } from "@/stores/useAuthStore";
-import { getApiErrorMessage } from "@/services/api";
-import { SHOP_CATEGORY_BY_KEY } from "@/constants/shop";
+import { API_BASE_URL, getApiErrorMessage } from "@/services/api";
+import {
+  WORM_CATEGORY_CONFIG,
+  FURNITURE_CATEGORY_CONFIG,
+  SHOP_CATEGORY_BY_KEY,
+  DEFAULT_WORM_CATEGORY,
+  DEFAULT_FURNITURE_CATEGORY,
+} from "@/constants/shop";
 import { Colors } from "@/constants/colors";
 import { WormSprite } from "@/components/worm/WormSprite";
+import { RoomCanvas } from "@/components/room/RoomCanvas";
 import { CategoryTabBar } from "@/components/shop/CategoryTabBar";
-import type { ShopCategory, InventoryEntry } from "@/types/shop";
+import { DomainToggle } from "@/components/shop/DomainToggle";
+import {
+  isFurnitureCategory,
+  type FurnitureCategory,
+  type InventoryEntry,
+  type ShopCategory,
+  type ShopDomain,
+  type WormCategory,
+} from "@/types/shop";
 
 export default function BagScreen() {
   const insets = useSafeAreaInsets();
   const user = useAuthStore((s) => s.user);
   const showToast = useToastStore((s) => s.show);
   const { data: worm } = useWorm();
+  const { data: room } = useRoom();
   const { data: inventory = [], isLoading } = useInventory();
-  const equip = useEquipItem();
-  const unequip = useUnequipItem();
-  const [category, setCategory] = useState<ShopCategory>("hat");
+  const equipWorm = useEquipItem();
+  const unequipWorm = useUnequipItem();
+  const equipRoom = useEquipFurniture();
+  const unequipRoom = useUnequipFurniture();
 
-  const filtered = useMemo<InventoryEntry[]>(
-    () => inventory.filter((e) => e.item.category === category),
-    [inventory, category],
+  const [domain, setDomain] = useState<ShopDomain>("worm");
+  const [wormCategory, setWormCategory] =
+    useState<WormCategory>(DEFAULT_WORM_CATEGORY);
+  const [roomCategory, setRoomCategory] = useState<FurnitureCategory>(
+    DEFAULT_FURNITURE_CATEGORY,
   );
 
-  const handleToggle = (entry: InventoryEntry) => {
-    const slot = entry.item.category;
-    if (entry.equipped) {
-      unequip.mutate(
-        { slot },
-        {
-          onSuccess: () => showToast("장착을 해제했어요.", "info"),
-          onError: (e) =>
-            showToast(getApiErrorMessage(e, "해제에 실패했어요."), "error"),
-        },
-      );
-    } else {
-      equip.mutate(
-        { slot, shopItemId: entry.item.id },
-        {
-          onSuccess: () => showToast(`${entry.item.name} 장착!`, "success"),
-          onError: (e) =>
-            showToast(getApiErrorMessage(e, "장착에 실패했어요."), "error"),
-        },
+  const activeCategory: ShopCategory =
+    domain === "worm" ? wormCategory : roomCategory;
+
+  const domainInventory = useMemo<InventoryEntry[]>(
+    () =>
+      inventory.filter((e) =>
+        domain === "worm"
+          ? !isFurnitureCategory(e.item.category)
+          : isFurnitureCategory(e.item.category),
+      ),
+    [inventory, domain],
+  );
+
+  const filtered = useMemo<InventoryEntry[]>(
+    () => domainInventory.filter((e) => e.item.category === activeCategory),
+    [domainInventory, activeCategory],
+  );
+
+  const equippedFurnitureIdBySlot = useMemo(() => {
+    const map: Partial<Record<FurnitureCategory, string>> = {};
+    if (!room) return map;
+    (Object.keys(room.equipped) as FurnitureCategory[]).forEach((slot) => {
+      const item = room.equipped[slot];
+      if (item) map[slot] = item.id;
+    });
+    return map;
+  }, [room]);
+
+  const isEquipped = (entry: InventoryEntry): boolean => {
+    if (isFurnitureCategory(entry.item.category)) {
+      return (
+        equippedFurnitureIdBySlot[entry.item.category as FurnitureCategory] ===
+        entry.item.id
       );
     }
+    return entry.equipped;
+  };
+
+  const handleToggle = (entry: InventoryEntry) => {
+    if (isFurnitureCategory(entry.item.category)) {
+      const slot = entry.item.category as FurnitureCategory;
+      const equipped = isEquipped(entry);
+      if (equipped) {
+        unequipRoom.mutate(
+          { slot },
+          {
+            onSuccess: () => showToast("가구를 치웠어요.", "info"),
+            onError: (e) =>
+              showToast(getApiErrorMessage(e, "해제에 실패했어요."), "error"),
+          },
+        );
+      } else {
+        equipRoom.mutate(
+          { slot, shopItemId: entry.item.id },
+          {
+            onSuccess: () =>
+              showToast(`${entry.item.name} 배치 완료!`, "success"),
+            onError: (e) =>
+              showToast(getApiErrorMessage(e, "배치에 실패했어요."), "error"),
+          },
+        );
+      }
+    } else {
+      const slot = entry.item.category as WormCategory;
+      if (entry.equipped) {
+        unequipWorm.mutate(
+          { slot },
+          {
+            onSuccess: () => showToast("장착을 해제했어요.", "info"),
+            onError: (e) =>
+              showToast(getApiErrorMessage(e, "해제에 실패했어요."), "error"),
+          },
+        );
+      } else {
+        equipWorm.mutate(
+          { slot, shopItemId: entry.item.id },
+          {
+            onSuccess: () => showToast(`${entry.item.name} 장착!`, "success"),
+            onError: (e) =>
+              showToast(getApiErrorMessage(e, "장착에 실패했어요."), "error"),
+          },
+        );
+      }
+    }
+  };
+
+  const isBusy = (entry: InventoryEntry): boolean => {
+    if (isFurnitureCategory(entry.item.category)) {
+      const slot = entry.item.category as FurnitureCategory;
+      const equipped = isEquipped(entry);
+      return (
+        (equipRoom.isPending &&
+          equipRoom.variables?.shopItemId === entry.item.id) ||
+        (unequipRoom.isPending &&
+          unequipRoom.variables?.slot === slot &&
+          equipped)
+      );
+    }
+    return (
+      (equipWorm.isPending &&
+        equipWorm.variables?.shopItemId === entry.item.id) ||
+      (unequipWorm.isPending &&
+        unequipWorm.variables?.slot === entry.item.category &&
+        entry.equipped)
+    );
   };
 
   return (
@@ -84,33 +193,55 @@ export default function BagScreen() {
         </View>
       </View>
 
-      <View className="mx-5 mt-2 mb-4 rounded-3xl bg-white/70 border border-village-border py-6 items-center justify-center">
-        <WormSprite
-          equipped={worm?.equipped}
-          size={1.4}
-        />
+      <View className="px-5 mb-3">
+        <DomainToggle value={domain} onChange={setDomain} />
+      </View>
+
+      <View className="mx-5 mb-4 rounded-3xl bg-white/70 border border-village-border overflow-hidden">
+        {domain === "worm" ? (
+          <View className="py-6 items-center justify-center">
+            <WormSprite equipped={worm?.equipped} size={1.4} />
+          </View>
+        ) : (
+          <RoomCanvas room={room?.equipped} worm={worm?.equipped} showWorm />
+        )}
       </View>
 
       <View className="px-5 mb-4">
-        <CategoryTabBar value={category} onChange={setCategory} />
+        <CategoryTabBar
+          value={activeCategory}
+          onChange={(c) => {
+            if (isFurnitureCategory(c)) setRoomCategory(c);
+            else setWormCategory(c as WormCategory);
+          }}
+          categories={
+            domain === "worm"
+              ? WORM_CATEGORY_CONFIG
+              : FURNITURE_CATEGORY_CONFIG
+          }
+          scrollable={domain === "room"}
+        />
       </View>
 
       {isLoading ? (
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" color={Colors.primary} />
         </View>
-      ) : inventory.length === 0 ? (
+      ) : domainInventory.length === 0 ? (
         <View className="flex-1 items-center justify-center px-6">
           <MaterialCommunityIcons
-            name="treasure-chest-outline"
+            name={domain === "worm" ? "treasure-chest-outline" : "sofa-outline"}
             size={80}
             color={Colors.inactive}
           />
           <Text className="text-lg text-village-text-secondary mt-4">
-            아직 아이템이 없어요
+            {domain === "worm"
+              ? "아직 아이템이 없어요"
+              : "아직 가구가 없어요"}
           </Text>
           <Text className="text-sm text-village-inactive mt-1 text-center">
-            상점에서 지렁이 친구에게 선물해보세요
+            상점에서{" "}
+            {domain === "worm" ? "지렁이 친구에게 선물해보세요" : "가구를 사보세요"}
           </Text>
         </View>
       ) : filtered.length === 0 ? (
@@ -126,12 +257,9 @@ export default function BagScreen() {
         >
           <View className="flex-row flex-wrap -mx-1">
             {filtered.map((entry) => {
-              const busy =
-                (equip.isPending &&
-                  equip.variables?.shopItemId === entry.item.id) ||
-                (unequip.isPending &&
-                  unequip.variables?.slot === entry.item.category &&
-                  entry.equipped);
+              const equipped = isEquipped(entry);
+              const busy = isBusy(entry);
+              const isFurniture = isFurnitureCategory(entry.item.category);
               return (
                 <View key={entry.inventoryId} className="w-1/3 px-1 mb-2">
                   <TouchableOpacity
@@ -139,12 +267,12 @@ export default function BagScreen() {
                     disabled={busy}
                     activeOpacity={0.8}
                     className={`rounded-2xl p-2 border ${
-                      entry.equipped
+                      equipped
                         ? "bg-white border-village-primary border-2"
                         : "bg-village-surface border-village-border"
                     }`}
                   >
-                    {entry.equipped && (
+                    {equipped && (
                       <View className="absolute -top-2 -right-2 z-10 bg-village-primary w-6 h-6 rounded-full items-center justify-center border-2 border-white">
                         <MaterialCommunityIcons
                           name="check"
@@ -153,14 +281,25 @@ export default function BagScreen() {
                         />
                       </View>
                     )}
-                    <View className="h-20 items-center justify-center bg-white/60 rounded-xl">
+                    <View
+                      className="items-center justify-center bg-white/60 rounded-xl"
+                      style={{ aspectRatio: 1 }}
+                    >
                       {busy ? (
                         <ActivityIndicator color={Colors.primary} />
+                      ) : isFurniture ? (
+                        <Image
+                          source={{
+                            uri: `${API_BASE_URL}${entry.item.imageUrl}`,
+                          }}
+                          style={{ width: "85%", height: "85%" }}
+                          resizeMode="contain"
+                        />
                       ) : (
                         <MaterialCommunityIcons
                           name={
-                            SHOP_CATEGORY_BY_KEY[entry.item.category]
-                              .icon as never
+                            (SHOP_CATEGORY_BY_KEY[entry.item.category]
+                              ?.icon ?? "help-circle") as never
                           }
                           size={36}
                           color={Colors.primary}

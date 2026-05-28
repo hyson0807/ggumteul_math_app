@@ -31,8 +31,8 @@ export function ActionCard({
   };
 
   const handlePress = () => {
-    feedback.tabPress();
     onPress();
+    feedback.tabPress();
   };
 
   return (

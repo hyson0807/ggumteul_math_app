@@ -39,6 +39,15 @@ export default function TabsLayout() {
             }}
           />
           <Tabs.Screen
+            name="room"
+            options={{
+              title: "방꾸미기",
+              tabBarIcon: ({ color, size }) => (
+                <MaterialCommunityIcons name="sofa-outline" size={size} color={color} />
+              ),
+            }}
+          />
+          <Tabs.Screen
             name="shop"
             options={{
               title: "상점",

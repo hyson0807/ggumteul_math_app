@@ -9,6 +9,7 @@ const BGM_BY_PATH: Record<string, BgmKey> = {
   "/concept-learning": "home",
   "/shop": "shop",
   "/bag": "shop",
+  "/room": "shop",
 };
 
 export function BgmController() {
