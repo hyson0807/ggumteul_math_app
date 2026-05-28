@@ -7,8 +7,6 @@ const BGM_BY_PATH: Record<string, BgmKey> = {
   "/recommend": "home",
   "/recommend-session": "home",
   "/concept-learning": "home",
-  "/shop": "shop",
-  "/bag": "shop",
   "/room": "shop",
 };
 

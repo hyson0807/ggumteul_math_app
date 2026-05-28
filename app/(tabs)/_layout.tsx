@@ -48,15 +48,6 @@ export default function TabsLayout() {
             }}
           />
           <Tabs.Screen
-            name="shop"
-            options={{
-              title: "상점",
-              tabBarIcon: ({ color, size }) => (
-                <MaterialCommunityIcons name="storefront-outline" size={size} color={color} />
-              ),
-            }}
-          />
-          <Tabs.Screen
             name="profile"
             options={{
               title: "프로필",

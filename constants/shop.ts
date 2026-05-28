@@ -1,14 +1,12 @@
 import type {
   FurnitureCategory,
   ShopCategory,
-  WormCategory,
 } from "@/types/shop";
+import type { TabConfig } from "@/components/shop/CategoryTabBar";
 
-export interface ShopCategoryConfig {
-  key: ShopCategory;
-  label: string;
-  icon: string;
-}
+export type ShopCategoryConfig = TabConfig<ShopCategory>;
+
+export type RoomTabKey = FurnitureCategory | "all" | "outfit";
 
 export const WORM_CATEGORY_CONFIG: ShopCategoryConfig[] = [
   { key: "hat", label: "모자", icon: "hat-fedora" },
@@ -16,7 +14,7 @@ export const WORM_CATEGORY_CONFIG: ShopCategoryConfig[] = [
   { key: "accessory", label: "장신구", icon: "bag-personal-outline" },
 ];
 
-export const FURNITURE_CATEGORY_CONFIG: ShopCategoryConfig[] = [
+export const FURNITURE_CATEGORY_CONFIG: TabConfig<FurnitureCategory>[] = [
   { key: "wallpaper", label: "벽지", icon: "wallpaper" },
   { key: "desk", label: "책상", icon: "desk" },
   { key: "shelf", label: "책장", icon: "bookshelf" },
@@ -26,19 +24,19 @@ export const FURNITURE_CATEGORY_CONFIG: ShopCategoryConfig[] = [
   { key: "rug", label: "러그", icon: "rug" },
 ];
 
-export const SHOP_CATEGORY_CONFIG: ShopCategoryConfig[] = [
+export const SHOP_CATEGORY_BY_KEY: Record<ShopCategory, ShopCategoryConfig> = [
   ...WORM_CATEGORY_CONFIG,
   ...FURNITURE_CATEGORY_CONFIG,
+].reduce(
+  (acc, c) => {
+    acc[c.key] = c;
+    return acc;
+  },
+  {} as Record<ShopCategory, ShopCategoryConfig>,
+);
+
+export const ROOM_TAB_CONFIG: TabConfig<RoomTabKey>[] = [
+  { key: "all", label: "전체", icon: "view-grid-outline" },
+  { key: "outfit", label: "의상", icon: "hanger" },
+  ...FURNITURE_CATEGORY_CONFIG,
 ];
-
-export const SHOP_CATEGORY_BY_KEY: Record<ShopCategory, ShopCategoryConfig> =
-  SHOP_CATEGORY_CONFIG.reduce(
-    (acc, c) => {
-      acc[c.key] = c;
-      return acc;
-    },
-    {} as Record<ShopCategory, ShopCategoryConfig>,
-  );
-
-export const DEFAULT_WORM_CATEGORY: WormCategory = "hat";
-export const DEFAULT_FURNITURE_CATEGORY: FurnitureCategory = "desk";

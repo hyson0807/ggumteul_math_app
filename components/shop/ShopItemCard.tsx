@@ -8,47 +8,60 @@ import { isFurnitureCategory, type ShopItemWithStatus } from "@/types/shop";
 interface Props {
   item: ShopItemWithStatus;
   currentStage: number;
-  onPurchase: () => void;
-  onTryOn?: () => void;
-  previewing?: boolean;
-  disabled?: boolean;
+  onPress: () => void;
   busy?: boolean;
 }
 
-export function ShopItemCard({
-  item,
-  currentStage,
-  onPurchase,
-  onTryOn,
-  previewing,
-  disabled,
-  busy,
-}: Props) {
+export function ShopItemCard({ item, currentStage, onPress, busy }: Props) {
   const locked = currentStage < item.unlockStage;
   const isOwned = item.owned;
-  const ctaLabel = isOwned
-    ? item.equipped
-      ? "장착 중"
-      : "보유중"
-    : locked
-      ? `Lv.${item.unlockStage} 해제`
-      : `${item.price} 코인`;
-  const ctaDisabled = disabled || isOwned || locked;
+  const isEquipped = isOwned && item.equipped;
+  const isOwnedNotEquipped = isOwned && !item.equipped;
+
+  const cardContainer = isEquipped
+    ? "bg-white border-2 border-village-primary"
+    : isOwnedNotEquipped
+      ? "bg-village-primary/5 border border-dashed border-village-primary"
+      : "bg-village-surface border border-village-border";
+
+  const ctaLabel = isEquipped
+    ? "장착 중"
+    : isOwnedNotEquipped
+      ? "장착하기"
+      : locked
+        ? `Lv.${item.unlockStage} 해제`
+        : `${item.price} 코인`;
+  const ctaContainer = isEquipped
+    ? "bg-village-primary"
+    : isOwnedNotEquipped
+      ? "bg-white border border-village-primary"
+      : locked
+        ? "bg-village-border"
+        : "bg-village-cta";
+  const ctaTextColor = isEquipped
+    ? "text-white"
+    : isOwnedNotEquipped
+      ? "text-village-primary"
+      : locked
+        ? "text-village-text-secondary"
+        : "text-white";
 
   return (
     <TouchableOpacity
-      activeOpacity={onTryOn ? 0.8 : 1}
-      onPress={onTryOn}
-      disabled={!onTryOn}
-      className={`flex-1 rounded-2xl p-3 border ${
-        previewing
-          ? "bg-white border-village-primary border-2"
-          : "bg-village-surface border-village-border"
-      }`}
+      activeOpacity={0.85}
+      onPress={onPress}
+      disabled={busy}
+      className={`flex-1 rounded-2xl p-3 ${cardContainer}`}
     >
-      {previewing && (
-        <View className="absolute -top-2 -right-2 z-10 bg-village-primary w-6 h-6 rounded-full items-center justify-center border-2 border-white">
-          <MaterialCommunityIcons name="check" size={14} color="#fff" />
+      {isEquipped && (
+        <View className="absolute -top-2 -right-2 z-10 bg-village-primary w-7 h-7 rounded-full items-center justify-center border-2 border-white">
+          <MaterialCommunityIcons name="check-bold" size={16} color="#fff" />
+        </View>
+      )}
+
+      {isOwnedNotEquipped && (
+        <View className="absolute -top-2 left-2 z-10 bg-village-primary px-2 py-0.5 rounded-full border border-white">
+          <Text className="text-[10px] font-bold text-white">보유</Text>
         </View>
       )}
 
@@ -75,16 +88,14 @@ export function ShopItemCard({
         {item.description}
       </Text>
 
-      <TouchableOpacity
-        className={`rounded-xl py-2 items-center flex-row justify-center ${
-          ctaDisabled ? "bg-village-border" : "bg-village-primary"
-        }`}
-        disabled={ctaDisabled}
-        onPress={onPurchase}
-        activeOpacity={0.8}
+      <View
+        className={`rounded-xl py-2 items-center flex-row justify-center ${ctaContainer}`}
       >
         {busy ? (
-          <ActivityIndicator color="#fff" size="small" />
+          <ActivityIndicator
+            color={isOwnedNotEquipped ? Colors.primary : "#fff"}
+            size="small"
+          />
         ) : (
           <>
             {!isOwned && !locked && (
@@ -95,16 +106,12 @@ export function ShopItemCard({
                 style={{ marginRight: 4 }}
               />
             )}
-            <Text
-              className={`text-xs font-bold ${
-                ctaDisabled ? "text-village-text-secondary" : "text-white"
-              }`}
-            >
+            <Text className={`text-xs font-bold ${ctaTextColor}`}>
               {ctaLabel}
             </Text>
           </>
         )}
-      </TouchableOpacity>
+      </View>
     </TouchableOpacity>
   );
 }
