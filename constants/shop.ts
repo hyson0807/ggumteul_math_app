@@ -6,7 +6,7 @@ import type { TabConfig } from "@/components/shop/CategoryTabBar";
 
 export type ShopCategoryConfig = TabConfig<ShopCategory>;
 
-export type RoomTabKey = FurnitureCategory | "all" | "outfit";
+export type RoomTabKey = FurnitureCategory | "outfit";
 
 export const WORM_CATEGORY_CONFIG: ShopCategoryConfig[] = [
   { key: "hat", label: "모자", icon: "hat-fedora" },
@@ -36,7 +36,6 @@ export const SHOP_CATEGORY_BY_KEY: Record<ShopCategory, ShopCategoryConfig> = [
 );
 
 export const ROOM_TAB_CONFIG: TabConfig<RoomTabKey>[] = [
-  { key: "all", label: "전체", icon: "view-grid-outline" },
-  { key: "outfit", label: "의상", icon: "hanger" },
   ...FURNITURE_CATEGORY_CONFIG,
+  { key: "outfit", label: "의상", icon: "hanger" },
 ];

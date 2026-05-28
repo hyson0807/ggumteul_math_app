@@ -38,11 +38,10 @@ export default function RoomScreen() {
   const unequipFurniture = useUnequipFurniture();
   const equipWorm = useEquipItem();
   const unequipWorm = useUnequipItem();
-  const [category, setCategory] = useState<RoomTabKey>("all");
+  const [category, setCategory] = useState<RoomTabKey>("wallpaper");
 
   const { owned, purchasable, sorted } = useMemo(() => {
     const filtered = items.filter((i) => {
-      if (category === "all") return true;
       if (category === "outfit") return !isFurnitureCategory(i.category);
       return i.category === category;
     });
@@ -179,6 +178,20 @@ export default function RoomScreen() {
           <RoomCanvas room={room?.equipped} worm={worm?.equipped} />
         </View>
 
+        <View className="px-5 mb-2 flex-row items-center">
+          <MaterialCommunityIcons
+            name="shopping-outline"
+            size={20}
+            color={Colors.cta}
+          />
+          <Text className="text-lg font-extrabold text-village-text ml-1.5">
+            상점
+          </Text>
+          <Text className="text-xs text-village-text-secondary ml-2">
+            코인으로 가구를 구매해 보세요!
+          </Text>
+        </View>
+
         <View className="px-5 mb-3">
           <CategoryTabBar
             value={category}
@@ -201,14 +214,6 @@ export default function RoomScreen() {
             </View>
           ) : (
             <>
-              <View className="flex-row items-center justify-between mt-1 mb-2">
-                <Text className="text-sm font-bold text-village-text">
-                  총 {sorted.length}개
-                </Text>
-                <Text className="text-xs text-village-text-secondary">
-                  보유 {owned.length} · 구매 가능 {purchasable.length}
-                </Text>
-              </View>
               <ScrollView
                 horizontal
                 showsHorizontalScrollIndicator={false}

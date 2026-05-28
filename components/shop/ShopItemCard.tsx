@@ -84,7 +84,11 @@ export function ShopItemCard({ item, currentStage, onPress, busy }: Props) {
       <Text className="text-sm font-bold text-village-text" numberOfLines={1}>
         {item.name}
       </Text>
-      <Text className="text-[11px] text-village-text-secondary mb-2" numberOfLines={2}>
+      <Text
+        className="text-[11px] text-village-text-secondary mb-2"
+        numberOfLines={1}
+        style={{ lineHeight: 14, minHeight: 14 }}
+      >
         {item.description}
       </Text>
 
