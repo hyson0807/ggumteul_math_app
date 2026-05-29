@@ -1,5 +1,5 @@
 import api from "./api";
-import type { RoomSlot, RoomState } from "@/types/room";
+import type { RoomLayout, RoomSlot, RoomState } from "@/types/room";
 
 export const roomApi = {
   getState: async () => {
@@ -17,6 +17,11 @@ export const roomApi = {
 
   unequip: async (slot: RoomSlot) => {
     const { data } = await api.post<RoomState>("/room/unequip", { slot });
+    return data;
+  },
+
+  saveLayout: async (layout: RoomLayout) => {
+    const { data } = await api.patch<RoomState>("/room/layout", { layout });
     return data;
   },
 };

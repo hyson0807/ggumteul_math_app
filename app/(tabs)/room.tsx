@@ -5,12 +5,18 @@ import {
   ScrollView,
   ActivityIndicator,
   Alert,
+  Pressable,
 } from "react-native";
 import { Image } from "expo-image";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useShopItems, usePurchaseItem } from "@/hooks/useShop";
-import { useRoom, useEquipFurniture, useUnequipFurniture } from "@/hooks/useRoom";
+import {
+  useRoom,
+  useEquipFurniture,
+  useUnequipFurniture,
+  useSaveRoomLayout,
+} from "@/hooks/useRoom";
 import { useWorm, useEquipItem, useUnequipItem } from "@/hooks/useWorm";
 import { useToastStore } from "@/stores/useToastStore";
 import { useAuthStore } from "@/stores/useAuthStore";
@@ -19,7 +25,8 @@ import { ROOM_TAB_CONFIG, type RoomTabKey } from "@/constants/shop";
 import { Colors } from "@/constants/colors";
 import { CategoryTabBar } from "@/components/shop/CategoryTabBar";
 import { ShopItemCard } from "@/components/shop/ShopItemCard";
-import { RoomCanvas } from "@/components/room/RoomCanvas";
+import { RoomCanvas, type EditSelection } from "@/components/room/RoomCanvas";
+import type { RoomLayout } from "@/types/room";
 import {
   isFurnitureCategory,
   type FurnitureCategory,
@@ -39,7 +46,38 @@ export default function RoomScreen() {
   const unequipFurniture = useUnequipFurniture();
   const equipWorm = useEquipItem();
   const unequipWorm = useUnequipItem();
+  const saveLayout = useSaveRoomLayout();
   const [category, setCategory] = useState<RoomTabKey>("wallpaper");
+
+  // 수정 모드 state — 진입 시 서버 layout 을 draft 로 복사
+  const [editMode, setEditMode] = useState(false);
+  const [draftLayout, setDraftLayout] = useState<RoomLayout>({});
+  const [selected, setSelected] = useState<EditSelection>(null);
+
+  const enterEdit = () => {
+    setDraftLayout(room?.layout ?? {});
+    setSelected(null);
+    setEditMode(true);
+  };
+
+  const cancelEdit = () => {
+    setEditMode(false);
+    setSelected(null);
+    setDraftLayout({});
+  };
+
+  const handleSave = () => {
+    saveLayout.mutate(draftLayout, {
+      onSuccess: () => {
+        showToast("방 배치가 저장됐어요!", "success");
+        setEditMode(false);
+        setSelected(null);
+        setDraftLayout({});
+      },
+      onError: (e) =>
+        showToast(getApiErrorMessage(e, "저장에 실패했어요."), "error"),
+    });
+  };
 
   useEffect(() => {
     const urls = items
@@ -183,32 +221,180 @@ export default function RoomScreen() {
         contentContainerStyle={{ paddingBottom: 24 }}
       >
         <View className="px-2 mb-4">
-          <RoomCanvas room={room?.equipped} worm={worm?.equipped} />
+          <View className="relative">
+            <RoomCanvas
+              room={room?.equipped}
+              worm={worm?.equipped}
+              layout={room?.layout}
+              draftLayout={editMode ? draftLayout : undefined}
+              editMode={editMode}
+              selected={selected}
+              onSelect={setSelected}
+              onDraftChange={setDraftLayout}
+            />
+            {/* 캔버스 우측 상단 — 수정/저장/취소 버튼 */}
+            <View
+              style={{
+                position: "absolute",
+                top: 12,
+                right: 12,
+                flexDirection: "row",
+                gap: 8,
+              }}
+            >
+              {!editMode ? (
+                <Pressable
+                  onPress={enterEdit}
+                  style={({ pressed }) => ({
+                    flexDirection: "row",
+                    alignItems: "center",
+                    backgroundColor: pressed ? Colors.primary : Colors.cta,
+                    borderRadius: 999,
+                    paddingHorizontal: 12,
+                    paddingVertical: 6,
+                    shadowColor: "#000",
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.18,
+                    shadowRadius: 3,
+                    elevation: 3,
+                  })}
+                >
+                  <MaterialCommunityIcons
+                    name="pencil"
+                    size={14}
+                    color="#fff"
+                  />
+                  <Text
+                    style={{
+                      color: "#fff",
+                      fontWeight: "700",
+                      marginLeft: 4,
+                      fontSize: 13,
+                    }}
+                  >
+                    수정
+                  </Text>
+                </Pressable>
+              ) : (
+                <>
+                  <Pressable
+                    onPress={cancelEdit}
+                    style={({ pressed }) => ({
+                      flexDirection: "row",
+                      alignItems: "center",
+                      backgroundColor: pressed
+                        ? Colors.surfaceBorder
+                        : Colors.surface,
+                      borderRadius: 999,
+                      paddingHorizontal: 12,
+                      paddingVertical: 6,
+                      borderWidth: 1,
+                      borderColor: Colors.surfaceBorder,
+                    })}
+                  >
+                    <MaterialCommunityIcons
+                      name="close"
+                      size={14}
+                      color={Colors.text}
+                    />
+                    <Text
+                      style={{
+                        color: Colors.text,
+                        fontWeight: "700",
+                        marginLeft: 4,
+                        fontSize: 13,
+                      }}
+                    >
+                      취소
+                    </Text>
+                  </Pressable>
+                  <Pressable
+                    onPress={handleSave}
+                    disabled={saveLayout.isPending}
+                    style={({ pressed }) => ({
+                      flexDirection: "row",
+                      alignItems: "center",
+                      backgroundColor: pressed ? Colors.primary : Colors.cta,
+                      borderRadius: 999,
+                      paddingHorizontal: 12,
+                      paddingVertical: 6,
+                      opacity: saveLayout.isPending ? 0.6 : 1,
+                      shadowColor: "#000",
+                      shadowOffset: { width: 0, height: 2 },
+                      shadowOpacity: 0.18,
+                      shadowRadius: 3,
+                      elevation: 3,
+                    })}
+                  >
+                    {saveLayout.isPending ? (
+                      <ActivityIndicator size="small" color="#fff" />
+                    ) : (
+                      <MaterialCommunityIcons
+                        name="content-save"
+                        size={14}
+                        color="#fff"
+                      />
+                    )}
+                    <Text
+                      style={{
+                        color: "#fff",
+                        fontWeight: "700",
+                        marginLeft: 4,
+                        fontSize: 13,
+                      }}
+                    >
+                      저장
+                    </Text>
+                  </Pressable>
+                </>
+              )}
+            </View>
+          </View>
+          {editMode && (
+            <Text
+              style={{
+                marginTop: 8,
+                paddingHorizontal: 12,
+                fontSize: 12,
+                color: Colors.textSecondary,
+                textAlign: "center",
+              }}
+            >
+              {selected
+                ? "선택된 항목을 드래그해 옮기거나 ← → 로 회전하세요"
+                : "가구나 지렁이를 탭하면 옮길 수 있어요"}
+            </Text>
+          )}
         </View>
 
-        <View className="px-5 mb-2 flex-row items-center">
-          <MaterialCommunityIcons
-            name="shopping-outline"
-            size={20}
-            color={Colors.cta}
-          />
-          <Text className="text-lg font-extrabold text-village-text ml-1.5">
-            상점
-          </Text>
-          <Text className="text-xs text-village-text-secondary ml-2">
-            코인으로 가구를 구매해 보세요!
-          </Text>
-        </View>
+        {!editMode && (
+          <View className="px-5 mb-2 flex-row items-center">
+            <MaterialCommunityIcons
+              name="shopping-outline"
+              size={20}
+              color={Colors.cta}
+            />
+            <Text className="text-lg font-extrabold text-village-text ml-1.5">
+              상점
+            </Text>
+            <Text className="text-xs text-village-text-secondary ml-2">
+              코인으로 가구를 구매해 보세요!
+            </Text>
+          </View>
+        )}
 
-        <View className="px-5 mb-3">
-          <CategoryTabBar
-            value={category}
-            onChange={setCategory}
-            categories={ROOM_TAB_CONFIG}
-            scrollable
-          />
-        </View>
+        {!editMode && (
+          <View className="px-5 mb-3">
+            <CategoryTabBar
+              value={category}
+              onChange={setCategory}
+              categories={ROOM_TAB_CONFIG}
+              scrollable
+            />
+          </View>
+        )}
 
+        {!editMode && (
         <View className="px-5">
           {isLoading ? (
             <View className="py-12 items-center justify-center">
@@ -261,6 +447,7 @@ export default function RoomScreen() {
             </>
           )}
         </View>
+        )}
       </ScrollView>
     </View>
   );

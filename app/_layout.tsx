@@ -1,6 +1,8 @@
 import "../global.css";
+import "react-native-gesture-handler";
 import { useEffect, useState } from "react";
 import { Stack, useSegments, useRouter } from "expo-router";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import * as SplashScreen from "expo-splash-screen";
@@ -51,24 +53,26 @@ export default function RootLayout() {
   }, [isInitialized, isAuthenticated, user, rootSegment, router]);
 
   return (
-    <QueryProvider>
-      <SafeAreaProvider>
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="index" />
-          <Stack.Screen name="(auth)" />
-          <Stack.Screen name="(onboarding)" />
-          <Stack.Screen name="(tabs)" />
-          <Stack.Screen name="concept-learning" />
-          <Stack.Screen name="stage/[stage]" />
-          <Stack.Screen name="concept/[conceptId]" />
-          <Stack.Screen name="recommend-session" />
-          <Stack.Screen name="settings" />
-          <Stack.Screen name="diagnostic-result" />
-        </Stack>
-        <BgmController />
-        <Toast />
-      </SafeAreaProvider>
-    </QueryProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <QueryProvider>
+        <SafeAreaProvider>
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="index" />
+            <Stack.Screen name="(auth)" />
+            <Stack.Screen name="(onboarding)" />
+            <Stack.Screen name="(tabs)" />
+            <Stack.Screen name="concept-learning" />
+            <Stack.Screen name="stage/[stage]" />
+            <Stack.Screen name="concept/[conceptId]" />
+            <Stack.Screen name="recommend-session" />
+            <Stack.Screen name="settings" />
+            <Stack.Screen name="diagnostic-result" />
+          </Stack>
+          <BgmController />
+          <Toast />
+        </SafeAreaProvider>
+      </QueryProvider>
+    </GestureHandlerRootView>
   );
 }
 

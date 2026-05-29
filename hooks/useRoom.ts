@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { roomApi } from "@/services/room";
-import type { RoomSlot } from "@/types/room";
+import type { RoomLayout, RoomSlot } from "@/types/room";
 
 const ROOM_QUERY_KEY = ["room"] as const;
 
@@ -31,6 +31,16 @@ export const useUnequipFurniture = () => {
       queryClient.setQueryData(ROOM_QUERY_KEY, data);
       queryClient.invalidateQueries({ queryKey: ["shop", "items"] });
       queryClient.invalidateQueries({ queryKey: ["inventory"] });
+    },
+  });
+};
+
+export const useSaveRoomLayout = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (layout: RoomLayout) => roomApi.saveLayout(layout),
+    onSuccess: (data) => {
+      queryClient.setQueryData(ROOM_QUERY_KEY, data);
     },
   });
 };
