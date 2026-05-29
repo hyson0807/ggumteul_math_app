@@ -191,7 +191,7 @@ export function RoomCanvas({
           style={{
             position: "absolute",
             left: "34%",
-            top: "78%",
+            top: "70%",
             width: "32%",
             alignItems: "center",
             zIndex: 8,
