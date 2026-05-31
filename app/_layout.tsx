@@ -64,6 +64,7 @@ export default function RootLayout() {
             <Stack.Screen name="concept-learning" />
             <Stack.Screen name="stage/[stage]" />
             <Stack.Screen name="concept/[conceptId]" />
+            <Stack.Screen name="recommend-intro" />
             <Stack.Screen name="recommend-session" />
             <Stack.Screen name="settings" />
             <Stack.Screen name="diagnostic-result" />

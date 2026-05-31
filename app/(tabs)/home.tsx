@@ -54,7 +54,7 @@ export default function HomeScreen() {
             subtitle="약점 극복하기"
             icon="bullseye-arrow"
             accent={Colors.cta}
-            onPress={() => router.push("/recommend")}
+            onPress={() => router.push("/recommend-intro")}
           />
         </View>
       </View>
