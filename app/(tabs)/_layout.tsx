@@ -32,9 +32,9 @@ export default function TabsLayout() {
           <Tabs.Screen
             name="recommend"
             options={{
-              title: "추천",
+              title: "분석",
               tabBarIcon: ({ color, size }) => (
-                <MaterialCommunityIcons name="lightbulb-on" size={size} color={color} />
+                <MaterialCommunityIcons name="chart-bar" size={size} color={color} />
               ),
             }}
           />
