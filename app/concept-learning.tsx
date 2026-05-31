@@ -1,39 +1,39 @@
-import { useEffect, useState } from "react";
-import {
-  InteractionManager,
-  Pressable,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { useRef } from "react";
+import { Animated, Pressable, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors } from "@/constants/colors";
 import { feedback } from "@/utils/feedback";
-import { ALL_STAGES, STAGE_SCENES } from "@/constants/stages";
-import { SemesterSection } from "@/components/learning/SemesterSection";
+import {
+  ALL_STAGES,
+  STAGE_CARD_THEMES,
+  STAGE_SCENES,
+  type StageId,
+} from "@/constants/stages";
+import { useStages } from "@/hooks/useLearning";
+import type { StageSummary } from "@/types/learning";
 
-type Mode = "grade" | "concept";
+// 6개 → 3행 2열
+const STAGE_ROWS: StageId[][] = [
+  [ALL_STAGES[0], ALL_STAGES[1]],
+  [ALL_STAGES[2], ALL_STAGES[3]],
+  [ALL_STAGES[4], ALL_STAGES[5]],
+];
 
 export default function ConceptLearningScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const [mode, setMode] = useState<Mode>("concept");
-  const [contentReady, setContentReady] = useState(false);
+  const { data, isLoading } = useStages();
 
-  useEffect(() => {
-    const handle = InteractionManager.runAfterInteractions(() => {
-      setContentReady(true);
-    });
-    return () => handle.cancel();
-  }, []);
+  const summaryByStage = new Map<number, StageSummary>(
+    (data?.stages ?? []).map((s) => [s.stage, s]),
+  );
 
-  const switchMode = (next: Mode) => {
-    if (next === mode) return;
+  const handlePress = (stage: StageId, locked: boolean) => {
     feedback.tabPress();
-    setMode(next);
+    if (locked) return;
+    router.push(`/stage/${stage}`);
   };
 
   return (
@@ -48,7 +48,7 @@ export default function ConceptLearningScreen() {
           gap: 12,
         }}
       >
-        <TouchableOpacity
+        <Pressable
           onPress={() => router.back()}
           accessibilityLabel="뒤로 가기"
           hitSlop={10}
@@ -68,7 +68,7 @@ export default function ConceptLearningScreen() {
             size={22}
             color={Colors.text}
           />
-        </TouchableOpacity>
+        </Pressable>
         <View style={{ flex: 1 }}>
           <Text
             style={{
@@ -86,150 +86,300 @@ export default function ConceptLearningScreen() {
         </View>
       </View>
 
-      <View style={{ paddingHorizontal: 20, paddingBottom: 16 }}>
+      <View
+        style={{
+          paddingHorizontal: 20,
+          paddingTop: 4,
+          paddingBottom: 12,
+        }}
+      >
         <Text
           style={{
             fontFamily: "GowunDodum",
             fontSize: 13,
             color: Colors.textSecondary,
-            marginBottom: 12,
           }}
         >
-          학년별 또는 개념별로 골라서 풀 수 있어요
+          학기를 골라 개념을 풀어볼까요?
         </Text>
+      </View>
 
+      <View
+        style={{
+          flex: 1,
+          paddingHorizontal: 20,
+          paddingBottom: insets.bottom + 16,
+          gap: 12,
+        }}
+      >
+        {STAGE_ROWS.map((row, rowIdx) => (
+          <View
+            key={rowIdx}
+            style={{ flex: 1, flexDirection: "row", gap: 12 }}
+          >
+            {row.map((stage) => (
+              <StageCard
+                key={stage}
+                stage={stage}
+                summary={summaryByStage.get(stage)}
+                loading={isLoading}
+                onPress={handlePress}
+              />
+            ))}
+          </View>
+        ))}
+      </View>
+    </View>
+  );
+}
+
+function StageCard({
+  stage,
+  summary,
+  loading,
+  onPress,
+}: {
+  stage: StageId;
+  summary: StageSummary | undefined;
+  loading: boolean;
+  onPress: (stage: StageId, locked: boolean) => void;
+}) {
+  const scene = STAGE_SCENES[stage];
+  const theme = STAGE_CARD_THEMES[stage];
+  const scale = useRef(new Animated.Value(1)).current;
+
+  const locked = summary?.locked ?? false;
+  const current = summary?.current ?? false;
+  const done = summary?.cleared ?? false;
+  const cleared = summary?.clearedNodes ?? 0;
+  const total = summary?.totalNodes ?? 0;
+  const showProgress = !loading && !locked && total > 0;
+  const percent = showProgress ? Math.min(100, (cleared / total) * 100) : 0;
+
+  const animateTo = (value: number) =>
+    Animated.spring(scale, {
+      toValue: value,
+      useNativeDriver: true,
+      speed: 40,
+      bounciness: 6,
+    }).start();
+
+  const borderColor = locked
+    ? Colors.surfaceBorder
+    : current
+      ? Colors.secondary
+      : theme.accent;
+
+  return (
+    <Animated.View style={{ flex: 1, transform: [{ scale }] }}>
+      <Pressable
+        onPress={() => onPress(stage, locked)}
+        onPressIn={() => !locked && animateTo(0.96)}
+        onPressOut={() => !locked && animateTo(1)}
+        accessibilityRole="button"
+        accessibilityLabel={`${scene.grade}${locked ? " 잠김" : ""}`}
+        style={{
+          flex: 1,
+          backgroundColor: Colors.surface,
+          borderRadius: 24,
+          padding: 16,
+          borderWidth: 2,
+          borderColor,
+          justifyContent: "space-between",
+          shadowColor: locked ? "#000" : theme.accent,
+          shadowOpacity: locked ? 0.05 : 0.18,
+          shadowRadius: 14,
+          shadowOffset: { width: 0, height: 6 },
+          elevation: 4,
+          opacity: locked ? 0.55 : 1,
+        }}
+      >
+        {/* 상단: 아이콘 칩 + 학기 배지 */}
         <View
           style={{
             flexDirection: "row",
-            padding: 4,
-            backgroundColor: Colors.surface,
-            borderRadius: 999,
-            borderWidth: 1,
-            borderColor: Colors.surfaceBorder,
+            justifyContent: "space-between",
+            alignItems: "flex-start",
           }}
         >
-          {(["grade", "concept"] as Mode[]).map((m) => {
-            const active = mode === m;
-            return (
-              <Pressable
-                key={m}
-                onPress={() => switchMode(m)}
-                accessibilityRole="button"
+          <View
+            style={{
+              width: 48,
+              height: 48,
+              borderRadius: 16,
+              backgroundColor: locked ? Colors.surfaceBorder : theme.tint,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <View
+              style={{
+                position: "absolute",
+                top: 5,
+                left: 8,
+                width: 12,
+                height: 5,
+                borderRadius: 999,
+                backgroundColor: "#FFFFFF",
+                opacity: 0.6,
+              }}
+            />
+            <MaterialCommunityIcons
+              name={theme.icon}
+              size={26}
+              color={locked ? Colors.inactive : theme.accent}
+            />
+          </View>
+
+          {current ? (
+            <View
+              style={{
+                paddingHorizontal: 9,
+                paddingVertical: 4,
+                borderRadius: 999,
+                backgroundColor: Colors.secondary,
+              }}
+            >
+              <Text style={{ fontFamily: "Jua", fontSize: 10, color: "#fff" }}>
+                진행중
+              </Text>
+            </View>
+          ) : done ? (
+            <View
+              style={{
+                width: 24,
+                height: 24,
+                borderRadius: 999,
+                backgroundColor: `${theme.accent}1F`,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <MaterialCommunityIcons
+                name="check-bold"
+                size={14}
+                color={theme.accent}
+              />
+            </View>
+          ) : (
+            <Text
+              style={{
+                fontFamily: "Jua",
+                fontSize: 18,
+                color: locked ? Colors.inactive : `${theme.accent}80`,
+                letterSpacing: 0.5,
+              }}
+            >
+              {scene.unitId}
+            </Text>
+          )}
+        </View>
+
+        {/* 하단: 제목 · 진행도 */}
+        <View>
+          <Text
+            numberOfLines={1}
+            style={{
+              fontFamily: "Jua",
+              fontSize: 17,
+              color: locked ? Colors.textSecondary : Colors.text,
+            }}
+          >
+            {scene.grade}
+          </Text>
+          <Text
+            numberOfLines={1}
+            style={{
+              fontFamily: "GowunDodum",
+              fontSize: 11,
+              color: Colors.textSecondary,
+              marginTop: 2,
+              marginBottom: 10,
+            }}
+          >
+            {locked ? "잠겨 있어요" : total > 0 ? `개념 ${total}개` : " "}
+          </Text>
+
+          {showProgress ? (
+            <View>
+              <View
                 style={{
-                  flex: 1,
-                  paddingVertical: 10,
-                  borderRadius: 999,
-                  alignItems: "center",
-                  backgroundColor: active ? Colors.primary : "transparent",
-                  shadowColor: active ? "#000" : "transparent",
-                  shadowOpacity: active ? 0.12 : 0,
-                  shadowRadius: active ? 6 : 0,
-                  shadowOffset: { width: 0, height: 2 },
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "baseline",
+                  marginBottom: 5,
                 }}
               >
                 <Text
                   style={{
-                    fontFamily: "Jua",
-                    fontSize: 14,
-                    color: active ? "#fff" : Colors.textSecondary,
+                    fontFamily: "GowunDodum",
+                    fontSize: 10,
+                    color: Colors.textSecondary,
                   }}
                 >
-                  {m === "grade" ? "학년별" : "개념별"}
+                  진행도
                 </Text>
-              </Pressable>
-            );
-          })}
+                <Text
+                  style={{
+                    fontFamily: "Jua",
+                    fontSize: 12,
+                    color: theme.accent,
+                  }}
+                >
+                  {cleared}
+                  <Text style={{ color: Colors.textSecondary }}>
+                    {" / "}
+                    {total}
+                  </Text>
+                </Text>
+              </View>
+              <View
+                style={{
+                  height: 6,
+                  borderRadius: 999,
+                  backgroundColor: Colors.surfaceBorder,
+                  overflow: "hidden",
+                }}
+              >
+                <View
+                  style={{
+                    width: `${percent}%`,
+                    height: "100%",
+                    backgroundColor: theme.accent,
+                    borderRadius: 999,
+                  }}
+                />
+              </View>
+            </View>
+          ) : locked ? (
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+              <MaterialCommunityIcons
+                name="lock"
+                size={13}
+                color={Colors.inactive}
+              />
+              <Text
+                style={{
+                  fontFamily: "GowunDodum",
+                  fontSize: 11,
+                  color: Colors.inactive,
+                }}
+              >
+                이전 학기 완료 시 열려요
+              </Text>
+            </View>
+          ) : (
+            <View
+              style={{
+                height: 6,
+                borderRadius: 999,
+                backgroundColor: Colors.surfaceBorder,
+                opacity: 0.5,
+              }}
+            />
+          )}
         </View>
-      </View>
-
-      {mode === "grade" ? (
-        <GradeTabPlaceholder bottomInset={insets.bottom} />
-      ) : (
-        <ConceptTab bottomInset={insets.bottom} ready={contentReady} />
-      )}
-    </View>
-  );
-}
-
-function ConceptTab({
-  bottomInset,
-  ready,
-}: {
-  bottomInset: number;
-  ready: boolean;
-}) {
-  return (
-    <ScrollView
-      contentContainerStyle={{
-        paddingHorizontal: 20,
-        paddingTop: 4,
-        paddingBottom: bottomInset + 80,
-      }}
-      showsVerticalScrollIndicator={false}
-    >
-      {ready &&
-        ALL_STAGES.map((stage) => (
-          <SemesterSection
-            key={stage}
-            stage={stage}
-            gradeLabel={STAGE_SCENES[stage].grade}
-          />
-        ))}
-    </ScrollView>
-  );
-}
-
-function GradeTabPlaceholder({ bottomInset }: { bottomInset: number }) {
-  return (
-    <View
-      style={{
-        flex: 1,
-        alignItems: "center",
-        justifyContent: "center",
-        paddingHorizontal: 36,
-        paddingBottom: bottomInset + 80,
-        gap: 14,
-      }}
-    >
-      <View
-        style={{
-          width: 72,
-          height: 72,
-          borderRadius: 999,
-          backgroundColor: Colors.surface,
-          borderWidth: 1,
-          borderColor: Colors.surfaceBorder,
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <MaterialCommunityIcons
-          name="clock-outline"
-          size={36}
-          color={Colors.inactive}
-        />
-      </View>
-      <Text
-        style={{
-          fontFamily: "Jua",
-          fontSize: 18,
-          color: Colors.text,
-        }}
-      >
-        준비 중이에요
-      </Text>
-      <Text
-        style={{
-          fontFamily: "GowunDodum",
-          fontSize: 13,
-          color: Colors.textSecondary,
-          textAlign: "center",
-          lineHeight: 20,
-        }}
-      >
-        곧 학년별로 모아 풀 수 있는 학습이 열려요.{"\n"}먼저 개념별 탭에서
-        시작해볼까요?
-      </Text>
-    </View>
+      </Pressable>
+    </Animated.View>
   );
 }

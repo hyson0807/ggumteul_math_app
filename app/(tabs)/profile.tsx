@@ -3,7 +3,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { useAuthStore } from "@/stores/useAuthStore";
-import { WORM_STAGE_LABELS, MAX_WORM_STAGE } from "@/constants/worm";
+import { STAGE_SCENES, clampStage } from "@/constants/stages";
 import { WormSprite } from "@/components/worm/WormSprite";
 import { useWorm } from "@/hooks/useWorm";
 import { Colors } from "@/constants/colors";
@@ -14,8 +14,7 @@ export default function ProfileScreen() {
   const user = useAuthStore((s) => s.user);
   const { data: worm } = useWorm();
 
-  const stage = Math.min(Math.max(user?.wormStage ?? 1, 1), MAX_WORM_STAGE);
-  const stageLabel = WORM_STAGE_LABELS[stage];
+  const stageLabel = STAGE_SCENES[clampStage(user?.wormStage ?? 1)].grade;
 
   return (
     <View className="flex-1 bg-transparent">
@@ -82,7 +81,7 @@ export default function ProfileScreen() {
             elevation: 2,
           }}
         >
-          <StatRow label="단계" value={stageLabel} />
+          <StatRow label="진도" value={stageLabel} />
           <Divider />
           <StatRow label="모은 별" value={`${user?.stars ?? 0}`} />
           <Divider />

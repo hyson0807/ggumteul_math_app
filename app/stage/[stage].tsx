@@ -9,7 +9,8 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Svg, { Circle, Path, Rect } from "react-native-svg";
 import { Colors } from "@/constants/colors";
-import { MAX_WORM_STAGE, WORM_STAGE_LABELS } from "@/constants/worm";
+import { MAX_WORM_STAGE } from "@/constants/worm";
+import { STAGE_SCENES, type StageId } from "@/constants/stages";
 import { useStageNodes } from "@/hooks/useLearning";
 import { ErrorState } from "@/components/common/ErrorState";
 import type { ConceptNode } from "@/types/learning";
@@ -48,7 +49,9 @@ export default function StageScreen() {
       : 1;
 
   const { data, isLoading, isError, refetch } = useStageNodes(safeStage);
-  const regionLabel = WORM_STAGE_LABELS[safeStage] ?? "";
+  const scene = STAGE_SCENES[safeStage as StageId];
+  const semesterLabel = scene.grade;
+  const unitLabel = scene.unitId;
 
   return (
     <View
@@ -91,10 +94,10 @@ export default function StageScreen() {
               letterSpacing: 2,
             }}
           >
-            STAGE {safeStage} · {data ? `${data.grade}-${data.semester}학기` : ""}
+            {unitLabel}
           </Text>
           <Text style={{ fontSize: 22, fontWeight: "900", color: Colors.text }}>
-            {regionLabel}
+            {semesterLabel}
           </Text>
         </View>
         {data && !data.stageLocked && (

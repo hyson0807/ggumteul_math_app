@@ -1,3 +1,4 @@
+import type { MaterialCommunityIcons } from "@expo/vector-icons";
 import type { UnitId } from "./units";
 
 export type StageId = 1 | 2 | 3 | 4 | 5 | 6;
@@ -92,6 +93,29 @@ export const STAGE_SCENES: Record<StageId, StageSceneConfig> = {
     wormX: 0.5,
     wormY: 0.38,
   },
+};
+
+/**
+ * 개념 학습 화면의 학기 카드 테마 (밝은 톤).
+ * STAGE_SCENES.gradient 는 스테이지 맵 배경(어두운 톤)용이라 카드와 분리한다.
+ * 지하 → 지상 → 하늘 → 우주 순으로 accent 색을 흙빛에서 하늘빛으로 전개.
+ */
+export interface StageCardTheme {
+  /** 카드 테두리/포인트 색 */
+  accent: string;
+  /** 아이콘 칩 배경 (accent 의 옅은 틴트) */
+  tint: string;
+  /** MaterialCommunityIcons glyph 이름 */
+  icon: keyof typeof MaterialCommunityIcons.glyphMap;
+}
+
+export const STAGE_CARD_THEMES: Record<StageId, StageCardTheme> = {
+  1: { accent: "#3F8F6B", tint: "#E5F1EC", icon: "sprout" },
+  2: { accent: "#2E9E8F", tint: "#E2F2F0", icon: "leaf" },
+  3: { accent: "#7BA23F", tint: "#EEF3E2", icon: "grass" },
+  4: { accent: "#C99A2E", tint: "#F7EFDC", icon: "flower" },
+  5: { accent: "#4A9FD4", tint: "#E4F0F8", icon: "weather-partly-cloudy" },
+  6: { accent: "#7C6BC4", tint: "#ECE9F6", icon: "rocket-launch" },
 };
 
 export function isStageId(n: number): n is StageId {
