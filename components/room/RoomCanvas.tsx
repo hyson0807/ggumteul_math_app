@@ -55,7 +55,7 @@ const SLOT_DEFAULTS: Record<PlacedRoomSlot, SlotDefault> = {
   light: { x: 0.45, y: 0.35, rotate: 5, flipX: true, width: 0.32, zIndex: 5 },
   desk: { x: -0.05, y: 0.4, rotate: 3, flipX: true, width: 0.45, zIndex: 5 },
   bed: { x: 0.56, y: 0.4, rotate: 6, flipX: true, width: 0.49, zIndex: 4 },
-  rug: { x: 0.12, y: 0.5, rotate: 6, flipX: false, width: 0.7, zIndex: 1 },
+  rug: { x: 0.12, y: 0.5, rotate: 6, flipX: false, width: 0.5, zIndex: 1 },
   toy: { x: 0.55, y: 0.62, rotate: -3, flipX: false, width: 0.22, zIndex: 6 },
   window: { x: 0.54, y: 0.05, rotate: 0, flipX: false, width: 0.38, zIndex: 2 },
 };
@@ -417,9 +417,20 @@ export function RoomCanvas({
   }, []);
 
   const wallpaper = placed?.wallpaper ?? null;
-  const backgroundSource = wallpaper
-    ? { uri: `${API_BASE_URL}${wallpaper.imageUrl}` }
-    : require("@/assets/images/room-empty-card.png");
+
+  const WALLPAPER_ROOM_BACKGROUNDS: Record<string, ReturnType<typeof require>> = {
+    wallpaper_pink_vine: require("@/assets/images/room-empty-wallpaper-pink-vine-no-window.png"),
+    wallpaper_cream_floral: require("@/assets/images/room-empty-wallpaper-cream-floral-no-window.png"),
+    wallpaper_sky_blue: require("@/assets/images/room-empty-wallpaper-sky-blue-no-window.png"),
+    wallpaper_blue_cloud: require("@/assets/images/room-empty-wallpaper-blue-cloud-no-window.png"),
+    wallpaper_yellow_floral: require("@/assets/images/room-empty-wallpaper-yellow-floral-no-window.png"),
+  };
+  const DEFAULT_ROOM_BG = require("@/assets/images/room-empty-wallpaper-pink-vine-no-window.png");
+
+  const wallpaperKey = wallpaper?.imageUrl
+    ? (wallpaper.imageUrl.split("/").pop()?.replace(".png", "") ?? "")
+    : "";
+  const backgroundSource = WALLPAPER_ROOM_BACKGROUNDS[wallpaperKey] ?? DEFAULT_ROOM_BG;
 
   const wormPos = resolveWormPosition(draftLayout, layout);
 

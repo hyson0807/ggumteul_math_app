@@ -99,17 +99,28 @@ export function ShopItemCard({ item, currentStage, onPress, busy }: Props) {
       )}
 
       <View
-        className="h-24 items-center justify-center rounded-xl mb-2"
+        className="h-24 items-center justify-center rounded-xl mb-2 overflow-hidden"
         style={{ backgroundColor: "rgba(255, 255, 255, 0.65)" }}
       >
         {isFurnitureCategory(item.category) ? (
-          <Image
-            source={{ uri: `${API_BASE_URL}${item.imageUrl}` }}
-            style={{ width: "85%", height: "85%", opacity: locked ? 0.4 : 1 }}
-            contentFit="contain"
-            cachePolicy="memory-disk"
-            transition={150}
-          />
+          item.category === "wallpaper" ? (
+            <Image
+              source={{ uri: `${API_BASE_URL}${item.imageUrl}` }}
+              style={{ width: "100%", height: "100%", opacity: locked ? 0.4 : 1 }}
+              contentFit="cover"
+              contentPosition="top"
+              cachePolicy="memory-disk"
+              transition={150}
+            />
+          ) : (
+            <Image
+              source={{ uri: `${API_BASE_URL}${item.imageUrl}` }}
+              style={{ width: "85%", height: "85%", opacity: locked ? 0.4 : 1 }}
+              contentFit="contain"
+              cachePolicy="memory-disk"
+              transition={150}
+            />
+          )
         ) : (
           <MaterialCommunityIcons
             name={(SHOP_CATEGORY_BY_KEY[item.category]?.icon ?? "help-circle") as never}
