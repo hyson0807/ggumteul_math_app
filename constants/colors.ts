@@ -23,5 +23,5 @@ export const Colors = {
   groundGrass: "#7FB83D",
   skyLight: "#8FC9F9",
   spaceDark: "#0B0E2A",
-  splashBg: "#F6FAF8",
+  splashBg: "#FFFFFF",
 };
