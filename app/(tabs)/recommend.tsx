@@ -5,6 +5,7 @@ import { useAttendance, useDiagnosticProfile, useStages } from "@/hooks/useLearn
 import { useRecommendationHistory } from "@/hooks/useRecommendation";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { ProgressBar } from "@/components/common/ProgressBar";
+import { CollapsibleCard } from "@/components/common/CollapsibleCard";
 import { Colors } from "@/constants/colors";
 import type {
   AttendanceResponse,
@@ -70,15 +71,10 @@ export default function AnalysisScreen() {
 
   return (
     <View className="flex-1 bg-transparent">
-      <View className="px-5 pb-2" style={{ paddingTop: insets.top + 8 }}>
-        <Text style={{ fontSize: 24, fontWeight: "800", color: Colors.text }}>
-          분석
-        </Text>
-      </View>
-
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
+          paddingTop: insets.top + 12,
           paddingBottom: insets.bottom + 120,
           paddingHorizontal: 20,
         }}
@@ -87,13 +83,13 @@ export default function AnalysisScreen() {
           <DiagnosticGate />
         ) : (
           <>
+            <AttendanceCard data={attendanceData} isLoading={attendanceLoading} />
+            <View style={{ height: 14 }} />
             <DktSection
               weak={profile?.weak ?? []}
               strong={profile?.strong ?? []}
               isLoading={profileLoading}
             />
-            <View style={{ height: 14 }} />
-            <AttendanceCard data={attendanceData} isLoading={attendanceLoading} />
             <View style={{ height: 14 }} />
             <HistoryCard data={historyData ?? []} isLoading={historyLoading} />
             <View style={{ height: 14 }} />
@@ -165,12 +161,7 @@ function DktSection({
           borderRadius: 20,
           padding: 32,
           alignItems: "center",
-          marginTop: 16,
-          shadowColor: "#000",
-          shadowOpacity: 0.05,
-          shadowRadius: 10,
-          shadowOffset: { width: 0, height: 2 },
-          elevation: 2,
+          ...CARD_SHADOW,
         }}
       >
         <ActivityIndicator color={Colors.primary} />
@@ -184,65 +175,22 @@ function DktSection({
   }
 
   return (
-    <>
-      <ConceptCard
-        title="더 연습이 필요한 개념"
-        subtitle="AI가 분석한 약점 개념이에요"
-        icon="alert-circle-outline"
-        iconColor={Colors.error}
-        items={weak}
-        barColor={Colors.error}
-        emptyText="약점 개념이 없어요! 잘 하고 있어요 🎉"
-      />
-      <View style={{ height: 14 }} />
-      <ConceptCard
-        title="잘 하고 있는 개념"
-        subtitle="AI가 분석한 강점 개념이에요"
-        icon="star-circle-outline"
-        iconColor={Colors.secondary}
-        items={strong}
-        barColor={Colors.primary}
-        emptyText="학습 기록이 쌓이면 강점을 분석해 드릴게요"
-      />
-    </>
-  );
-}
-
-function ConceptCard({
-  title,
-  subtitle,
-  icon,
-  iconColor,
-  items,
-  barColor,
-  emptyText,
-}: {
-  title: string;
-  subtitle: string;
-  icon: string;
-  iconColor: string;
-  items: DiagnosticProfileItem[];
-  barColor: string;
-  emptyText: string;
-}) {
-  return (
     <View
       style={{
         backgroundColor: Colors.surface,
         borderRadius: 20,
         padding: 20,
-        marginTop: 16,
-        shadowColor: "#000",
-        shadowOpacity: 0.05,
-        shadowRadius: 10,
-        shadowOffset: { width: 0, height: 2 },
-        elevation: 2,
+        ...CARD_SHADOW,
       }}
     >
       <View
         style={{ flexDirection: "row", alignItems: "center", marginBottom: 3 }}
       >
-        <MaterialCommunityIcons name={icon as any} size={20} color={iconColor} />
+        <MaterialCommunityIcons
+          name="lightbulb-on-outline"
+          size={20}
+          color={Colors.secondary}
+        />
         <Text
           style={{
             fontSize: 15,
@@ -251,91 +199,159 @@ function ConceptCard({
             marginLeft: 6,
           }}
         >
-          {title}
+          개념 분석
         </Text>
       </View>
       <Text
         style={{ fontSize: 12, color: Colors.textSecondary, marginBottom: 18 }}
       >
-        {subtitle}
+        AI가 분석한 개념별 학습 포인트예요
       </Text>
 
-      {items.length === 0 ? (
+      <ConceptCarousel
+        title="더 연습이 필요한 개념"
+        icon="alert-circle-outline"
+        iconColor={Colors.error}
+        items={weak}
+        starColor={Colors.error}
+        kind="weak"
+        emptyText="약점 개념이 없어요! 잘 하고 있어요 🎉"
+      />
+      <View style={{ height: 18 }} />
+      <ConceptCarousel
+        title="잘 하고 있는 개념"
+        icon="star-circle-outline"
+        iconColor={Colors.secondary}
+        items={strong}
+        starColor={Colors.secondary}
+        kind="strong"
+        emptyText="학습 기록이 쌓이면 강점을 분석해 드릴게요"
+      />
+    </View>
+  );
+}
+
+type ConceptKind = "weak" | "strong";
+
+// 별 개수(1~3)별 라벨. index = stars - 1
+const STAR_LABELS: Record<ConceptKind, [string, string, string]> = {
+  weak: ["조금 더", "필요해요", "꼭 필요"],
+  strong: ["좋아요", "훌륭해요", "최고예요"],
+};
+
+// 숙련도(probability)를 별 개수 + 라벨로 매핑.
+// 약점은 숙련도가 낮을수록, 강점은 높을수록 별이 많다.
+function conceptStars(probability: number, kind: ConceptKind) {
+  const score = kind === "weak" ? 1 - probability : probability;
+  const stars = score >= 0.66 ? 3 : score >= 0.33 ? 2 : 1;
+  return { stars, label: STAR_LABELS[kind][stars - 1] };
+}
+
+function ConceptCarousel({
+  title,
+  icon,
+  iconColor,
+  items,
+  starColor,
+  kind,
+  emptyText,
+}: {
+  title: string;
+  icon: string;
+  iconColor: string;
+  items: DiagnosticProfileItem[];
+  starColor: string;
+  kind: ConceptKind;
+  emptyText: string;
+}) {
+  return (
+    <View>
+      <View
+        style={{ flexDirection: "row", alignItems: "center", marginBottom: 10 }}
+      >
+        <MaterialCommunityIcons name={icon as any} size={16} color={iconColor} />
         <Text
           style={{
             fontSize: 13,
-            color: Colors.inactive,
-            textAlign: "center",
-            paddingVertical: 8,
+            fontWeight: "700",
+            color: Colors.text,
+            marginLeft: 5,
           }}
+        >
+          {title}
+        </Text>
+      </View>
+
+      {items.length === 0 ? (
+        <Text
+          style={{ fontSize: 13, color: Colors.inactive, paddingVertical: 8 }}
         >
           {emptyText}
         </Text>
       ) : (
-        <>
-          {items.map((item, idx) => (
-            <View key={item.conceptId} style={{ marginTop: idx > 0 ? 14 : 0 }}>
-              <ConceptRow item={item} barColor={barColor} />
-            </View>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{ paddingVertical: 2, paddingRight: 4 }}
+        >
+          {items.map((item) => (
+            <ConceptChip
+              key={item.conceptId}
+              item={item}
+              starColor={starColor}
+              kind={kind}
+            />
           ))}
-        </>
+        </ScrollView>
       )}
     </View>
   );
 }
 
-function ConceptRow({
+function ConceptChip({
   item,
-  barColor,
+  starColor,
+  kind,
 }: {
   item: DiagnosticProfileItem;
-  barColor: string;
+  starColor: string;
+  kind: ConceptKind;
 }) {
-  const pct = Math.round(item.probability * 100);
+  const { stars, label } = conceptStars(item.probability, kind);
   return (
-    <View>
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "flex-end",
-          marginBottom: 6,
-        }}
+    <View
+      style={{
+        width: 138,
+        backgroundColor: Colors.background,
+        borderWidth: 1,
+        borderColor: Colors.surfaceBorder,
+        borderRadius: 16,
+        padding: 14,
+        marginRight: 10,
+      }}
+    >
+      <Text
+        style={{ fontSize: 14, fontWeight: "700", color: Colors.text }}
+        numberOfLines={1}
       >
-        <View style={{ flex: 1, marginRight: 8 }}>
-          <Text
-            style={{ fontSize: 14, fontWeight: "600", color: Colors.text }}
-            numberOfLines={1}
-          >
-            {item.conceptName}
-          </Text>
-          <Text
-            style={{ fontSize: 11, color: Colors.textSecondary, marginTop: 1 }}
-          >
-            {item.grade}학년 {item.semester}학기
-          </Text>
-        </View>
-        <Text style={{ fontSize: 13, fontWeight: "700", color: barColor }}>
-          {pct}%
-        </Text>
+        {item.conceptName}
+      </Text>
+      <Text style={{ fontSize: 11, color: Colors.textSecondary, marginTop: 2 }}>
+        {item.grade}학년 {item.semester}학기
+      </Text>
+      <View style={{ flexDirection: "row", marginTop: 12, marginBottom: 4 }}>
+        {[0, 1, 2].map((i) => (
+          <MaterialCommunityIcons
+            key={i}
+            name={i < stars ? "star" : "star-outline"}
+            size={18}
+            color={i < stars ? starColor : Colors.inactive}
+          />
+        ))}
       </View>
-      <View
-        style={{
-          height: 6,
-          backgroundColor: Colors.surfaceBorder,
-          borderRadius: 3,
-          overflow: "hidden",
-        }}
-      >
-        <View
-          style={{
-            height: "100%",
-            width: `${pct}%`,
-            backgroundColor: barColor,
-            borderRadius: 3,
-          }}
-        />
-      </View>
+      <Text style={{ fontSize: 12, fontWeight: "700", color: starColor }}>
+        {label}
+      </Text>
     </View>
   );
 }
@@ -480,36 +496,38 @@ function HistoryCard({
   data: RecommendationHistoryItem[];
   isLoading: boolean;
 }) {
-  return (
-    <View
-      style={{
-        backgroundColor: Colors.surface,
-        borderRadius: 20,
-        padding: 20,
-        ...CARD_SHADOW,
-      }}
-    >
-      <View
-        style={{ flexDirection: "row", alignItems: "center", marginBottom: 3 }}
-      >
-        <MaterialCommunityIcons name="history" size={20} color={Colors.secondary} />
-        <Text
-          style={{
-            fontSize: 15,
-            fontWeight: "700",
-            color: Colors.text,
-            marginLeft: 6,
-          }}
-        >
-          추천 과거 내역
-        </Text>
-      </View>
-      <Text
-        style={{ fontSize: 12, color: Colors.textSecondary, marginBottom: 18 }}
-      >
-        세션별 추천 학습 결과예요
-      </Text>
+  const latest = data[0];
+  const latestPct =
+    latest && latest.totalProblems > 0
+      ? Math.round((latest.correctCount / latest.totalProblems) * 100)
+      : 0;
 
+  const summary = isLoading ? (
+    <Text style={{ fontSize: 12, color: Colors.textSecondary }}>
+      불러오는 중...
+    </Text>
+  ) : data.length === 0 ? (
+    <Text style={{ fontSize: 12, color: Colors.inactive }}>
+      아직 추천 학습 기록이 없어요
+    </Text>
+  ) : (
+    <Text style={{ fontSize: 12, color: Colors.textSecondary }}>
+      최근 {formatDateLabel(localDateKey(latest.startedAt))} · 정답률{" "}
+      <Text style={{ fontWeight: "700", color: Colors.secondary }}>
+        {latestPct}%
+      </Text>{" "}
+      · 총 {data.length}회
+    </Text>
+  );
+
+  return (
+    <CollapsibleCard
+      icon="history"
+      iconColor={Colors.secondary}
+      title="추천 과거 내역"
+      subtitle="세션별 추천 학습 결과예요"
+      summary={summary}
+    >
       {isLoading ? (
         <ActivityIndicator color={Colors.primary} />
       ) : data.length === 0 ? (
@@ -619,7 +637,7 @@ function HistoryCard({
           </View>
         ))
       )}
-    </View>
+    </CollapsibleCard>
   );
 }
 
@@ -630,44 +648,52 @@ function StageSection({
   data: StagesResponse | undefined;
   isLoading: boolean;
 }) {
-  return (
-    <View
-      style={{
-        backgroundColor: Colors.surface,
-        borderRadius: 20,
-        padding: 20,
-        shadowColor: "#000",
-        shadowOpacity: 0.05,
-        shadowRadius: 10,
-        shadowOffset: { width: 0, height: 2 },
-        elevation: 2,
-      }}
-    >
+  const current = data?.stages.find((s) => s.current);
+  const currentPct =
+    current && current.totalNodes > 0
+      ? Math.round((current.clearedNodes / current.totalNodes) * 100)
+      : 0;
+
+  const summary = isLoading ? (
+    <Text style={{ fontSize: 12, color: Colors.textSecondary }}>
+      불러오는 중...
+    </Text>
+  ) : !current ? (
+    <Text style={{ fontSize: 12, color: Colors.inactive }}>
+      스테이지 정보가 없어요
+    </Text>
+  ) : (
+    <View>
       <View
-        style={{ flexDirection: "row", alignItems: "center", marginBottom: 3 }}
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: 6,
+        }}
       >
-        <MaterialCommunityIcons
-          name="map-marker-path"
-          size={20}
-          color={Colors.primary}
-        />
-        <Text
-          style={{
-            fontSize: 15,
-            fontWeight: "700",
-            color: Colors.text,
-            marginLeft: 6,
-          }}
-        >
-          학습 진도
+        <Text style={{ fontSize: 12, color: Colors.textSecondary }}>
+          현재{" "}
+          <Text style={{ fontWeight: "700", color: Colors.text }}>
+            {current.grade}학년 {current.semester}학기
+          </Text>
+        </Text>
+        <Text style={{ fontSize: 12, color: Colors.textSecondary }}>
+          {current.clearedNodes}/{current.totalNodes}
         </Text>
       </View>
-      <Text
-        style={{ fontSize: 12, color: Colors.textSecondary, marginBottom: 18 }}
-      >
-        스테이지별 진행 현황이에요
-      </Text>
+      <ProgressBar percent={currentPct} color={Colors.secondary} height={5} />
+    </View>
+  );
 
+  return (
+    <CollapsibleCard
+      icon="map-marker-path"
+      iconColor={Colors.primary}
+      title="학습 진도"
+      subtitle="스테이지별 진행 현황이에요"
+      summary={summary}
+    >
       {isLoading ? (
         <ActivityIndicator color={Colors.primary} />
       ) : !data ? null : (
@@ -755,6 +781,6 @@ function StageSection({
           })}
         </>
       )}
-    </View>
+    </CollapsibleCard>
   );
 }
