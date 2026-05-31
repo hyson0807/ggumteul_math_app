@@ -23,6 +23,7 @@ export const FURNITURE_CATEGORY_CONFIG: TabConfig<FurnitureCategory>[] = [
   { key: "light", label: "조명", icon: "lamp" },
   { key: "rug", label: "러그", icon: "rug" },
   { key: "toy", label: "장난감", icon: "toy-brick" },
+  { key: "window", label: "창문", icon: "window-open-variant" },
 ];
 
 export const SHOP_CATEGORY_BY_KEY: Record<ShopCategory, ShopCategoryConfig> = [
