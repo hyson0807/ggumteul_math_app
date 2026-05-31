@@ -152,3 +152,9 @@ export interface DiagnosticProfileResponse {
   weak: DiagnosticProfileItem[];
   fetchedAt: string;
 }
+
+export interface AttendanceResponse {
+  currentStreak: number;
+  totalActiveDays: number;
+  activeDates: string[]; // YYYY-MM-DD[], desc
+}

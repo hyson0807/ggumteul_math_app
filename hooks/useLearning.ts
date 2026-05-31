@@ -19,6 +19,7 @@ export const LEARNING_QUERY_KEYS = {
     [...LEARNING_QUERY_KEYS.all, "diagnostic", "result"] as const,
   diagnosticProfile: () =>
     [...LEARNING_QUERY_KEYS.all, "diagnostic", "profile"] as const,
+  attendance: () => [...LEARNING_QUERY_KEYS.all, "attendance"] as const,
 };
 
 const WORM_QUERY_KEY = ["worm"] as const;
@@ -85,6 +86,16 @@ export const useDiagnosticProfile = () => {
     enabled: !!completedAt,
     staleTime: Infinity,
     retry: 1,
+  });
+};
+
+export const useAttendance = () => {
+  const completedAt = useAuthStore((s) => s.user?.diagnosticCompletedAt);
+  return useQuery({
+    queryKey: LEARNING_QUERY_KEYS.attendance(),
+    queryFn: learningApi.getAttendance,
+    enabled: !!completedAt,
+    staleTime: 5 * 60_000,
   });
 };
 

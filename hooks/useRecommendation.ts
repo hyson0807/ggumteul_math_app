@@ -1,9 +1,25 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { recommendationApi } from "@/services/recommendation";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useRecommendationSession } from "@/stores/useRecommendationSession";
 import { LEARNING_QUERY_KEYS } from "@/hooks/useLearning";
 import type { SubmitRecommendationAnswerPayload } from "@/types/recommendation";
+
+export const RECOMMENDATION_QUERY_KEYS = {
+  all: ["recommendation"] as const,
+  history: () => [...RECOMMENDATION_QUERY_KEYS.all, "history"] as const,
+};
+
+export const useRecommendationHistory = () => {
+  // 추천 학습 기록은 진단평가 완료 후에만 생길 수 있으므로 동일 게이트 적용
+  const completedAt = useAuthStore((s) => s.user?.diagnosticCompletedAt);
+  return useQuery({
+    queryKey: RECOMMENDATION_QUERY_KEYS.history(),
+    queryFn: recommendationApi.getHistory,
+    enabled: !!completedAt,
+    staleTime: 5 * 60_000,
+  });
+};
 
 export const useStartRecommendationSession = () => {
   const startStore = useRecommendationSession((s) => s.start);
@@ -32,6 +48,12 @@ export const useSubmitRecommendationAnswer = () => {
       if (problems.length > 0 && results.length >= problems.length) {
         queryClient.invalidateQueries({
           queryKey: LEARNING_QUERY_KEYS.diagnosticProfile(),
+        });
+        queryClient.invalidateQueries({
+          queryKey: RECOMMENDATION_QUERY_KEYS.history(),
+        });
+        queryClient.invalidateQueries({
+          queryKey: LEARNING_QUERY_KEYS.attendance(),
         });
       }
     },

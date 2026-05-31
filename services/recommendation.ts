@@ -1,5 +1,6 @@
 import api from "./api";
 import type {
+  RecommendationHistoryResponse,
   StartRecommendationSessionResponse,
   SubmitRecommendationAnswerPayload,
   SubmitRecommendationAnswerResponse,
@@ -17,6 +18,13 @@ export const recommendationApi = {
     const { data } = await api.post<SubmitRecommendationAnswerResponse>(
       "/learning/recommendation/submit",
       payload,
+    );
+    return data;
+  },
+
+  getHistory: async () => {
+    const { data } = await api.get<RecommendationHistoryResponse>(
+      "/learning/recommendation/history",
     );
     return data;
   },

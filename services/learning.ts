@@ -1,5 +1,6 @@
 import api from "./api";
 import type {
+  AttendanceResponse,
   CompleteDiagnosticPayload,
   CompleteDiagnosticResponse,
   ConceptProblemsResponse,
@@ -66,6 +67,11 @@ export const learningApi = {
     const { data } = await api.get<DiagnosticProfileResponse>(
       "/learning/diagnostic/profile",
     );
+    return data;
+  },
+
+  getAttendance: async () => {
+    const { data } = await api.get<AttendanceResponse>("/learning/attendance");
     return data;
   },
 };

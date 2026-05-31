@@ -39,3 +39,12 @@ export interface SubmitRecommendationAnswerResponse {
   explanation: string | null;
   user: User;
 }
+
+export interface RecommendationHistoryItem {
+  date: string; // YYYY-MM-DD
+  totalProblems: number;
+  correctCount: number;
+  coinsEarned: number;
+}
+
+export type RecommendationHistoryResponse = RecommendationHistoryItem[];
