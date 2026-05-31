@@ -12,6 +12,7 @@ export interface LearningResult {
   explanation: string | null;
   nodeNewlyCleared?: boolean;
   stageNewlyCleared?: boolean;
+  nextConceptId?: number | null;
 }
 
 export function ResultSheet({
@@ -24,6 +25,7 @@ export function ResultSheet({
   onNext: () => void;
 }) {
   const insets = useSafeAreaInsets();
+  const goNextConcept = !!result.nodeNewlyCleared && result.nextConceptId != null;
   return (
     <View
       style={{
@@ -194,7 +196,11 @@ export function ResultSheet({
           }}
         >
           <Text style={{ color: "#fff", fontSize: 17, fontWeight: "900" }}>
-            {isLast ? "마치기" : "다음 문제"}
+            {goNextConcept
+              ? "다음 개념 풀기"
+              : isLast
+                ? "마치기"
+                : "다음 문제"}
           </Text>
         </TouchableOpacity>
       </View>

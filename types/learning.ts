@@ -81,6 +81,8 @@ export interface SubmitAnswerResponse {
   starsEarned: number;
   nodeNewlyCleared: boolean;
   stageNewlyCleared: boolean;
+  /** 개념을 새로 클리어했을 때, 곧장 이어서 풀 다음 미클리어 개념 id (없으면 null). */
+  nextConceptId: number | null;
   correctAnswer: string;
   explanation: string | null;
   user: User;
