@@ -29,6 +29,7 @@ export interface SubmitRecommendationAnswerPayload {
   problemId: number;
   answer: string;
   timeSpent: number;
+  sessionId?: string;
 }
 
 export interface SubmitRecommendationAnswerResponse {
@@ -41,7 +42,8 @@ export interface SubmitRecommendationAnswerResponse {
 }
 
 export interface RecommendationHistoryItem {
-  date: string; // YYYY-MM-DD
+  sessionId: string | null; // 구버전 기록은 null (날짜 단위로 집계됨)
+  startedAt: string; // 세션 시작 시각 ISO — 날짜/시간 표시는 클라이언트 로컬 기준
   totalProblems: number;
   correctCount: number;
   coinsEarned: number;

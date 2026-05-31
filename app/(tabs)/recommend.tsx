@@ -13,6 +13,52 @@ import type {
 } from "@/types/learning";
 import type { RecommendationHistoryItem } from "@/types/recommendation";
 
+// ISO 시각 → 로컬 YYYY-MM-DD (날짜 그룹 키)
+function localDateKey(iso: string): string {
+  const d = new Date(iso);
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
+// 날짜 키 → 사람이 읽는 라벨 (오늘 / 어제 / YYYY.MM.DD)
+function formatDateLabel(key: string): string {
+  const todayKey = localDateKey(new Date().toISOString());
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yesterdayKey = localDateKey(yesterday.toISOString());
+  if (key === todayKey) return "오늘";
+  if (key === yesterdayKey) return "어제";
+  return key.replace(/-/g, ".");
+}
+
+// ISO 시각 → 로컬 HH:mm
+function formatSessionTime(iso: string): string {
+  const d = new Date(iso);
+  return `${String(d.getHours()).padStart(2, "0")}:${String(
+    d.getMinutes(),
+  ).padStart(2, "0")}`;
+}
+
+// 세션 목록(startedAt desc 정렬)을 로컬 날짜별로 묶는다. 입력 순서를 유지한다.
+function groupSessionsByDate(
+  items: RecommendationHistoryItem[],
+): { dateKey: string; sessions: RecommendationHistoryItem[] }[] {
+  const groups: { dateKey: string; sessions: RecommendationHistoryItem[] }[] =
+    [];
+  for (const item of items) {
+    const dateKey = localDateKey(item.startedAt);
+    const last = groups[groups.length - 1];
+    if (last && last.dateKey === dateKey) {
+      last.sessions.push(item);
+    } else {
+      groups.push({ dateKey, sessions: [item] });
+    }
+  }
+  return groups;
+}
+
 export default function AnalysisScreen() {
   const insets = useSafeAreaInsets();
   const user = useAuthStore((s) => s.user);
@@ -461,7 +507,7 @@ function HistoryCard({
       <Text
         style={{ fontSize: 12, color: Colors.textSecondary, marginBottom: 18 }}
       >
-        날짜별 추천 세션 결과예요
+        세션별 추천 학습 결과예요
       </Text>
 
       {isLoading ? (
@@ -478,76 +524,100 @@ function HistoryCard({
           아직 추천 학습 기록이 없어요
         </Text>
       ) : (
-        data.map((item, idx) => {
-          const pct =
-            item.totalProblems > 0
-              ? Math.round((item.correctCount / item.totalProblems) * 100)
-              : 0;
-          return (
-            <View
-              key={item.date}
+        groupSessionsByDate(data).map((group, gIdx) => (
+          <View key={group.dateKey} style={{ marginTop: gIdx > 0 ? 18 : 0 }}>
+            <Text
               style={{
-                marginTop: idx > 0 ? 14 : 0,
-                paddingBottom: idx < data.length - 1 ? 14 : 0,
-                borderBottomWidth: idx < data.length - 1 ? 1 : 0,
-                borderBottomColor: Colors.surfaceBorder,
+                fontSize: 13,
+                fontWeight: "700",
+                color: Colors.text,
+                marginBottom: 10,
               }}
             >
+              {formatDateLabel(group.dateKey)}
+            </Text>
+            {group.sessions.map((item, sIdx) => {
+              const pct =
+                item.totalProblems > 0
+                  ? Math.round((item.correctCount / item.totalProblems) * 100)
+                  : 0;
+              return (
                 <View
-                  style={{
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    marginBottom: 6,
-                  }}
+                  key={item.sessionId ?? `${group.dateKey}-${sIdx}`}
+                  style={{ marginTop: sIdx > 0 ? 12 : 0 }}
                 >
-                  <Text
-                    style={{
-                      fontSize: 13,
-                      fontWeight: "600",
-                      color: Colors.text,
-                    }}
-                  >
-                    {item.date.replace(/-/g, ".")}
-                  </Text>
                   <View
                     style={{
                       flexDirection: "row",
+                      justifyContent: "space-between",
                       alignItems: "center",
-                      columnGap: 10,
+                      marginBottom: 6,
                     }}
                   >
-                    <Text style={{ fontSize: 12, color: Colors.textSecondary }}>
-                      {item.correctCount}/{item.totalProblems}
-                    </Text>
                     <View
                       style={{
                         flexDirection: "row",
                         alignItems: "center",
-                        columnGap: 3,
+                        columnGap: 6,
                       }}
                     >
-                      <MaterialCommunityIcons
-                        name="circle"
-                        size={10}
-                        color={Colors.coin}
-                      />
                       <Text
                         style={{
                           fontSize: 12,
                           fontWeight: "600",
-                          color: Colors.coin,
+                          color: Colors.textSecondary,
                         }}
                       >
-                        +{item.coinsEarned}
+                        {formatSessionTime(item.startedAt)}
+                      </Text>
+                      <Text
+                        style={{ fontSize: 12, color: Colors.inactive }}
+                      >
+                        세션
                       </Text>
                     </View>
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        columnGap: 10,
+                      }}
+                    >
+                      <Text
+                        style={{ fontSize: 12, color: Colors.textSecondary }}
+                      >
+                        {item.correctCount}/{item.totalProblems}
+                      </Text>
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          alignItems: "center",
+                          columnGap: 3,
+                        }}
+                      >
+                        <MaterialCommunityIcons
+                          name="circle"
+                          size={10}
+                          color={Colors.coin}
+                        />
+                        <Text
+                          style={{
+                            fontSize: 12,
+                            fontWeight: "600",
+                            color: Colors.coin,
+                          }}
+                        >
+                          +{item.coinsEarned}
+                        </Text>
+                      </View>
+                    </View>
                   </View>
+                  <ProgressBar percent={pct} height={4} />
                 </View>
-              <ProgressBar percent={pct} height={4} />
-            </View>
-          );
-        })
+              );
+            })}
+          </View>
+        ))
       )}
     </View>
   );

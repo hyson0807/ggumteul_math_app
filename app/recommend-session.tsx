@@ -37,6 +37,7 @@ export default function RecommendSessionScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
+  const sessionId = useRecommendationSession((s) => s.sessionId);
   const problems = useRecommendationSession((s) => s.problems);
   const currentIndex = useRecommendationSession((s) => s.currentIndex);
   const advance = useRecommendationSession((s) => s.advance);
@@ -120,7 +121,12 @@ export default function RecommendSessionScreen() {
     );
 
     submitMutation.mutate(
-      { problemId: currentProblem.id, answer, timeSpent },
+      {
+        problemId: currentProblem.id,
+        answer,
+        timeSpent,
+        ...(sessionId ? { sessionId } : {}),
+      },
       {
         onSuccess: (res) => setResultModal(res),
         onError: (err) => {
