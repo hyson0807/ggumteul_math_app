@@ -56,6 +56,7 @@ const SLOT_DEFAULTS: Record<PlacedRoomSlot, SlotDefault> = {
   desk: { x: -0.05, y: 0.4, rotate: 3, flipX: true, width: 0.45, zIndex: 5 },
   bed: { x: 0.56, y: 0.4, rotate: 6, flipX: true, width: 0.49, zIndex: 4 },
   rug: { x: 0.12, y: 0.5, rotate: 6, flipX: false, width: 0.7, zIndex: 1 },
+  toy: { x: 0.55, y: 0.62, rotate: -3, flipX: false, width: 0.22, zIndex: 6 },
 };
 
 const SLOT_ORDER: PlacedRoomSlot[] = [
@@ -65,6 +66,7 @@ const SLOT_ORDER: PlacedRoomSlot[] = [
   "desk",
   "bed",
   "rug",
+  "toy",
 ];
 
 const WORM_DEFAULT: WormPosition = { x: 0.34, y: 0.7 };
