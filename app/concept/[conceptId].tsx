@@ -58,6 +58,15 @@ export default function ConceptScreen() {
     };
   }, []);
 
+  // conceptId 가 바뀌면(다음 개념 자동 이동 등) 풀이 진행 상태를 처음으로 리셋.
+  useEffect(() => {
+    setCurrentIndex(0);
+    setAnswerText("");
+    setSelectedChoice(null);
+    setResultModal(null);
+    startedAtRef.current = Date.now();
+  }, [safeConceptId]);
+
   const problems = data?.problems ?? [];
   const currentProblem = problems[currentIndex];
   const isMCQ = currentProblem?.problemType === "MCQ";
@@ -88,10 +97,17 @@ export default function ConceptScreen() {
   };
 
   const handleNext = () => {
+    const finished = resultModal;
     setResultModal(null);
     setAnswerText("");
     setSelectedChoice(null);
     startedAtRef.current = Date.now();
+
+    // 개념을 새로 클리어했고 다음 개념이 있으면 곧장 이어서 진행.
+    if (finished?.nodeNewlyCleared && finished.nextConceptId != null) {
+      router.replace(`/concept/${finished.nextConceptId}`);
+      return;
+    }
 
     if (isLast) {
       router.back();
