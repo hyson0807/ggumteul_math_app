@@ -4,8 +4,12 @@ import type { QueryClient } from "@tanstack/react-query";
 import { versionApi } from "@/services/versionApi";
 import { wormApi } from "@/services/worm";
 import { learningApi } from "@/services/learning";
-import { LEARNING_QUERY_KEYS } from "@/hooks/useLearning";
 import { shopApi } from "@/services/shop";
+import {
+  LEARNING_QUERY_KEYS,
+  WORM_QUERY_KEY,
+  SHOP_ITEMS_QUERY_KEY,
+} from "@/hooks/queryKeys";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { getCurrentAppVersion, isVersionBelow } from "@/utils/version";
 import { isUserOnboarded } from "@/utils/onboarding";
@@ -118,7 +122,7 @@ export function useStartupFlow(queryClient: QueryClient): StartupState {
         let currentStage = 1;
         try {
           const worm = await queryClient.ensureQueryData<WormState>({
-            queryKey: ["worm"],
+            queryKey: WORM_QUERY_KEY,
             queryFn: wormApi.getState,
           });
           if (worm?.stage && worm.stage > 0) currentStage = worm.stage;
@@ -137,7 +141,7 @@ export function useStartupFlow(queryClient: QueryClient): StartupState {
             queryFn: () => learningApi.getStageNodes(currentStage),
           }),
           queryClient.prefetchQuery({
-            queryKey: ["shop", "items"],
+            queryKey: SHOP_ITEMS_QUERY_KEY,
             queryFn: shopApi.listItems,
           }),
         ]);

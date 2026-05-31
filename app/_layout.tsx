@@ -1,11 +1,17 @@
 import "../global.css";
 import "react-native-gesture-handler";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Stack, useSegments, useRouter } from "expo-router";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import * as SplashScreen from "expo-splash-screen";
+import { queryClient } from "@/services/queryClient";
+import {
+  queryPersister,
+  PERSIST_MAX_AGE,
+  PERSIST_BUSTER,
+} from "@/services/queryPersister";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { Toast } from "@/components/common/Toast";
 import { BgmController } from "@/components/common/BgmController";
@@ -78,13 +84,16 @@ export default function RootLayout() {
 }
 
 function QueryProvider({ children }: { children: React.ReactNode }) {
-  const [client] = useState(
-    () =>
-      new QueryClient({
-        defaultOptions: {
-          queries: { staleTime: 30_000, retry: 1 },
-        },
-      }),
+  return (
+    <PersistQueryClientProvider
+      client={queryClient}
+      persistOptions={{
+        persister: queryPersister,
+        maxAge: PERSIST_MAX_AGE,
+        buster: PERSIST_BUSTER,
+      }}
+    >
+      {children}
+    </PersistQueryClientProvider>
   );
-  return <QueryClientProvider client={client}>{children}</QueryClientProvider>;
 }

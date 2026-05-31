@@ -2,6 +2,7 @@ import { useRef } from "react";
 import { Animated, Pressable, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useQueryClient } from "@tanstack/react-query";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors } from "@/constants/colors";
 import { feedback } from "@/utils/feedback";
@@ -11,7 +12,7 @@ import {
   STAGE_SCENES,
   type StageId,
 } from "@/constants/stages";
-import { useStages } from "@/hooks/useLearning";
+import { useStages, prefetchStageNodes } from "@/hooks/useLearning";
 import type { StageSummary } from "@/types/learning";
 
 // 6개 → 3행 2열
@@ -24,6 +25,7 @@ const STAGE_ROWS: StageId[][] = [
 export default function ConceptLearningScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const queryClient = useQueryClient();
   const { data, isLoading } = useStages();
 
   const summaryByStage = new Map<number, StageSummary>(
@@ -34,6 +36,12 @@ export default function ConceptLearningScreen() {
     feedback.tabPress();
     if (locked) return;
     router.push(`/stage/${stage}`);
+  };
+
+  // 카드를 누르는 순간 해당 스테이지 노드 맵을 선제 로드해 진입 지연 제거
+  // (locked 가드는 onPressIn 호출부에서 이미 처리)
+  const handlePrefetch = (stage: StageId) => {
+    prefetchStageNodes(queryClient, stage);
   };
 
   return (
@@ -124,6 +132,7 @@ export default function ConceptLearningScreen() {
                 summary={summaryByStage.get(stage)}
                 loading={isLoading}
                 onPress={handlePress}
+                onPrefetch={handlePrefetch}
               />
             ))}
           </View>
@@ -138,11 +147,13 @@ function StageCard({
   summary,
   loading,
   onPress,
+  onPrefetch,
 }: {
   stage: StageId;
   summary: StageSummary | undefined;
   loading: boolean;
   onPress: (stage: StageId, locked: boolean) => void;
+  onPrefetch: (stage: StageId) => void;
 }) {
   const scene = STAGE_SCENES[stage];
   const theme = STAGE_CARD_THEMES[stage];
@@ -174,7 +185,11 @@ function StageCard({
     <Animated.View style={{ flex: 1, transform: [{ scale }] }}>
       <Pressable
         onPress={() => onPress(stage, locked)}
-        onPressIn={() => !locked && animateTo(0.96)}
+        onPressIn={() => {
+          if (locked) return;
+          animateTo(0.96);
+          onPrefetch(stage);
+        }}
         onPressOut={() => !locked && animateTo(1)}
         accessibilityRole="button"
         accessibilityLabel={`${scene.grade}${locked ? " 잠김" : ""}`}

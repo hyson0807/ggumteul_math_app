@@ -1,8 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { wormApi } from "@/services/worm";
+import { SHOP_ITEMS_QUERY_KEY, WORM_QUERY_KEY } from "@/hooks/queryKeys";
 import type { EquipSlot } from "@/types/worm";
-
-const WORM_QUERY_KEY = ["worm"] as const;
 
 export const useWorm = () =>
   useQuery({
@@ -17,8 +16,7 @@ export const useEquipItem = () => {
       wormApi.equip(slot, shopItemId),
     onSuccess: (data) => {
       queryClient.setQueryData(WORM_QUERY_KEY, data);
-      queryClient.invalidateQueries({ queryKey: ["shop", "items"] });
-      queryClient.invalidateQueries({ queryKey: ["inventory"] });
+      queryClient.invalidateQueries({ queryKey: SHOP_ITEMS_QUERY_KEY });
     },
   });
 };
@@ -29,8 +27,7 @@ export const useUnequipItem = () => {
     mutationFn: ({ slot }: { slot: EquipSlot }) => wormApi.unequip(slot),
     onSuccess: (data) => {
       queryClient.setQueryData(WORM_QUERY_KEY, data);
-      queryClient.invalidateQueries({ queryKey: ["shop", "items"] });
-      queryClient.invalidateQueries({ queryKey: ["inventory"] });
+      queryClient.invalidateQueries({ queryKey: SHOP_ITEMS_QUERY_KEY });
     },
   });
 };

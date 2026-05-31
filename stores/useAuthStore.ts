@@ -2,6 +2,8 @@ import { create } from "zustand";
 import { authApi, User } from "@/services/auth";
 import { tokenService } from "@/services/token";
 import { getApiErrorMessage } from "@/services/api";
+import { queryClient } from "@/services/queryClient";
+import { queryPersister } from "@/services/queryPersister";
 
 interface AuthState {
   isAuthenticated: boolean;
@@ -56,6 +58,8 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({ isLoading: true, error: null });
     try {
       const { user } = await authApi.login(email, password);
+      // 이전 세션의 사용자별 캐시(worm/room/shop/진단 등) 잔여 제거
+      queryClient.clear();
       set({ isAuthenticated: true, user, isLoading: false });
     } catch (e: unknown) {
       set({ isLoading: false, error: getApiErrorMessage(e, "로그인에 실패했습니다.") });
@@ -67,6 +71,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({ isLoading: true, error: null });
     try {
       const { user } = await authApi.googleSignIn(idToken);
+      queryClient.clear();
       set({ isAuthenticated: true, user, isLoading: false });
     } catch (e: unknown) {
       set({
@@ -81,6 +86,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({ isLoading: true, error: null });
     try {
       const { user } = await authApi.appleSignIn(params);
+      queryClient.clear();
       set({ isAuthenticated: true, user, isLoading: false });
     } catch (e: unknown) {
       set({
@@ -95,6 +101,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({ isLoading: true, error: null });
     try {
       const { user } = await authApi.register(email, password);
+      queryClient.clear();
       set({ isAuthenticated: true, user, isLoading: false });
     } catch (e: unknown) {
       set({ isLoading: false, error: getApiErrorMessage(e, "회원가입에 실패했습니다.") });
@@ -106,6 +113,9 @@ export const useAuthStore = create<AuthState>((set) => ({
     try {
       await authApi.logout();
     } finally {
+      queryClient.clear();
+      // 디스크 영속 캐시도 즉시 폐기 (앱이 throttle flush 전에 종료돼도 누수 방지)
+      await queryPersister.removeClient();
       set({ isAuthenticated: false, user: null, error: null });
     }
   },
@@ -113,6 +123,8 @@ export const useAuthStore = create<AuthState>((set) => ({
   deleteAccount: async () => {
     try {
       await authApi.deleteAccount();
+      queryClient.clear();
+      await queryPersister.removeClient();
       set({ isAuthenticated: false, user: null, error: null });
     } catch (e: unknown) {
       set({ error: getApiErrorMessage(e, "계정 삭제에 실패했습니다.") });

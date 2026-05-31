@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { recommendationApi } from "@/services/recommendation";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useRecommendationSession } from "@/stores/useRecommendationSession";
-import { LEARNING_QUERY_KEYS } from "@/hooks/useLearning";
+import { LEARNING_QUERY_KEYS } from "@/hooks/queryKeys";
 import type { SubmitRecommendationAnswerPayload } from "@/types/recommendation";
 
 export const RECOMMENDATION_QUERY_KEYS = {

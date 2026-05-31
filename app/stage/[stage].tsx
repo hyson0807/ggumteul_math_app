@@ -7,11 +7,12 @@ import {
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useQueryClient } from "@tanstack/react-query";
 import Svg, { Circle, Path, Rect } from "react-native-svg";
 import { Colors } from "@/constants/colors";
 import { MAX_WORM_STAGE } from "@/constants/worm";
 import { STAGE_SCENES, type StageId } from "@/constants/stages";
-import { useStageNodes } from "@/hooks/useLearning";
+import { useStageNodes, prefetchConceptProblems } from "@/hooks/useLearning";
 import { ErrorState } from "@/components/common/ErrorState";
 import type { ConceptNode } from "@/types/learning";
 
@@ -41,6 +42,7 @@ function resolveNodeStatus(node: ConceptNode): NodeStatus {
 export default function StageScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const queryClient = useQueryClient();
   const { stage: stageParam } = useLocalSearchParams<{ stage: string }>();
   const parsed = Number.parseInt(stageParam ?? "1", 10);
   const safeStage =
@@ -123,6 +125,9 @@ export default function StageScreen() {
         onRetry={refetch}
         bottomInset={insets.bottom}
         onNodePress={(conceptId) => router.push(`/concept/${conceptId}`)}
+        onNodePrefetch={(conceptId) =>
+          prefetchConceptProblems(queryClient, conceptId)
+        }
       />
     </View>
   );
@@ -135,6 +140,7 @@ function StageBody({
   onRetry,
   bottomInset,
   onNodePress,
+  onNodePrefetch,
 }: {
   data: ReturnType<typeof useStageNodes>["data"];
   isLoading: boolean;
@@ -142,6 +148,7 @@ function StageBody({
   onRetry: () => void;
   bottomInset: number;
   onNodePress: (conceptId: number) => void;
+  onNodePrefetch: (conceptId: number) => void;
 }) {
   if (isLoading) {
     return (
@@ -195,6 +202,7 @@ function StageBody({
           index={idx}
           isLast={idx === data.nodes.length - 1}
           onPress={() => onNodePress(node.conceptId)}
+          onPrefetch={() => onNodePrefetch(node.conceptId)}
         />
       ))}
     </ScrollView>
@@ -206,11 +214,13 @@ function NodeRow({
   index,
   isLast,
   onPress,
+  onPrefetch,
 }: {
   node: ConceptNode;
   index: number;
   isLast: boolean;
   onPress: () => void;
+  onPrefetch: () => void;
 }) {
   const status = resolveNodeStatus(node);
   const disabled = status === "locked" || status === "unavailable";
@@ -219,6 +229,7 @@ function NodeRow({
   return (
     <TouchableOpacity
       onPress={onPress}
+      onPressIn={disabled ? undefined : onPrefetch}
       disabled={disabled}
       activeOpacity={disabled ? 1 : 0.8}
       style={{ flexDirection: "row", gap: 14, alignItems: "stretch" }}

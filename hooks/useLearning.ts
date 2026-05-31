@@ -1,28 +1,31 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+  type QueryClient,
+} from "@tanstack/react-query";
 import { learningApi } from "@/services/learning";
 import { useAuthStore } from "@/stores/useAuthStore";
+import { LEARNING_QUERY_KEYS, WORM_QUERY_KEY } from "@/hooks/queryKeys";
 import type {
   CompleteDiagnosticPayload,
   SubmitAnswerPayload,
 } from "@/types/learning";
 
-export const LEARNING_QUERY_KEYS = {
-  all: ["learning"] as const,
-  stages: () => [...LEARNING_QUERY_KEYS.all, "stages"] as const,
-  stageNodes: (stage: number) =>
-    [...LEARNING_QUERY_KEYS.all, "stage", stage, "nodes"] as const,
-  conceptProblems: (conceptId: number) =>
-    [...LEARNING_QUERY_KEYS.all, "concept", conceptId, "problems"] as const,
-  diagnosticProblems: (grade: number) =>
-    [...LEARNING_QUERY_KEYS.all, "diagnostic", "problems", grade] as const,
-  diagnosticResult: () =>
-    [...LEARNING_QUERY_KEYS.all, "diagnostic", "result"] as const,
-  diagnosticProfile: () =>
-    [...LEARNING_QUERY_KEYS.all, "diagnostic", "profile"] as const,
-  attendance: () => [...LEARNING_QUERY_KEYS.all, "attendance"] as const,
-};
+const isValidId = (id: number) => Number.isFinite(id) && id > 0;
 
-const WORM_QUERY_KEY = ["worm"] as const;
+// 훅과 prefetch 헬퍼가 동일한 queryKey/queryFn/staleTime 을 공유하도록 설정을
+// 한 곳에서 만든다 (single source of truth).
+const stageNodesQuery = (stage: number) => ({
+  queryKey: LEARNING_QUERY_KEYS.stageNodes(stage),
+  queryFn: () => learningApi.getStageNodes(stage),
+  staleTime: 5 * 60_000,
+});
+
+const conceptProblemsQuery = (conceptId: number) => ({
+  queryKey: LEARNING_QUERY_KEYS.conceptProblems(conceptId),
+  queryFn: () => learningApi.getConceptProblems(conceptId),
+});
 
 export const useStages = () =>
   useQuery({
@@ -31,19 +34,22 @@ export const useStages = () =>
   });
 
 export const useStageNodes = (stage: number) =>
-  useQuery({
-    queryKey: LEARNING_QUERY_KEYS.stageNodes(stage),
-    queryFn: () => learningApi.getStageNodes(stage),
-    enabled: Number.isFinite(stage) && stage > 0,
-    staleTime: 5 * 60_000,
-  });
+  useQuery({ ...stageNodesQuery(stage), enabled: isValidId(stage) });
 
 export const useConceptProblems = (conceptId: number | null) =>
   useQuery({
-    queryKey: LEARNING_QUERY_KEYS.conceptProblems(conceptId ?? -1),
-    queryFn: () => learningApi.getConceptProblems(conceptId as number),
+    ...conceptProblemsQuery(conceptId ?? -1),
     enabled: conceptId != null && conceptId > 0,
   });
+
+// 네비게이션 직전(카드/노드 onPressIn)에 다음 화면 데이터를 선제 로드한다.
+export const prefetchStageNodes = (qc: QueryClient, stage: number) => {
+  if (isValidId(stage)) qc.prefetchQuery(stageNodesQuery(stage));
+};
+
+export const prefetchConceptProblems = (qc: QueryClient, conceptId: number) => {
+  if (isValidId(conceptId)) qc.prefetchQuery(conceptProblemsQuery(conceptId));
+};
 
 export const useDiagnosticProblems = (grade: number | null) =>
   useQuery({
