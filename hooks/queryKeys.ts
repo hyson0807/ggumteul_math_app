@@ -13,6 +13,7 @@ export const LEARNING_QUERY_KEYS = {
     [...LEARNING_QUERY_KEYS.all, "diagnostic", "result"] as const,
   diagnosticProfile: () =>
     [...LEARNING_QUERY_KEYS.all, "diagnostic", "profile"] as const,
+  conceptStatus: () => [...LEARNING_QUERY_KEYS.all, "concept-status"] as const,
   attendance: () => [...LEARNING_QUERY_KEYS.all, "attendance"] as const,
 };
 

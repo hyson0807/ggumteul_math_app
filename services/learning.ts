@@ -4,6 +4,7 @@ import type {
   CompleteDiagnosticPayload,
   CompleteDiagnosticResponse,
   ConceptProblemsResponse,
+  ConceptStatusResponse,
   DiagnosticProblem,
   DiagnosticProfileResponse,
   DiagnosticResultResponse,
@@ -72,6 +73,13 @@ export const learningApi = {
 
   getAttendance: async () => {
     const { data } = await api.get<AttendanceResponse>("/learning/attendance");
+    return data;
+  },
+
+  getConceptStatus: async () => {
+    const { data } = await api.get<ConceptStatusResponse>(
+      "/learning/concept-status",
+    );
     return data;
   },
 };

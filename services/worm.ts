@@ -19,4 +19,9 @@ export const wormApi = {
     const { data } = await api.post<WormState>("/worm/unequip", { slot });
     return data;
   },
+
+  feed: async () => {
+    const { data } = await api.post<WormState>("/worm/feed");
+    return data;
+  },
 };

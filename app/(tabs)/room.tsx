@@ -224,7 +224,7 @@ export default function RoomScreen() {
           <View className="relative">
             <RoomCanvas
               room={room?.equipped}
-              worm={worm?.equipped}
+              wormLevel={worm?.level}
               layout={room?.layout}
               draftLayout={editMode ? draftLayout : undefined}
               editMode={editMode}

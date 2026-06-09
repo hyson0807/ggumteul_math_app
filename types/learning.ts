@@ -79,6 +79,8 @@ export interface SubmitAnswerResponse {
   correct: boolean;
   coinsEarned: number;
   starsEarned: number;
+  /** 개념을 새로 클리어해 받은 먹이 수 (클리어 시 1, 그 외 0). */
+  feedEarned: number;
   nodeNewlyCleared: boolean;
   stageNewlyCleared: boolean;
   /** 개념을 새로 클리어했을 때, 곧장 이어서 풀 다음 미클리어 개념 id (없으면 null). */
@@ -153,6 +155,18 @@ export interface DiagnosticProfileResponse {
   strong: DiagnosticProfileItem[];
   weak: DiagnosticProfileItem[];
   fetchedAt: string;
+}
+
+export interface ConceptStatusItem {
+  conceptId: number;
+  conceptName: string;
+  grade: number;
+  semester: number;
+}
+
+export interface ConceptStatusResponse {
+  growing: ConceptStatusItem[]; // 🌱 성장중
+  struggling: ConceptStatusItem[]; // 🔥 연속 오답
 }
 
 export interface AttendanceResponse {

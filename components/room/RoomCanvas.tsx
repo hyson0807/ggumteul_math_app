@@ -10,7 +10,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { API_BASE_URL } from "@/services/api";
 import { Colors } from "@/constants/colors";
-import { WormSprite } from "@/components/worm/WormSprite";
+import { caterpillarImage } from "@/constants/caterpillars";
 import { FloatingToolbar } from "@/components/room/FloatingToolbar";
 import type {
   FurnitureSlotPosition,
@@ -20,13 +20,12 @@ import type {
   WormPosition,
 } from "@/types/room";
 import type { ShopItem } from "@/types/shop";
-import type { WormState } from "@/types/worm";
 
 export type EditSelection = PlacedRoomSlot | "worm" | null;
 
 interface Props {
   room: RoomState["equipped"] | undefined;
-  worm?: WormState["equipped"];
+  wormLevel?: number;
   layout?: RoomLayout | null;
   draftLayout?: RoomLayout;
   editMode?: boolean;
@@ -246,7 +245,7 @@ function DraggableFurniture({
 }
 
 function DraggableWorm({
-  worm,
+  level,
   position,
   editMode,
   selected,
@@ -255,7 +254,7 @@ function DraggableWorm({
   canvasW,
   canvasH,
 }: {
-  worm?: WormState["equipped"];
+  level: number;
   position: WormPosition;
   editMode: boolean;
   selected: boolean;
@@ -327,7 +326,14 @@ function DraggableWorm({
     zIndex: selected ? WORM_Z_INDEX + 100 : WORM_Z_INDEX,
   };
 
-  const content = <WormSprite equipped={worm} size={0.85} />;
+  const content = (
+    <Image
+      source={caterpillarImage(level)}
+      style={{ width: "100%", aspectRatio: 1 }}
+      contentFit="contain"
+      transition={150}
+    />
+  );
 
   if (!editMode) {
     return (
@@ -398,7 +404,7 @@ function EmptySlot({
 
 export function RoomCanvas({
   room,
-  worm,
+  wormLevel,
   layout,
   draftLayout,
   editMode = false,
@@ -548,7 +554,7 @@ export function RoomCanvas({
 
       {showWorm && (
         <DraggableWorm
-          worm={worm}
+          level={wormLevel ?? 1}
           position={wormPos}
           editMode={editMode}
           selected={selected === "worm"}

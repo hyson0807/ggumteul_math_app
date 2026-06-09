@@ -95,6 +95,16 @@ export const useDiagnosticProfile = () => {
   });
 };
 
+export const useConceptStatus = () => {
+  const completedAt = useAuthStore((s) => s.user?.diagnosticCompletedAt);
+  return useQuery({
+    queryKey: LEARNING_QUERY_KEYS.conceptStatus(),
+    queryFn: learningApi.getConceptStatus,
+    enabled: !!completedAt,
+    staleTime: 5 * 60_000,
+  });
+};
+
 export const useAttendance = () => {
   const completedAt = useAuthStore((s) => s.user?.diagnosticCompletedAt);
   return useQuery({
@@ -115,6 +125,10 @@ export const useSubmitAnswer = () => {
       // 푼 문제의 solved 플래그가 바뀌므로 concept problems 쿼리는 항상 갱신.
       queryClient.invalidateQueries({
         queryKey: [...LEARNING_QUERY_KEYS.all, "concept"],
+      });
+      // 학습 기록이 추가됐으므로 개념 상태(성장중/연속오답) 갱신
+      queryClient.invalidateQueries({
+        queryKey: LEARNING_QUERY_KEYS.conceptStatus(),
       });
       // stages/stageNodes/worm 상태는 클리어 변화가 있을 때만 갱신.
       if (data.nodeNewlyCleared || data.stageNewlyCleared) {

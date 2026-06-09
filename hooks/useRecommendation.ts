@@ -55,6 +55,9 @@ export const useSubmitRecommendationAnswer = () => {
         queryClient.invalidateQueries({
           queryKey: LEARNING_QUERY_KEYS.attendance(),
         });
+        queryClient.invalidateQueries({
+          queryKey: LEARNING_QUERY_KEYS.conceptStatus(),
+        });
       }
     },
   });

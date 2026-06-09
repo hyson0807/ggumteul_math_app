@@ -8,6 +8,8 @@ export interface LearningResult {
   correct: boolean;
   coinsEarned: number;
   starsEarned: number;
+  /** 개념 학습 클리어 보상. 추천 세션 응답에는 없으므로 optional. */
+  feedEarned?: number;
   correctAnswer: string;
   explanation: string | null;
   nodeNewlyCleared?: boolean;
@@ -81,24 +83,36 @@ export function ResultSheet({
           </Text>
         </View>
 
-        {result.correct && (
-          <View
-            style={{ flexDirection: "row", justifyContent: "center", gap: 14 }}
-          >
-            <StatChip
-              label="코인"
-              value={`+${result.coinsEarned}`}
-              tint={Colors.coin}
-            />
-            {result.starsEarned > 0 && (
-              <StatChip
-                label="별"
-                value={`+${result.starsEarned}`}
-                tint={Colors.star}
-              />
-            )}
-          </View>
-        )}
+        {result.correct &&
+          (result.coinsEarned > 0 ||
+            (result.feedEarned ?? 0) > 0 ||
+            result.starsEarned > 0) && (
+            <View
+              style={{ flexDirection: "row", justifyContent: "center", gap: 14 }}
+            >
+              {result.coinsEarned > 0 && (
+                <StatChip
+                  label="코인"
+                  value={`+${result.coinsEarned}`}
+                  tint={Colors.coin}
+                />
+              )}
+              {(result.feedEarned ?? 0) > 0 && (
+                <StatChip
+                  label="먹이"
+                  value={`+${result.feedEarned}`}
+                  tint={Colors.cta}
+                />
+              )}
+              {result.starsEarned > 0 && (
+                <StatChip
+                  label="별"
+                  value={`+${result.starsEarned}`}
+                  tint={Colors.star}
+                />
+              )}
+            </View>
+          )}
 
         {!result.correct && (
           <View

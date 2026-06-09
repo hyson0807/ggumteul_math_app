@@ -12,6 +12,9 @@ export interface User {
   stars: number;
   wormStage: number;
   wormProgress: number;
+  feed: number;
+  feedConsumed: number;
+  wormLevel: number;
   equippedHatId: string | null;
   equippedBodyId: string | null;
   equippedAccessoryId: string | null;
