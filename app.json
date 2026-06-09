@@ -71,7 +71,7 @@
     },
     "updates": {
       "enabled": true,
-      "checkAutomatically": "ON_ERROR_RECOVERY",
+      "checkAutomatically": "ON_LOAD",
       "fallbackToCacheTimeout": 0,
       "url": "https://u.expo.dev/7afb0c27-e40b-4ba1-ae12-67101fef154b"
     },
