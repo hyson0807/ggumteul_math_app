@@ -19,6 +19,9 @@ import type {
 } from "@/types/learning";
 import type { RecommendationHistoryItem } from "@/types/recommendation";
 
+// 추천 한 세션의 문제 수 (백엔드 SESSION_SIZE 와 동일) — 완료 세션 판정에 사용
+const RECOMMENDATION_SESSION_SIZE = 5;
+
 export default function AnalysisScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
@@ -47,14 +50,14 @@ export default function AnalysisScreen() {
           <>
             <AttendanceCard data={attendanceData} isLoading={attendanceLoading} />
             <View style={{ height: 14 }} />
-            <AccuracyCard data={historyData ?? []} isLoading={historyLoading} />
-            <View style={{ height: 14 }} />
             <DktSection
               weak={profile?.weak ?? []}
               strong={profile?.strong ?? []}
               isLoading={profileLoading}
               onRetry={goConcept}
             />
+            <View style={{ height: 14 }} />
+            <AccuracyCard data={historyData ?? []} isLoading={historyLoading} />
             <View style={{ height: 14 }} />
             <ConceptStatusSection
               data={conceptStatus}
@@ -109,7 +112,10 @@ function AccuracyCard({
   isLoading: boolean;
 }) {
   // history 는 최신 → 오래된 순. 그래프는 오래된 → 최신.
-  const sessions = [...data].reverse().filter((s) => s.totalProblems > 0);
+  // 완료된 세션(5문제)만 한 점으로 — 중단/진행 중 부분 세션은 추이를 왜곡하므로 제외.
+  const sessions = [...data]
+    .reverse()
+    .filter((s) => s.totalProblems >= RECOMMENDATION_SESSION_SIZE);
   const points = sessions
     .map((s) => Math.round((s.correctCount / s.totalProblems) * 100))
     .slice(-12);
@@ -148,7 +154,7 @@ function AccuracyCard({
       ) : (
         <>
           <AccuracyLineChart points={points} />
-          {comment && (
+          {comment ? (
             <View
               style={{
                 marginTop: 12,
@@ -163,6 +169,17 @@ function AccuracyCard({
                 {comment.text}
               </Text>
             </View>
+          ) : (
+            <Text
+              style={{
+                marginTop: 12,
+                fontSize: 12,
+                color: Colors.textSecondary,
+                textAlign: "center",
+              }}
+            >
+              세션을 더 풀면 정답률 추이를 보여드릴게요
+            </Text>
           )}
         </>
       )}
@@ -386,7 +403,7 @@ function ConceptStatusSection({
         </Text>
       </View>
       <Text style={{ fontSize: 12, color: Colors.textSecondary, marginBottom: 16 }}>
-        최근 학습에서 성장한 개념과 더 챙겨야 할 개념이에요
+        최근 일주일 추천 학습에서 성장한 개념과 더 챙겨야 할 개념이에요
       </Text>
 
       {isLoading ? (
