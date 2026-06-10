@@ -57,7 +57,7 @@ export default function SettingsScreen() {
   };
 
   const appVersion =
-    Application.nativeApplicationVersion ?? "1.0.1";
+    Application.nativeApplicationVersion ?? "1.0.2";
 
   return (
     <View
